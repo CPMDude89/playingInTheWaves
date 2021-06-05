@@ -1,17 +1,26 @@
 let soundFile;
 let isLoadedTest;
+let reverseTest = false;
+let onendedTest;
 let playButton;
 let loopButton;
 let pauseButton;
 let jumpButton;
 let stopButton;
+let reverseButton;
+let removeCueButton;
+let clearCuesButton;
 let volumeSlider;
 let panSlider;
 let rateSlider;
+let cuedText = "";
+let cueID;
+
 
 function preload() 
 {
   //soundFormats('ogg', 'mp3'); 
+  soundFile = loadSound('sounds/mothership_short.mp3');
 }
 
 function playSong()
@@ -39,10 +48,47 @@ function stopSong()
     soundFile.stop();
 }
 
+function onEndedFunction()
+{
+    console.log("onended() is telling you that the audio has ended");
+}
+
+function reverseSong()
+{
+    if (reverseTest)    //  flip print statement if buffer is reversed or not
+    {
+        reverseTest = false;
+    }
+    else
+    {
+        reverseTest = true;
+    }
+
+    //soundFile.stop();
+    soundFile.pause();
+    soundFile.reverseBuffer();
+    soundFile.play();
+}
+
+function changeCuedText(text_)
+{
+    cuedText = text_;
+}
+
+function removeLastCue()
+{
+    soundFile.removeCue(cueID);
+}
+
+function clearCuesFunction()
+{
+    soundFile.clearCues();
+}
+
 function setup()
 {
     let canv = createCanvas(800, 500);
-    soundFile = loadSound('sounds/mothership_short.mp3');
+    
 
     //  song control buttons
     playButton = createButton("PLAY SONG"); //  play button
@@ -60,6 +106,15 @@ function setup()
     stopButton = createButton("STOP SONG"); //  stop button
     stopButton.mousePressed(stopSong);
 
+    reverseButton = createButton("REVERSE BUFFER"); //  reverse button
+    reverseButton.mousePressed(reverseSong);
+
+    removeCueButton = createButton("REMOVE LAST CUE");  //  removeCue()
+    removeCueButton.mousePressed(removeLastCue);
+
+    clearCuesButton = createButton("CLEAR ALL CUES");   //  clearCues()
+    clearCuesButton.mousePressed(clearCuesFunction);
+
     //  volume control
     volumeSlider = createSlider(0, 1.0, 0.4, 0.01);
 
@@ -68,13 +123,13 @@ function setup()
 
     // playback rate control
     rateSlider = createSlider(-3.0, 3.0, 1.0, 0.01);
-}
-
-
+} 
 
 function draw()
 {
     background(102, 153, 0);    //  call background() every frame to clear old text
+
+    soundFile.onended(onEndedFunction);     //  sends a message to the console if the song ends
 
     //  check isLoaded()
     let isLoadedX;
@@ -103,8 +158,13 @@ function draw()
     soundFile.rate(rateSlider.value());
     let rateControlVal = "Song's playback rate is currently: " + rateSlider.value();
 
-
     testFunction(isLoadedText, isLoadedX, volControlVal, panControlVal, rateControlVal);
+    
+    soundFile.addCue(0.0, changeCuedText, "addCue() is triggering");
+    soundFile.addCue(1.0, changeCuedText, "addCue() is triggering these words");
+    soundFile.addCue(1.5, changeCuedText, "addCue() is triggering these words that are");
+    //  check to see if I'm doing this right
+    cueID = soundFile.addCue(2.0, changeCuedText, "addCue() is triggering these words that are being printed to the screen!");
 }
 
 function testFunction(isLoadedText_, isLoadedX_, volControlVal_, panControlVal_, rateControlVal_)
@@ -122,5 +182,9 @@ function testFunction(isLoadedText_, isLoadedX_, volControlVal_, panControlVal_,
     text("This audio file has this many channels: " + soundFile.channels(), 100, 180);
     text("This audio file's sample rate is: " + soundFile.sampleRate(), 100, 200);
     text("The amount of 'frames' in this audio file is: " + soundFile.frames(), 100, 220);
-
+    text("The audio buffer is reversed true/false: " + reverseTest, 100, 240);
+    text("isPlaying() is returning: " + soundFile.isPlaying(), 100, 260);
+    text("isLooping() is returning: " + soundFile.isLooping(), 100, 280);
+    text("isPaused() is returning: " + soundFile.isPaused(), 100, 300);
+    text(cuedText, 100, 320);
 }
