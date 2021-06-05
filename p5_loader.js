@@ -1,6 +1,22 @@
 var song;
 var button; 
 
+
+function togglePlaying() {
+    if (!song.isPlaying()) {
+        song.play();
+        button.html("Pause");
+        console.log("Song IS playing!");
+        console.log(song.isPlaying());
+    } 
+    else {
+         song.pause();
+         button.html("Play");
+         console.log("Song is NOT playing!");
+    }
+    
+}
+
 function setup() {
     createCanvas(400, 400);
     song = loadSound("sounds/mothership.mp3", loaded);
@@ -9,17 +25,7 @@ function setup() {
     slider = createSlider(0, 1, 0.5, 0.01);
 }
 
-function togglePlaying() {
-    if (!song.isPlaying()) {
-        song.play();
-        button.html("Pause");
-    } 
-    else {
-         song.pause();
-         button.html("Play");
-    }
-    
-}
+
 
 function loaded() {
     console.log("Loaded!");
