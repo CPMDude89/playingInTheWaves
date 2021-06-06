@@ -10,11 +10,17 @@ let stopButton;
 let reverseButton;
 let removeCueButton;
 let clearCuesButton;
+let ampButton;
+let fftButton;
 let volumeSlider;
 let panSlider;
 let rateSlider;
 let cuedText = "";
 let cueID;
+let amp;
+let ampActive = false;
+let fft;
+let fftActive = false;
 
 
 function preload() 
@@ -85,10 +91,37 @@ function clearCuesFunction()
     soundFile.clearCues();
 }
 
+function toggleAmp()
+{
+    if (ampActive)
+    {
+        ampActive = false;
+    }
+    else
+    {
+        ampActive = true;
+    }
+}
+
+function toggleFFT()
+{
+    if (fftActive)
+    {
+        fftActive = false;
+    }
+    else
+    {
+        fftActive = true;
+    }
+}
+
 function setup()
 {
-    let canv = createCanvas(800, 500);
-    
+    let canv = createCanvas(1024, 500);
+    amp = new p5.Amplitude();
+    //mic = new p5.AudioIn(); 
+    //mic.start();
+    fft = new p5.FFT();
 
     //  song control buttons
     playButton = createButton("PLAY SONG"); //  play button
@@ -115,6 +148,12 @@ function setup()
     clearCuesButton = createButton("CLEAR ALL CUES");   //  clearCues()
     clearCuesButton.mousePressed(clearCuesFunction);
 
+    ampButton = createButton("TOGGLE AMP SENSE");   //  clear reactive amplitude ellipse
+    ampButton.mousePressed(toggleAmp);
+
+    fftButton = createButton("TOGGLE FFT");   //  clear fft
+    fftButton.mousePressed(toggleFFT);
+
     //  volume control
     volumeSlider = createSlider(0, 1.0, 0.4, 0.01);
 
@@ -125,9 +164,37 @@ function setup()
     rateSlider = createSlider(-3.0, 3.0, 1.0, 0.01);
 } 
 
+
 function draw()
 {
     background(102, 153, 0);    //  call background() every frame to clear old text
+
+    if (ampActive)
+    {
+        //  draw amplitude ellipse to demonstrate p5.Amplitude()
+        var vol = amp.getLevel();
+        var diam = map(vol, 0.0, 1.0, 50, 200);
+
+        fill(120);
+        ellipse(800, 50, diam);
+        fill(0);
+    }
+
+    //  use FFT() to draw spectrum analysis at bottom of canvas
+    if (fftActive)
+    {
+        var spectrum = fft.analyze();
+        stroke(225);
+        for (let i = 0; i < spectrum.length; i++)
+        {
+            let specAmp = spectrum[i];
+            let y_Val = map(specAmp, 0.0, 255, height, 0.0);
+            line(i, height, i, y_Val);
+        }
+        noStroke();
+    }
+
+
 
     soundFile.onended(onEndedFunction);     //  sends a message to the console if the song ends
 
