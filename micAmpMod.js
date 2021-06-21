@@ -3,8 +3,7 @@ let state = 0;
 let playButton;
 let loopButton;
 let stopButton;
-let ampModButton;
-let ampModSlider;
+
 let ampModToggle = false;
 let phase = 0;
 let ampMod = 0;
@@ -80,11 +79,6 @@ function makeInterface() {
     stopButton = createButton('STOP');
     stopButton.mousePressed(stopSoundFile);
 
-    ampModButton = createButton('AMP MOD VIA DRAW');
-    ampModButton.mousePressed(activateAmpMod);
-
-    ampModSlider = createSlider(0.1, 10, 4.0, 0.1);
-
     oscAmpModButton = createButton('AMP MOD VIA OSC');
     oscAmpModButton.mousePressed(activateOscAmpMod);
 
@@ -103,21 +97,11 @@ function stopSoundFile() {
     soundFile.stop();
 }
 
-function activateAmpMod() {
-    if (!ampModToggle) {
-        ampModToggle = true;
-    }
-    else {
-        ampModToggle = false;
-    }
-}
-
 function activateOscAmpMod() {
     if (!oscAmpModToggle) {
         oscAmpModToggle = true;
         osc.start()
         osc.disconnect();
-        osc.connect(soundFile);
         osc.amp(1.0);
         osc.freq(oscAmpModSlider.value());
     }
@@ -128,15 +112,6 @@ function activateOscAmpMod() {
 }
 
 function draw() {
-
-    if (ampModToggle) {
-        ampMod = map(sin(phase), -1, 1, 0.001, 0.9);
-
-        phase += ampModSlider.value();
-
-        soundFile.setVolume(ampMod, 0.01);
-    }
-    //console.log(ampMod);
 
     if (oscAmpModToggle) {
         osc.freq(oscAmpModSlider.value());

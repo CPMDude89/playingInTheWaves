@@ -4,6 +4,7 @@ let reverseTest = false;
 let onendedTest;
 let playButton;
 let loopButton;
+let setLoopButton;
 let pauseButton;
 let jumpButton;
 let stopButton;
@@ -39,6 +40,18 @@ function loopSong()
     soundFile.loop();
 }
 
+function changeLoopStatus()
+{
+    if (soundFile.isLooping() == true)
+    {
+        soundFile.setLoop(false);
+    }
+    else
+    {
+        soundFile.setLoop(true);
+    }
+}
+
 function jumpTo1Sec()
 {
     soundFile.jump(1.0);
@@ -71,7 +84,7 @@ function reverseSong()
     }
 
     //soundFile.stop();
-    soundFile.pause();
+    //soundFile.pause();
     soundFile.reverseBuffer();
     soundFile.play();
 }
@@ -129,6 +142,9 @@ function setup()
 
     loopButton = createButton("LOOP SONG"); //  loop button
     loopButton.mousePressed(loopSong);
+
+    setLoopButton = createButton("SET LOOP");   //  change loop status
+    setLoopButton.mousePressed(changeLoopStatus);
 
     jumpButton = createButton("JUMP TO 1 SEC"); //  jump button
     jumpButton.mousePressed(jumpTo1Sec);
@@ -253,5 +269,6 @@ function testFunction(isLoadedText_, isLoadedX_, volControlVal_, panControlVal_,
     text("isPlaying() is returning: " + soundFile.isPlaying(), 100, 260);
     text("isLooping() is returning: " + soundFile.isLooping(), 100, 280);
     text("isPaused() is returning: " + soundFile.isPaused(), 100, 300);
-    text(cuedText, 100, 320);
+    text("getPan() is returning: " + soundFile.getPan(), 100, 320);
+    text(cuedText, 100, 340);
 }
