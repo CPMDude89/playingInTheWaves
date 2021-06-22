@@ -7,10 +7,10 @@ let playheadMonitor = 0, playheadActive = false;
 let progBarWidth = w/6, progBarHeight = h/28, progBarX = 3.2 * (w/4), progBarY = 1.01 * h/5;
 let loopingActive = false;
 let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
-let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5;
-let clearButton, clearButtonY; 
-let lfo1, lfo2, lfoButton1, lfoButton2, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave, lfoOut;
+let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5, clearButton;
+let lfo1, lfoButton1, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave;
 let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.5, rect1X = (w/18), rect1Y = 0.9 * (h/4);
+
 
 
 function preload()
@@ -76,34 +76,35 @@ function draw()
         noFill();
         strokeWeight(2);
         rectMode(CORNER);
-        rect(progBarX, progBarY, progBarWidth, progBarHeight);
-        //  fill progress bar 
-        fill(113, 218, 113);
-        playheadMonitor = map(soundFile1.currentTime(), 0, soundFile1.duration(), 0, progBarWidth);
-        rect(progBarX, progBarY, playheadMonitor, progBarHeight);
-    }
+        rect(progBarX, progBarY, progBarWidth, progBarHeight); // draw prog bar borders
 
-    lfo1.freq(lfoFreqSlider.value());
+        //  fill progress bar 
+        fill(113, 218, 113);    //  sage green
+        playheadMonitor = map(soundFile1.currentTime(), 0, soundFile1.duration(), 0, progBarWidth);
+        rect(progBarX, progBarY, playheadMonitor, progBarHeight);   //  draw prog bar filling
+    }
 
     //  draw lfo visualizer
     rectMode(CORNER);
-    fill(0);
+    fill(0);    //  black
+    rect(rect1X, rect1Y, lfoVizRectWidth, lfoVizRectHeight);    //  lfo viz container
 
-    rect(rect1X, rect1Y, lfoVizRectWidth, lfoVizRectHeight);
-
-    fill(113, 218, 113);
+    fill(113, 218, 113);    //  sage green
 
     if (lfoActive1) {
-        let r = 50
-        let min = (rect1Y + lfoVizRectHeight)-r;
-        let max = rect1Y + r;
+        let r = 50  //  circle radius
+        let min = (rect1Y + lfoVizRectHeight)-r;    //  bottom of container
+        let max = rect1Y + r;   //  top of container
+        
+        let lfoY = map(getLFO1_out(), -1, 1, min, max);
+        circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
 
-        lfoWave = lfoAnalyzer1.waveform();
-        let lfoY = map(lfoWave[0], -1, 1, min, max);
-        circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);
-        lfoOut = map(lfoWave[0], -1, 1, 0, 1);
-        soundFile1.setVolume(lfoOut, 0.01);
-        lfo1.amp(lfoAmpSlider.value());
+        let vol = map(getLFO1_out(), -1, 1, 0, 1);
+        soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
+        
+        //  set slider values to lfo properties
+        lfo1.freq(lfoFreqSlider.value());
+        lfo1.amp(lfoAmpSlider.value(), 0.001);
     }
 }
 
@@ -115,18 +116,14 @@ function record1()
 {
     //  make sure audio is good to go
     userStartAudio();
-
     //  make sure user has mic enabled
     if (state1 === 0 && mic.enabled) {
-
         //  record into p5.SoundFile after 80 milliseconds to get past mouse click
         setTimeout(function() {recorder.record(soundFile1, 10)}, 120);
-
         recorderButton1.html('RECORDING!')
         state1++;
     }
     else if(state1 === 1) {
-
         //  stop recorder and 
         //  send result to soundFile
         recorder.stop();
@@ -140,12 +137,16 @@ function record1()
         recorderButton1.html('PLAY RECORDING');
         state1++;
     }
-
     else if (state1 === 2) {
         soundFile1.play();
         soundFile1.jump(0);
         playheadActive = soundFile1.isPlaying();
     }
+}
+
+function getLFO1_out() {
+    lfoWave = lfoAnalyzer1.waveform();
+    return lfoWave[0];
 }
 
 function addLoopButton() {
