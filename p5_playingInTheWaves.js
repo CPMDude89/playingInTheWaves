@@ -4,14 +4,18 @@ let mic, recorder, soundFile1;
 let recorderButton1, recButtonWidth = w/12, recButtonHeight = h/12, recButtonX = 2.75 * (w/4), recButtonY = h/5;
 let state1 = 0;
 let playheadMonitor = 0, playheadActive = false;
-let progBarWidth = w/6, progBarHeight = h/28, progBarX = 3.2 * (w/4), progBarY = 1.01 * h/5;
+let progBarWidth = w/6, progBarHeight = h/28, progBarX = 2.417 * (w/4), progBarY = 0.75 * h/5;
 let loopingActive = false;
 let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
 let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5, clearButton;
-let lfo1, lfoButton1, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave;
-let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.5, rect1X = (w/18), rect1Y = 0.9 * (h/4);
-let delay, delayButton, delayActive = false, delayButtonX = 2 * (w/4), delayButtonY = 1.103 * (h/5), delayButtonWidth = w/15, delayButtonHeight = h/25;
-let delayTimeSlider, delayFeedbackSlider;
+let ampLFO, ampLFOButton, ampLFOButtonX= 3.9 * (w/5), ampLFOButtonY= 1.103 * (h/5), ampLFOActive=false, ampLFOAnalyzer, lfoWave;
+let ampModFreqSlider, ampModDepthSlider;
+let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.6, rect1X = (w/18), rect1Y = 0.75 * (h/4);
+let delay, delayButton, delayActive = false, delayButtonX = 3.15 * (w/6), delayButtonY = 1.103 * (h/5), 
+    delayButtonWidth = (w/15), delayButtonHeight = h/25;
+let delayTimeSlider, delayFeedbackSlider; 
+let delayLFO, delayLFOButton, delayLFOActive=false, delayLFOViz=false, delayLFOFreqSlider, delayLFODepthSlider;
+let ampModVizButton, ampModVizActive=false, delayLFOVizButton, delayLFOVizActive=false;
 
 
 
@@ -40,23 +44,17 @@ function setup()
     recorderButton1.size(recButtonWidth, recButtonHeight);
     recorderButton1.mousePressed(record1);
 
-    lfo1 = new p5.Oscillator('sine');
-    lfoButton1 = createButton('ACTIVATE LFO 1');
-    lfoButton1.position(w/20, h/12);
-    lfoButton1.mousePressed(LFO1Activate);
-
-    lfoFreqSlider = createSlider(0.001, 15.0, 8.0, 0.001);
-    lfoFreqSlider.position(w/34, (h/8));
-    lfoFreqSlider.size(w/9, h/150);
+    ampLFO = new p5.Oscillator('sine');
     
-    lfoAmpSlider = createSlider(0.001, 1.0, 1.0, 0.001);
-    lfoAmpSlider.position(w/34, h/6);
-    lfoAmpSlider.size(w/9, h/150);
+    createSliders() //  make control sliders, but hide them
 
-    lfoAnalyzer1 = new p5.FFT();
+    ampLFOAnalyzer = new p5.FFT();
+    delayLFOAnalyzer = new p5.FFT();
     
     delay = new p5.Delay();
     delay.disconnect();
+
+    delayLFO = new p5.Oscillator;
 }
 // ======================================================== DRAW ======================================================== //
 // ======================================================== DRAW ======================================================== //
@@ -72,8 +70,8 @@ function draw()
 
     //  labels
     textSize(16);
-    text("LFO Frequency", w/12, 1.1 * (h/7));
-    text("LFO Depth", w/12, 0.98 * (h/5));
+    text("LFO 1 Frequency", w/12, 1.05 * (h/8));
+    text("LFO 1 Depth", w/12, 1.03 * (h/6));
 
 
     // bar fills as clip is played through
@@ -96,28 +94,41 @@ function draw()
 
     fill(113, 218, 113);    //  sage green
 
-    if (lfoActive1) {
-        let r = 50  //  circle radius
-        let min = (rect1Y + lfoVizRectHeight)-r;    //  bottom of container
-        let max = rect1Y + r;   //  top of container
-        
-        let lfoY = map(getLFO1_out(), -1, 1, min, max);
-        circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
+    let r = 50  //  circle radius
+    let min = (rect1Y + lfoVizRectHeight)-r;    //  bottom of container
+    let max = rect1Y + r;   //  top of container
 
-        let vol = map(getLFO1_out(), -1, 1, 0, 1);
-        soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
+
+    if (ampModVizActive == true || delayLFOVizActive == true) {
+        //  draw visualizer
+        if (delayLFOVizActive) {    //  if drawing delay time LFO
+            let lfoY = map(drawLFO1(), 0, 1, min, max);  // 
+            circle(rect1X + (lfoVizRectWidth/2), (2*lfoY)-(0.8 * lfoVizRectHeight), r*2);    //  draw viz circle
+        }
+        else if (ampModVizActive) {  //  if drawing amp mod
+            let lfoY = map(drawLFO1(), 0, 1, min, max);  //  
+            circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
+        }
         
+        if (ampModVizActive) {  //  during amp mod
+            let vol = map(drawLFO1(), 0, 1, 0, 1);
+            soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
+        }
+
         //  set slider values to lfo properties
-        lfo1.freq(lfoFreqSlider.value());
-        lfo1.amp(lfoAmpSlider.value(), 0.001);
+        ampLFO.freq(ampModFreqSlider.value());
+        ampLFO.amp(ampModDepthSlider.value(), 0.001);
+        delayLFO.freq(delayLFOFreqSlider.value());
+        delayLFO.amp(delayLFODepthSlider.value(), 0.001);
     }
 
     if (delayActive) {
-        delay.delayTime(delayTimeSlider.value());
         delay.feedback(delayFeedbackSlider.value());
-    }
-    
 
+        if (!delayLFOActive) {
+            delay.delayTime(delayTimeSlider.value());
+        }
+    }
 }
 
 // ======================================================== END DRAW ======================================================== //
@@ -140,12 +151,13 @@ function record1()
         //  send result to soundFile
         recorder.stop();
         setTimeout(function() {
-            testText = "clip length: " + soundFile1.duration(); 
             playheadActive = true;
             addLoopButton();
             addStopButton();
             addClearButton();
+            addAmpModButton();
             addDelayButton();
+            addLFOVizButtons();
         }, 100);
         recorderButton1.html('PLAY RECORDING');
         state1++;
@@ -157,9 +169,54 @@ function record1()
     }
 }
 
-function getLFO1_out() {
-    lfoWave = lfoAnalyzer1.waveform();
-    return lfoWave[0];
+function drawLFO1() {
+    if (ampModVizActive) {  //  to control amplitude modulation
+    lfoWave = ampLFOAnalyzer.waveform();
+    }
+
+    else if (delayLFOVizActive) {   //  to control delay time LFO 
+        lfoWave = delayLFOAnalyzer.waveform();
+    }
+
+    let out = map(lfoWave[0], -1, 1, 0, 1)  //  send a scaled signal out to draw()
+    return out;
+}
+
+function addLFOVizButtons() {
+    ampModVizButton = createButton('AMPLITUDE MODIFICATION');
+    ampModVizButton.position(w/34, 4.1 * (h/5));
+
+    delayLFOVizButton = createButton('DELAY TIME LFO');
+    delayLFOVizButton.position(w/34, 4.25 * (h/5));
+
+    ampModVizButton.mousePressed(function() {
+        if (!ampModVizActive) {
+            ampModVizActive = true;
+            delayLFOVizActive = false;
+            ampModFreqSlider.show();
+            ampModDepthSlider.show();
+            delayLFOFreqSlider.hide();
+            delayLFODepthSlider.hide();
+        }
+        else {
+            ampModVizActive = false;
+            
+        }
+    })
+
+    delayLFOVizButton.mousePressed(function() {
+        if (!delayLFOVizActive) {
+            delayLFOVizActive = true;
+            ampModVizActive = false;
+            delayLFOFreqSlider.show();
+            delayLFODepthSlider.show();
+            ampModFreqSlider.hide();
+            ampModDepthSlider.hide();
+        }
+        else {
+            delayLFOVizActive = false;
+        }
+    })
 }
 
 function addLoopButton() {
@@ -199,7 +256,9 @@ function addClearButton() {
         soundFile1.stop();
         loopButton.remove();
         stopButton.remove();
+        ampLFOButton.remove();
         delayButton.remove();
+        delayLFOButton.remove();
         recorderButton1.size(recButtonWidth, recButtonHeight);
         recorderButton1.html('RECORD');
         state1 = 0;
@@ -208,22 +267,30 @@ function addClearButton() {
     });
 }
 
-function LFO1Activate() {
-    if (!lfoActive1) {
-        lfoButton1.html('DEACTIVATE LFO 1');
-        lfo1.start();
-        lfo1.disconnect();
-        lfo1.freq(lfoFreqSlider.value());
-        lfo1.amp(1.0);
-        lfoActive1 = true;
+function ampLFOActivate() {
+    if (!ampLFOActive) {
+        ampLFOButton.html('AMPLITUDE MOD OFF');
+        ampLFO.start();
+        ampLFO.disconnect();
+        ampLFO.freq(ampModFreqSlider.value());
+        ampLFO.amp(1.0);
 
-        lfoAnalyzer1.setInput(lfo1);
+        ampLFOActive = true;
+
+        ampLFOAnalyzer.setInput(ampLFO);
     }
     else {
-        lfoButton1.html('ACTIVATE LFO 1');
-        lfo1.stop();
-        lfoActive1 = false;
+        ampLFOButton.html('AMPLITUDE MOD ON');
+        ampLFO.stop();
+        ampLFOActive = false;
     }
+}
+
+function addAmpModButton() {
+    ampLFOButton = createButton('AMPLITUDE MOD ON');
+    ampLFOButton.position(ampLFOButtonX, ampLFOButtonY);
+    ampLFOButton.size(w/11, h/24);
+    ampLFOButton.mousePressed(ampLFOActivate);
 }
 
 function addDelayButton() {
@@ -232,45 +299,90 @@ function addDelayButton() {
     delayButton.size(delayButtonWidth, delayButtonHeight);
     delayButton.mousePressed(activateDelay);    //  trigger delay effect
 
-    delayTimeSlider = createSlider(0.1, 1, 0.5, 0.00001);
+    delayTimeSlider = createSlider(0.1, 1, 0.5, 0.00001);   //  control delay time
     delayTimeSlider.position(2.9 * (w/6), 0.95 * (h/5));
     delayTimeSlider.size(w/10, h/50);
 
-    delayFeedbackSlider = createSlider(0.01, 0.99, 0.5, 0.00001);
+    delayFeedbackSlider = createSlider(0.01, 0.99, 0.5, 0.00001);   //  control delay feedback
     delayFeedbackSlider.position(2.9 * (w/6), 1.345 * (h/5));
     delayFeedbackSlider.size(w/10, h/50);
 
+    delayLFOButton = createButton('DELAY LFO ON');   //  set delay time to LFO output
+    delayLFOButton.position(2.9 * (w/6), 1.103 * (h/5));
+    delayLFOButton.size(w/24.5, h/25);
+    delayLFOButton.mousePressed(activateDelayLFO);
 }
 
+//  turn on delay effect
 function activateDelay() {
-    if (!delayActive) {   
+    if (!delayActive) {   //    on
         delayActive = true;
         delayButton.html('DELAY OFF');
     }
-    else {
+    else {              //  off
         delayActive = false;
         delayButton.html('DELAY ON');
     }
 
-    if (delayActive) {
-        
-        
+    if (delayActive) {  //  set up delay
         delay.connect();
         delay.setType('pingPong');
         delay.process(soundFile1);
+        delay.delayTime(0.5);
         delay.delayTime(delayTimeSlider.value());
         delay.feedback(delayFeedbackSlider.value());
         delay.filter(5000);
     }
-
-    else {
+    else {  //  turn off delay
         delay.disconnect();
         delayTimeSlider.remove();
     }
-
-
-    
 }
+
+function activateDelayLFO() {
+    if (!delayLFOActive) {
+        delayLFO.start();
+        delayLFO.disconnect();
+        delayLFO.amp(delayLFODepthSlider.value());
+        delayLFO.freq(delayLFOFreqSlider.value());
+
+        delayLFOAnalyzer.setInput(delayLFO);
+        
+        delay.delayTime(delayLFO.scale(-1, 1, 0, 1));
+
+        delayLFOButton.html('DELAY LFO OFF');    
+        delayLFOActive = true;
+    }
+    else {
+        delayLFO.stop();
+        delayLFOButton.html('DELAY LFO ON');
+        delayLFOActive = false;
+    }
+
+}
+
+function createSliders() {
+    ampModFreqSlider = createSlider(0.001, 15.0, 8.0, 0.001);
+    ampModFreqSlider.position(w/34, (h/10));
+    ampModFreqSlider.size(w/9, h/150);
+    ampModFreqSlider.hide();
+    
+    ampModDepthSlider = createSlider(0.001, 1.0, 1.0, 0.001);
+    ampModDepthSlider.position(w/34, h/7);
+    ampModDepthSlider.size(w/9, h/150);
+    ampModDepthSlider.hide();
+
+    delayLFOFreqSlider = createSlider(0.0001, 3, 0.5, 0.0001);
+    delayLFOFreqSlider.position(w/34, (h/10));
+    delayLFOFreqSlider.size(w/9, h/150);
+    delayLFOFreqSlider.hide();
+
+    delayLFODepthSlider = createSlider(0.001, 1.0, 1.0, 0.001);
+    delayLFODepthSlider.position(w/34, h/7);
+    delayLFODepthSlider.size(w/9, h/150);
+    delayLFODepthSlider.hide();
+}
+
 
 
 window.onresize = function() {
