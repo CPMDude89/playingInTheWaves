@@ -10,6 +10,8 @@ let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallBu
 let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5, clearButton;
 let lfo1, lfoButton1, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave;
 let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.5, rect1X = (w/18), rect1Y = 0.9 * (h/4);
+let delay, delayButton, delayActive = false, delayButtonX = 2 * (w/4), delayButtonY = 1.103 * (h/5), delayButtonWidth = w/15, delayButtonHeight = h/25;
+let delayTimeSlider, delayFeedbackSlider;
 
 
 
@@ -51,7 +53,10 @@ function setup()
     lfoAmpSlider.position(w/34, h/6);
     lfoAmpSlider.size(w/9, h/150);
 
-    lfoAnalyzer1 = new p5.FFT();    
+    lfoAnalyzer1 = new p5.FFT();
+    
+    delay = new p5.Delay();
+    delay.disconnect();
 }
 // ======================================================== DRAW ======================================================== //
 // ======================================================== DRAW ======================================================== //
@@ -106,6 +111,13 @@ function draw()
         lfo1.freq(lfoFreqSlider.value());
         lfo1.amp(lfoAmpSlider.value(), 0.001);
     }
+
+    if (delayActive) {
+        delay.delayTime(delayTimeSlider.value());
+        delay.feedback(delayFeedbackSlider.value());
+    }
+    
+
 }
 
 // ======================================================== END DRAW ======================================================== //
@@ -133,6 +145,7 @@ function record1()
             addLoopButton();
             addStopButton();
             addClearButton();
+            addDelayButton();
         }, 100);
         recorderButton1.html('PLAY RECORDING');
         state1++;
@@ -186,6 +199,7 @@ function addClearButton() {
         soundFile1.stop();
         loopButton.remove();
         stopButton.remove();
+        delayButton.remove();
         recorderButton1.size(recButtonWidth, recButtonHeight);
         recorderButton1.html('RECORD');
         state1 = 0;
@@ -211,6 +225,53 @@ function LFO1Activate() {
         lfoActive1 = false;
     }
 }
+
+function addDelayButton() {
+    delayButton = createButton('DELAY ON');   //  make button
+    delayButton.position(delayButtonX, delayButtonY);
+    delayButton.size(delayButtonWidth, delayButtonHeight);
+    delayButton.mousePressed(activateDelay);    //  trigger delay effect
+
+    delayTimeSlider = createSlider(0.1, 1, 0.5, 0.00001);
+    delayTimeSlider.position(2.9 * (w/6), 0.95 * (h/5));
+    delayTimeSlider.size(w/10, h/50);
+
+    delayFeedbackSlider = createSlider(0.01, 0.99, 0.5, 0.00001);
+    delayFeedbackSlider.position(2.9 * (w/6), 1.345 * (h/5));
+    delayFeedbackSlider.size(w/10, h/50);
+
+}
+
+function activateDelay() {
+    if (!delayActive) {   
+        delayActive = true;
+        delayButton.html('DELAY OFF');
+    }
+    else {
+        delayActive = false;
+        delayButton.html('DELAY ON');
+    }
+
+    if (delayActive) {
+        
+        
+        delay.connect();
+        delay.setType('pingPong');
+        delay.process(soundFile1);
+        delay.delayTime(delayTimeSlider.value());
+        delay.feedback(delayFeedbackSlider.value());
+        delay.filter(5000);
+    }
+
+    else {
+        delay.disconnect();
+        delayTimeSlider.remove();
+    }
+
+
+    
+}
+
 
 window.onresize = function() {
     w = window.innerWidth;
