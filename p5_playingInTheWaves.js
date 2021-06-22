@@ -9,9 +9,8 @@ let rectHeight = 40;    //  for playhead progress bar
 let loopingActive = false;
 let loopButton, initialButtonSize = 80, loopButtonSize = initialButtonSize/2;
 let clearButton, stopButton;
-let lfo1, lfo2, lfoButton1, lfoButton2, lfoSlider1, lfoSlider2, lfoActive1=false;
+let lfo1, lfo2, lfoButton1, lfoButton2, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave, lfoOut;
 let lfoVizRectWidth=100, lfoVizRectHeight=h/1.5;
-let phase1=-1, phaseDelta1=0, freq1=0, sampleRate=60;
 
 function preload()
 {
@@ -36,24 +35,38 @@ function setup()
     recorderButton1.size(150, initialButtonSize);
     recorderButton1.mousePressed(record1);
 
-    lfo1 = new p5.Oscillator();
+    lfo1 = new p5.Oscillator('sine');
     lfoButton1 = createButton('ACTIVATE LFO 1');
-    lfoButton1.position(w/10, h/6);
+    lfoButton1.position(w/20, h/12);
     lfoButton1.mousePressed(LFO1Activate);
-    lfoSlider1 = createSlider(0.001, 15.0, 8.0, 0.001);
-    lfoSlider1.size(200, 20);
-    lfoSlider1.position(w/13, 1.2 * (h/6));
+
+    lfoFreqSlider = createSlider(0.001, 15.0, 8.0, 0.001);
+    lfoFreqSlider.position(w/34, (h/8));
+    lfoFreqSlider.size(w/9, h/150);
+    
+    lfoAmpSlider = createSlider(0.001, 1.0, 1.0, 0.001);
+    lfoAmpSlider.position(w/34, h/6);
+    lfoAmpSlider.size(w/9, h/150);
+
+    lfoAnalyzer1 = new p5.FFT();
 }
 
 function draw()
 {
     background(179, 179, 204);
+    console.log(lfoAmpSlider.value());
 
     //  title
     fill(0);
     textSize(35);
     textAlign(CENTER)
-    text("Playing In The Waves: A Play-Based Approach to Generative Sound Design", w/2, h / 10);
+    text("Playing In The Waves: A Play-Based Approach to Generative Sound Design", w/2, h / 20);
+
+    //  labels
+    textSize(16);
+    text("LFO Frequency", w/12, 1.1 * (h/7));
+    text("LFO Depth", w/12, 0.98 * (h/5));
+
 
     // bar fills as clip is played through
     if (playheadActive) {
@@ -67,31 +80,28 @@ function draw()
         rect(2.9 * (w/4), h/5, playheadMonitor, rectHeight);
     }
 
-    lfo1.freq(lfoSlider1.value());
+    lfo1.freq(lfoFreqSlider.value());
 
     //  draw lfo visualizer
-    rectMode(CENTER);
+    rectMode(CORNER);
     fill(0);
-    rect1X = 1.1 * (w/8);
-    rect1Y = 1.2 * (h/2);
+    rect1X = (w/10);
+    rect1Y = (h/4);
     rect(rect1X, rect1Y, lfoVizRectWidth, lfoVizRectHeight);
 
     fill(113, 218, 113);
-    min1 = rect1Y + (lfoVizRectHeight / 2);
-    max1 = rect1Y - (lfoVizRectHeight / 2);
-    //console.log(min1)
-
-    
-    let y1 = map(sin(phase1), -1, 1, min1, max1);
-    circle(rect1X, y1, lfoVizRectWidth);
-    //console.log(y1)
 
     if (lfoActive1) {
-    phaseDelta1 = TWO_PI * lfoSlider1.value() / sampleRate;
-    phase1 += phaseDelta1;
-    }
+        let r = 50
+        let min = (rect1Y + lfoVizRectHeight)-r;
+        let max = rect1Y + r;
 
-    //console.log(mouseY);
+        lfoWave = lfoAnalyzer1.waveform();
+        let lfoY = map(lfoWave[0], -1, 1, min, max);
+        circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);
+        lfoOut = map(lfoWave[0], -1, 1, 0, 1);
+        soundFile1.setVolume(lfoOut, 0.01);
+    }
 }
 
 
@@ -105,7 +115,7 @@ function record1()
     if (state1 === 0 && mic.enabled) {
 
         //  record into p5.SoundFile after 80 milliseconds to get past mouse click
-        setTimeout(function() {recorder.record(soundFile1, 10)}, 80);
+        setTimeout(function() {recorder.record(soundFile1, 10)}, 120);
 
         recorderButton1.html('RECORDING!')
         state1++;
@@ -183,18 +193,20 @@ function LFO1Activate() {
         lfoButton1.html('DEACTIVATE LFO 1');
         lfo1.start();
         lfo1.disconnect();
+        lfo1.freq(lfoFreqSlider.value());
         lfo1.amp(1.0);
-        lfo1.freq(lfoSlider1.value());
-        soundFile1.setVolume(lfo1);
         lfoActive1 = true;
+
+        lfoAnalyzer1.setInput(lfo1);
+        //lfoWave = lfoAnalyzer1.waveform();
+
+        //soundFile1.amp(lfo1);
     }
     else {
         lfoButton1.html('ACTIVATE LFO 1');
         lfo1.stop();
         lfoActive1 = false;
     }
-
-    
 }
 
 window.onresize = function() {
