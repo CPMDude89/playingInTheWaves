@@ -6,9 +6,9 @@ let state1 = 0;
 let playheadMonitor = 0, playheadActive = false;
 let progBarWidth = w/6, progBarHeight = h/28, progBarX = 3.2 * (w/4), progBarY = 1.01 * h/5;
 let loopingActive = false;
-let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.2 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
-let clearButton, clearButtonX, clearButtonY; 
-let stopButton;
+let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
+let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5;
+let clearButton, clearButtonY; 
 let lfo1, lfo2, lfoButton1, lfoButton2, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave, lfoOut;
 let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.5, rect1X = (w/18), rect1Y = 0.9 * (h/4);
 
@@ -171,21 +171,21 @@ function addLoopButton() {
 
 function addStopButton() {
     stopButton = createButton('STOP SAMPLE');
-    stopButton.position(2.17 * (w/4), h/5);
+    stopButton.position(stopButtonX, stopButtonY);
     stopButton.size(smallButtonWidth, smallButtonHeight);
     stopButton.mousePressed(function() {soundFile1.stop()});
 }
 
 function addClearButton() {
     clearButton = createButton('CLEAR SAMPLE');
-    clearButton.position(2.17 * (w/4), 1.2 * (h/5));
+    clearButton.position(stopButtonX, loopButtonY);
     clearButton.size(smallButtonWidth, smallButtonHeight);
 
     clearButton.mousePressed(function() {
         soundFile1.stop();
         loopButton.remove();
         stopButton.remove();
-        recorderButton1.size(smallButtonWidth, recButtonWidth);
+        recorderButton1.size(recButtonWidth, recButtonHeight);
         recorderButton1.html('RECORD');
         state1 = 0;
         soundFile1 = new p5.SoundFile();
