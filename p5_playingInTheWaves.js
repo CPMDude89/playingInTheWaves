@@ -1,16 +1,16 @@
-let mic, recorder, soundFile1, soundFile2, recorderButton1, recorderButton2;
-let state1 = 0;
 let w = window.innerWidth;
 let h = window.innerHeight;
-let playheadMonitor = 0;
-let playheadActive = false;
-let rectWidth = 300;    //  for playhead progress bar
-let rectHeight = 40;    //  for playhead progress bar
+let mic, recorder, soundFile1; 
+let recorderButton1, recButtonWidth = w/12, recButtonHeight = h/12, recButtonX = 2.75 * (w/4), recButtonY = h/5;
+let state1 = 0;
+let playheadMonitor = 0, playheadActive = false;
+let progBarWidth = w/6, progBarHeight = h/28, progBarX = 3.2 * (w/4), progBarY = 1.01 * h/5;
 let loopingActive = false;
-let loopButton, initialButtonSize = 80, loopButtonSize = initialButtonSize/2;
-let clearButton, stopButton;
+let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.2 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
+let clearButton, stopButton, initialButtonSize = h/12;
 let lfo1, lfo2, lfoButton1, lfoButton2, lfoFreqSlider, lfoAmpSlider, lfoActive1=false, lfoAnalyzer1, lfoWave, lfoOut;
-let lfoVizRectWidth=100, lfoVizRectHeight=h/1.5;
+let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.5, rect1X = (w/18), rect1Y = 0.9 * (h/4);
+
 
 function preload()
 {
@@ -18,10 +18,12 @@ function preload()
     sound2 = loadSound("sounds/CD_paper_slide_lazer_03.wav");
 }
 
+// ======================================================== SETUP ======================================================== //
+// ======================================================== SETUP ======================================================== //
 function setup()
 {
     createCanvas(w, h);
-    
+
     mic = new p5.AudioIn(); //  get the soundRecorder input source ready
     mic.start();
 
@@ -31,8 +33,8 @@ function setup()
     soundFile1 = new p5.SoundFile();    //  create audio object to store recorded audio
     
     recorderButton1 = createButton('RECORD');   //  record button
-    recorderButton1.position(2.5 * (w/4), h/5);
-    recorderButton1.size(150, initialButtonSize);
+    recorderButton1.position(recButtonX, recButtonY);
+    recorderButton1.size(recButtonWidth, recButtonHeight);
     recorderButton1.mousePressed(record1);
 
     lfo1 = new p5.Oscillator('sine');
@@ -48,13 +50,13 @@ function setup()
     lfoAmpSlider.position(w/34, h/6);
     lfoAmpSlider.size(w/9, h/150);
 
-    lfoAnalyzer1 = new p5.FFT();
+    lfoAnalyzer1 = new p5.FFT();    
 }
-
+// ======================================================== DRAW ======================================================== //
+// ======================================================== DRAW ======================================================== //
 function draw()
 {
     background(179, 179, 204);
-    console.log(lfoAmpSlider.value());
 
     //  title
     fill(0);
@@ -73,11 +75,11 @@ function draw()
         noFill();
         strokeWeight(2);
         rectMode(CORNER);
-        rect(2.9 * (w/4), h/5, rectWidth, rectHeight);
+        rect(progBarX, progBarY, progBarWidth, progBarHeight);
         //  fill progress bar 
         fill(113, 218, 113);
-        playheadMonitor = map(soundFile1.currentTime(), 0, soundFile1.duration(), 0, rectWidth);
-        rect(2.9 * (w/4), h/5, playheadMonitor, rectHeight);
+        playheadMonitor = map(soundFile1.currentTime(), 0, soundFile1.duration(), 0, progBarWidth);
+        rect(progBarX, progBarY, playheadMonitor, progBarHeight);
     }
 
     lfo1.freq(lfoFreqSlider.value());
@@ -85,8 +87,7 @@ function draw()
     //  draw lfo visualizer
     rectMode(CORNER);
     fill(0);
-    rect1X = (w/10);
-    rect1Y = (h/4);
+
     rect(rect1X, rect1Y, lfoVizRectWidth, lfoVizRectHeight);
 
     fill(113, 218, 113);
@@ -101,9 +102,12 @@ function draw()
         circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);
         lfoOut = map(lfoWave[0], -1, 1, 0, 1);
         soundFile1.setVolume(lfoOut, 0.01);
+        lfo1.amp(lfoAmpSlider.value());
     }
 }
 
+// ======================================================== END DRAW ======================================================== //
+// ======================================================== END DRAW ======================================================== //
 
 // -------- CUSTOM FUNCTIONS -------- //
 function record1()
@@ -145,10 +149,10 @@ function record1()
 
 function addLoopButton() {
     loopButton = createButton('ACTIVATE LOOPING');   //  activate loop
-    loopButton.position(2.5 * (w/4), 1.2 * (h/5));
-    loopButton.size(150, loopButtonSize);
+    loopButton.position(loopButtonX, loopButtonY);
+    loopButton.size(smallButtonWidth, smallButtonHeight);
 
-    recorderButton1.size(150, loopButtonSize);
+    recorderButton1.size(smallButtonWidth, smallButtonHeight);
 
     loopButton.mousePressed(function() {
         if (!soundFile1.isLooping()) {
@@ -167,20 +171,20 @@ function addLoopButton() {
 function addStopButton() {
     stopButton = createButton('STOP SAMPLE');
     stopButton.position(2.17 * (w/4), h/5);
-    stopButton.size(150, loopButtonSize);
+    stopButton.size(150, smallButtonHeight);
     stopButton.mousePressed(function() {soundFile1.stop()});
 }
 
 function addClearButton() {
     clearButton = createButton('CLEAR SAMPLE');
     clearButton.position(2.17 * (w/4), 1.2 * (h/5));
-    clearButton.size(150, loopButtonSize);
+    clearButton.size(smallButtonWidth, smallButtonHeight);
 
     clearButton.mousePressed(function() {
         soundFile1.stop();
         loopButton.remove();
         stopButton.remove();
-        recorderButton1.size(150, initialButtonSize);
+        recorderButton1.size(smallButtonWidth, recButtonWidth);
         recorderButton1.html('RECORD');
         state1 = 0;
         soundFile1 = new p5.SoundFile();
@@ -198,9 +202,6 @@ function LFO1Activate() {
         lfoActive1 = true;
 
         lfoAnalyzer1.setInput(lfo1);
-        //lfoWave = lfoAnalyzer1.waveform();
-
-        //soundFile1.amp(lfo1);
     }
     else {
         lfoButton1.html('ACTIVATE LFO 1');
