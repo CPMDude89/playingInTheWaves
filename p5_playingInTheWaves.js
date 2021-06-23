@@ -47,6 +47,7 @@ function setup()
     ampLFO = new p5.Oscillator('sine');
     
     createSliders() //  make control sliders, but hide them
+    console.log(ampModFreqSlider.value());
 
     ampLFOAnalyzer = new p5.FFT();
     delayLFOAnalyzer = new p5.FFT();
@@ -109,11 +110,6 @@ function draw()
             let lfoY = map(drawLFO1(), 0, 1, min, max);  //  
             circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
         }
-        
-        if (ampModVizActive) {  //  during amp mod
-            let vol = map(drawLFO1(), 0, 1, 0, 1);
-            soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
-        }
 
         //  set slider values to lfo properties
         ampLFO.freq(ampModFreqSlider.value());
@@ -129,6 +125,12 @@ function draw()
             delay.delayTime(delayTimeSlider.value());
         }
     }
+    if (ampLFOActive) {
+        let waveform = ampLFOAnalyzer.waveform();
+        let vol = map(waveform[0], -1, 1, 0, 1);
+        soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
+    }
+    
 }
 
 // ======================================================== END DRAW ======================================================== //
@@ -331,7 +333,7 @@ function activateDelay() {
         delay.delayTime(0.5);
         delay.delayTime(delayTimeSlider.value());
         delay.feedback(delayFeedbackSlider.value());
-        delay.filter(5000);
+        delay.filter(2000);
     }
     else {  //  turn off delay
         delay.disconnect();
