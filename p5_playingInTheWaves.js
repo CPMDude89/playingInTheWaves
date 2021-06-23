@@ -8,7 +8,7 @@ let progBarWidth = w/6, progBarHeight = h/28, progBarX = 2.417 * (w/4), progBarY
 let loopingActive = false;
 let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
 let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5, clearButton;
-let ampLFO, ampLFOButton, ampLFOButtonX= 3.9 * (w/5), ampLFOButtonY= 1.103 * (h/5), ampLFOActive=false, ampLFOAnalyzer, lfoWave;
+let ampLFO, ampLFOButton, ampLFOButtonX= 3.9 * (w/5), ampLFOButtonY= 0.9 * (h/5), ampLFOActive=false, ampLFOAnalyzer, lfoWave;
 let ampModFreqSlider, ampModDepthSlider;
 let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.6, rect1X = (w/18), rect1Y = 0.75 * (h/4);
 let delay, delayButton, delayActive = false, delayButtonX = 3.15 * (w/6), delayButtonY = 1.103 * (h/5), 
@@ -16,6 +16,8 @@ let delay, delayButton, delayActive = false, delayButtonX = 3.15 * (w/6), delayB
 let delayTimeSlider, delayFeedbackSlider; 
 let delayLFO, delayLFOButton, delayLFOActive=false, delayLFOViz=false, delayLFOFreqSlider, delayLFODepthSlider;
 let ampModVizButton, ampModVizActive=false, delayLFOVizButton, delayLFOVizActive=false;
+let filer, filterActive=false, filterButton, filterFreqSlider, filterResSlider, filterLFO, filterLFOVizActive=false, filterLFOVizButton,
+    filterButtonX=2.7 * (w/4), filterButtonY=1.45 * (h/5), filterLFOFreqSlider, filterLFODepthSlider, filterLFOActive=false;
 
 
 
@@ -45,17 +47,20 @@ function setup()
     recorderButton1.mousePressed(record1);
 
     ampLFO = new p5.Oscillator('sine');
+    delayLFO = new p5.Oscillator('sine');
+    filterLFO = new p5.Oscillator('sine');
     
-    createSliders() //  make control sliders, but hide them
-    console.log(ampModFreqSlider.value());
+    createSliders() //  make control sliders and hide them
 
     ampLFOAnalyzer = new p5.FFT();
     delayLFOAnalyzer = new p5.FFT();
+    filterLFOAnalyzer = new p5.FFT();
     
     delay = new p5.Delay();
     delay.disconnect();
 
-    delayLFO = new p5.Oscillator;
+    filter = new p5.LowPass();
+    
 }
 // ======================================================== DRAW ======================================================== //
 // ======================================================== DRAW ======================================================== //
@@ -100,7 +105,7 @@ function draw()
     let max = rect1Y + r;   //  top of container
 
 
-    if (ampModVizActive == true || delayLFOVizActive == true) {
+    if (ampModVizActive == true || delayLFOVizActive == true || filterLFOVizActive == true) {
         //  draw visualizer
         if (delayLFOVizActive) {    //  if drawing delay time LFO
             let lfoY = map(drawLFO1(), 0, 1, min, max);  // 
@@ -110,12 +115,24 @@ function draw()
             let lfoY = map(drawLFO1(), 0, 1, min, max);  //  
             circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
         }
+        else if (filterLFOVizActive) {  //  if drawing filter freq LFO
+            let lfoY = map(drawLFO1(), 0, 1, min, max);  
+            circle(rect1X + (lfoVizRectWidth/2), lfoY, r*2);    //  draw viz circle
+        }
 
         //  set slider values to lfo properties
         ampLFO.freq(ampModFreqSlider.value());
         ampLFO.amp(ampModDepthSlider.value(), 0.001);
         delayLFO.freq(delayLFOFreqSlider.value());
         delayLFO.amp(delayLFODepthSlider.value(), 0.001);
+        filterLFO.freq(filterLFOFreqSlider.value(), 0.001);
+        filterLFO.amp(filterLFODepthSlider.value(), 0.001);
+    }
+
+    if (ampLFOActive) {
+        let waveform = ampLFOAnalyzer.waveform();
+        let vol = map(waveform[0], -1, 1, 0, 1);
+        soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
     }
 
     if (delayActive) {
@@ -124,11 +141,17 @@ function draw()
         if (!delayLFOActive) {
             delay.delayTime(delayTimeSlider.value());
         }
+    }    
+
+    if (filterActive) {
+        filter.freq(filterFreqSlider.value());
+        filter.res(filterResSlider.value());
     }
-    if (ampLFOActive) {
-        let waveform = ampLFOAnalyzer.waveform();
-        let vol = map(waveform[0], -1, 1, 0, 1);
-        soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
+
+    if (filterLFOActive) {
+        let filterWaveform = filterLFOAnalyzer.waveform();
+        let f = map(filterWaveform[0], -1, 1, 10, 5000);
+        filter.freq(f);
     }
     
 }
@@ -159,6 +182,7 @@ function record1()
             addClearButton();
             addAmpModButton();
             addDelayButton();
+            addFilterButton();
             addLFOVizButtons();
         }, 100);
         recorderButton1.html('PLAY RECORDING');
@@ -173,11 +197,15 @@ function record1()
 
 function drawLFO1() {
     if (ampModVizActive) {  //  to control amplitude modulation
-    lfoWave = ampLFOAnalyzer.waveform();
+        lfoWave = ampLFOAnalyzer.waveform();
     }
 
     else if (delayLFOVizActive) {   //  to control delay time LFO 
         lfoWave = delayLFOAnalyzer.waveform();
+    }
+
+    else if (filterLFOVizActive) {  //  to control filter freq LFO
+        lfoWave = filterLFOAnalyzer.waveform();
     }
 
     let out = map(lfoWave[0], -1, 1, 0, 1)  //  send a scaled signal out to draw()
@@ -191,6 +219,9 @@ function addLFOVizButtons() {
     delayLFOVizButton = createButton('DELAY TIME LFO');
     delayLFOVizButton.position(w/34, 4.25 * (h/5));
 
+    filterLFOVizButton = createButton('FILTER FREQ LFO');
+    filterLFOVizButton.position(w/34, 4.4 * (h/5));
+
     ampModVizButton.mousePressed(function() {
         if (!ampModVizActive) {
             ampModVizActive = true;
@@ -199,10 +230,11 @@ function addLFOVizButtons() {
             ampModDepthSlider.show();
             delayLFOFreqSlider.hide();
             delayLFODepthSlider.hide();
+            filterLFOFreqSlider.hide();
+            filterLFODepthSlider.hide();
         }
         else {
             ampModVizActive = false;
-            
         }
     })
 
@@ -214,9 +246,28 @@ function addLFOVizButtons() {
             delayLFODepthSlider.show();
             ampModFreqSlider.hide();
             ampModDepthSlider.hide();
+            filterLFOFreqSlider.hide();
+            filterLFODepthSlider.hide();
         }
         else {
             delayLFOVizActive = false;
+        }
+    })
+
+    filterLFOVizButton.mousePressed(function () {
+        if (!filterLFOVizActive) {
+            filterLFOVizActive = true;
+            delayLFOVizActive = false;
+            ampModVizActive = false;
+            filterLFOFreqSlider.show();
+            filterLFODepthSlider.show();
+            ampModFreqSlider.hide();
+            ampModDepthSlider.hide();
+            delayLFOFreqSlider.hide();
+            delayLFODepthSlider.hide();
+        }
+        else {
+            filterLFOVizActive = false;
         }
     })
 }
@@ -360,6 +411,69 @@ function activateDelayLFO() {
         delayLFOButton.html('DELAY LFO ON');
         delayLFOActive = false;
     }
+}
+
+function addFilterButton() {
+    filterButton = createButton('FILTER ON');
+    filterButton.position(filterButtonX, filterButtonY);
+    filterButton.size(delayButtonWidth, delayButtonHeight);
+    filterButton.mousePressed(activateFilter);
+
+    filterFreqSlider = createSlider(0, 5000, 500, 0.1);
+    filterFreqSlider.position(2.55 * (w/4), 1.15 * filterButtonY);
+    filterFreqSlider.size(w/10, h/50);
+
+    filterResSlider = createSlider(0.01, 30, 5, 0.01);
+    filterResSlider.position(2.55 * (w/4), 1.3 * filterButtonY);
+    filterResSlider.size(w/10, h/50);
+
+    filterLFOButton = createButton('FILTER LFO ON');
+    filterLFOButton.position(0.92 * filterButtonX, filterButtonY);
+    filterLFOButton.size(w/24.5, h/25);
+    filterLFOButton.mousePressed(activateFilterLFO);
+}
+
+function activateFilter() {
+    if (!filterActive) {    //  on
+        filterActive = true;
+        filterButton.html('FILTER OFF');
+    }
+    else {              //  off
+        filterActive = false;
+        filterButton.html('FILTER ON');
+    }
+    
+    if (filterActive) {    //  set up filter
+        filter.connect(soundFile1);
+        filter.setType('lowpass')
+        filter.process(soundFile1);
+        filter.freq(filterFreqSlider.value());
+        filter.res(filterResSlider.value());
+        filter.drywet(1.0);
+    }
+    else {
+        filter.setType('allpass');
+        filter.drywet(0.0);
+    }
+}
+
+function activateFilterLFO() {
+    if (!filterLFOActive) {
+        filterLFO.start()
+        filterLFO.disconnect();
+        filterLFO.amp(filterLFODepthSlider.value());
+        filterLFO.freq(filterLFOFreqSlider.value());
+        
+        filterLFOAnalyzer.setInput(filterLFO);
+
+        filterLFOButton.html('FILTER LFO OFF')
+        filterLFOActive = true;
+    }
+    else {
+        filterLFO.stop();
+        filterLFOButton.html('FILTER LFO ON');
+        filterLFOActive = false;
+    }
 
 }
 
@@ -374,7 +488,7 @@ function createSliders() {
     ampModDepthSlider.size(w/9, h/150);
     ampModDepthSlider.hide();
 
-    delayLFOFreqSlider = createSlider(0.0001, 3, 0.5, 0.0001);
+    delayLFOFreqSlider = createSlider(0.0001, 2, 0.3, 0.0001);
     delayLFOFreqSlider.position(w/34, (h/10));
     delayLFOFreqSlider.size(w/9, h/150);
     delayLFOFreqSlider.hide();
@@ -383,6 +497,16 @@ function createSliders() {
     delayLFODepthSlider.position(w/34, h/7);
     delayLFODepthSlider.size(w/9, h/150);
     delayLFODepthSlider.hide();
+
+    filterLFOFreqSlider = createSlider(0.001, 20, 0.5, 0.001);
+    filterLFOFreqSlider.position(w/34, (h/10));
+    filterLFOFreqSlider.size(w/9, h/150);
+    filterLFOFreqSlider.hide();
+
+    filterLFODepthSlider = createSlider(0.001, 1.0, 1.0, 0.001);
+    filterLFODepthSlider.position(w/34, h/7);
+    filterLFODepthSlider.size(w/9, h/150);
+    filterLFODepthSlider.hide();
 }
 
 
