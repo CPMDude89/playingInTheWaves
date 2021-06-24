@@ -8,7 +8,7 @@ let progBarWidth = w/6, progBarHeight = h/28, progBarX = 2.417 * (w/4), progBarY
 let loopingActive = false;
 let loopButton, loopButtonX = 2.75 * (w/4), loopButtonY = 1.206 * (h/5), smallButtonWidth = w/12, smallButtonHeight = h/24;
 let stopButton, stopButtonX = 2.417 * (w/4), stopButtonY = h/5, clearButton;
-let ampLFO, ampLFOButton, ampLFOButtonX= 3.9 * (w/5), ampLFOButtonY= 0.9 * (h/5), ampLFOActive=false, ampLFOAnalyzer, lfoWave;
+let ampLFO, ampLFOButton, ampLFOButtonX= 3.9 * (w/5), ampLFOButtonY= 0.85 * (h/5), ampLFOActive=false, ampLFOAnalyzer, lfoWave;
 let ampModFreqSlider, ampModDepthSlider;
 let lfoVizRectWidth=w/18, lfoVizRectHeight=h/1.6, rect1X = (w/18), rect1Y = 0.75 * (h/4);
 let delay, delayButton, delayActive = false, delayButtonX = 3.15 * (w/6), delayButtonY = 1.103 * (h/5), 
@@ -16,15 +16,18 @@ let delay, delayButton, delayActive = false, delayButtonX = 3.15 * (w/6), delayB
 let delayTimeSlider, delayFeedbackSlider; 
 let delayLFO, delayLFOButton, delayLFOActive=false, delayLFOViz=false, delayLFOFreqSlider, delayLFODepthSlider;
 let ampModVizButton, ampModVizActive=false, delayLFOVizButton, delayLFOVizActive=false;
-let filer, filterActive=false, filterButton, filterFreqSlider, filterResSlider, filterLFO, filterLFOVizActive=false, filterLFOVizButton,
+let filter, filterActive=false, filterButton, filterFreqSlider, filterResSlider, filterLFO, filterLFOVizActive=false, filterLFOVizButton,
     filterButtonX=2.7 * (w/4), filterButtonY=1.45 * (h/5), filterLFOFreqSlider, filterLFODepthSlider, filterLFOActive=false;
+let reverb, reverbActive=false, reverbButton, reverbButtonX=3.9 * (w/5), reverbButtonY=1.103 * (h/5), 
+    reverbTimeSlider, reverbDecaySlider;
+let reverseReverbButton, reverb3secButton, reverb7secButton, reverb10secButton, reverbReverse=false;
 
 
 
 function preload()
 {
-    sound1 = loadSound("sounds/CD_boilingWater_hiss_01.wav");
-    sound2 = loadSound("sounds/CD_paper_slide_lazer_03.wav");
+    //sound1 = loadSound("sounds/CD_boilingWater_hiss_01.wav");
+    //sound2 = loadSound("sounds/CD_paper_slide_lazer_03.wav");
 }
 
 // ======================================================== SETUP ======================================================== //
@@ -46,21 +49,22 @@ function setup()
     recorderButton1.size(recButtonWidth, recButtonHeight);
     recorderButton1.mousePressed(record1);
 
-    ampLFO = new p5.Oscillator('sine');
+    ampLFO = new p5.Oscillator('sine'); //  audio effect LFO's
     delayLFO = new p5.Oscillator('sine');
     filterLFO = new p5.Oscillator('sine');
     
     createSliders() //  make control sliders and hide them
 
-    ampLFOAnalyzer = new p5.FFT();
+    ampLFOAnalyzer = new p5.FFT();  //  use fft objects to get a clear reading from LFO's
     delayLFOAnalyzer = new p5.FFT();
     filterLFOAnalyzer = new p5.FFT();
     
-    delay = new p5.Delay();
+    delay = new p5.Delay(); //  delay
     delay.disconnect();
 
-    filter = new p5.LowPass();
+    filter = new p5.LowPass();  //  filter
     
+    reverb = new p5.Reverb();   //  reverb
 }
 // ======================================================== DRAW ======================================================== //
 // ======================================================== DRAW ======================================================== //
@@ -129,13 +133,13 @@ function draw()
         filterLFO.amp(filterLFODepthSlider.value(), 0.001);
     }
 
-    if (ampLFOActive) {
+    if (ampLFOActive) { //  turn on amplitude modulation
         let waveform = ampLFOAnalyzer.waveform();
         let vol = map(waveform[0], -1, 1, 0, 1);
         soundFile1.setVolume(vol, 0.01);    //  set recording volume to output of LFO  
     }
 
-    if (delayActive) {
+    if (delayActive) {  //  turn on delay
         delay.feedback(delayFeedbackSlider.value());
 
         if (!delayLFOActive) {
@@ -143,16 +147,24 @@ function draw()
         }
     }    
 
-    if (filterActive) {
+    if (filterActive) { //  turn on filter
         filter.freq(filterFreqSlider.value());
         filter.res(filterResSlider.value());
     }
 
-    if (filterLFOActive) {
+    if (filterLFOActive) {  //  turn on filter LFO
         let filterWaveform = filterLFOAnalyzer.waveform();
         let f = map(filterWaveform[0], -1, 1, 10, 5000);
         filter.freq(f);
     }
+    
+    if (reverbActive) {
+        //reverb.set(reverbTimeSlider.value(), 2, false);
+        //reverb.set(6, reverbTimeSlider, false);
+        reverb.drywet(reverbTimeSlider.value());
+    }
+    
+
     
 }
 
@@ -183,6 +195,7 @@ function record1()
             addAmpModButton();
             addDelayButton();
             addFilterButton();
+            addreverbButton();
             addLFOVizButtons();
         }, 100);
         recorderButton1.html('PLAY RECORDING');
@@ -320,6 +333,13 @@ function addClearButton() {
     });
 }
 
+function addAmpModButton() {
+    ampLFOButton = createButton('AMPLITUDE MOD ON');
+    ampLFOButton.position(ampLFOButtonX, ampLFOButtonY);
+    ampLFOButton.size(w/11, h/24);
+    ampLFOButton.mousePressed(ampLFOActivate);
+}
+
 function ampLFOActivate() {
     if (!ampLFOActive) {
         ampLFOButton.html('AMPLITUDE MOD OFF');
@@ -337,13 +357,6 @@ function ampLFOActivate() {
         ampLFO.stop();
         ampLFOActive = false;
     }
-}
-
-function addAmpModButton() {
-    ampLFOButton = createButton('AMPLITUDE MOD ON');
-    ampLFOButton.position(ampLFOButtonX, ampLFOButtonY);
-    ampLFOButton.size(w/11, h/24);
-    ampLFOButton.mousePressed(ampLFOActivate);
 }
 
 function addDelayButton() {
@@ -473,6 +486,61 @@ function activateFilterLFO() {
         filterLFO.stop();
         filterLFOButton.html('FILTER LFO ON');
         filterLFOActive = false;
+    }
+}
+
+function addreverbButton() {
+    reverbButton = createButton('REVERB ON');
+    reverbButton.position(reverbButtonX, reverbButtonY);
+    reverbButton.size(delayButtonWidth, delayButtonHeight);
+    reverbButton.mousePressed(activatereverb);
+
+    reverbTimeSlider = createSlider(0.0, 1, 0.5, 0.001);
+    reverbTimeSlider.position(reverbButtonX, 1.2 * reverbButtonY);
+    reverbTimeSlider.size(w/10, h/50);
+
+    /*
+    reverbDecaySlider = createSlider(0, 100, 2, 1)
+    reverbDecaySlider.position(reverbButtonX, 1.4 * reverbButtonY);
+    reverbDecaySlider.size(w/10, h/50);
+    */
+
+    reverseReverbButton = createButton('REVERSE VERB');
+    reverseReverbButton.position(1.09 * reverbButtonX, reverbButtonY);
+    reverseReverbButton.size(w/22, h/25);
+    reverseReverbButton.mousePressed(function () {
+        if (!reverbReverse) {
+            reverb.set(4, 5, true);
+            reverseReverbButton.html('REVERSE OFF');
+        }
+        else {
+            reverb.set(4, 5, false);
+            reverseReverbButton.html('REVERSE VERB');
+        }
+        
+    })
+
+}
+
+function activatereverb() {
+    if (!reverbActive) {
+        reverbButton.html('REVERB OFF');
+        reverbActive = true;
+    }
+    else {
+        reverbButton.html('REVERB ON');
+        reverbActive = false;
+    }
+    
+    if (reverbActive) {
+        reverb.process(soundFile1, 4, 5, false);
+        reverb.amp(2);
+        soundFile1.connect(reverb);
+        
+        reverb.drywet(reverbTimeSlider.value());
+    }
+    else {
+        reverb.drywet(0);
     }
 
 }
