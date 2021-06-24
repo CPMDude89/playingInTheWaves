@@ -20,7 +20,7 @@ let filter, filterActive=false, filterButton, filterFreqSlider, filterResSlider,
     filterButtonX=2.7 * (w/4), filterButtonY=1.45 * (h/5), filterLFOFreqSlider, filterLFODepthSlider, filterLFOActive=false;
 let reverb, reverbActive=false, reverbButton, reverbButtonX=3.9 * (w/5), reverbButtonY=1.103 * (h/5), 
     reverbTimeSlider, reverbDecaySlider;
-let reverseReverbButton, reverb3secButton, reverb7secButton, reverb10secButton, reverbReverse=false;
+let reverseReverbButton, reverbReverse=false;
 
 
 
@@ -498,12 +498,6 @@ function addreverbButton() {
     reverbTimeSlider = createSlider(0.0, 1, 0.5, 0.001);
     reverbTimeSlider.position(reverbButtonX, 1.2 * reverbButtonY);
     reverbTimeSlider.size(w/10, h/50);
-
-    /*
-    reverbDecaySlider = createSlider(0, 100, 2, 1)
-    reverbDecaySlider.position(reverbButtonX, 1.4 * reverbButtonY);
-    reverbDecaySlider.size(w/10, h/50);
-    */
 
     reverseReverbButton = createButton('REVERSE VERB');
     reverseReverbButton.position(1.09 * reverbButtonX, reverbButtonY);
