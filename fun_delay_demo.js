@@ -100,7 +100,7 @@ function activateDelay1() {
 
     if (delayActive1) {
         delay1.connect();
-        delay1.process(soundFile1, 0.5, 0.7, 3000);
+        delay1.process(soundFile1, 0.8, 0.7, 3000);
         delay1.drywet(1);
     }
     else {
@@ -192,7 +192,7 @@ function activateDelay2() {
 
     if (delayActive2) {
         delay2.connect();
-        delay2.process(soundFile2, 0.5, 0.7, 3000);
+        delay2.process(soundFile2, 0.6, 0.7, 3000);
         delay2.drywet(1);
     }
     else {
