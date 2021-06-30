@@ -4,13 +4,15 @@ class Looper {
         buttonX,    //  button x-coordinate
         buttonY,    //  button y-coordinate
         buttonWidth,    //  button width
-        buttonHeight    //  button height
+        buttonHeight,    //  button height
+        effButX     //  effect button x-coordinate
     ) {
         //  define properties
         this.buttonX = buttonX; //  properties from user input
         this.buttonY = buttonY;
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
+        this.effButX = effButX;
 
         this.mic = new p5.AudioIn();    //  user input source (computer mic)
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
@@ -23,6 +25,7 @@ class Looper {
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
 
         this.clearButton;
+        this.ampModButton;
         this.delayButton;
     }
 
@@ -55,6 +58,8 @@ class Looper {
             this.button.size(this.buttonWidth/2, this.buttonHeight);
 
             this.addClearButton();
+            this.addAmpModButton();
+            this.addDelayButton();
 
         }
 
@@ -64,14 +69,6 @@ class Looper {
 
             this.button.html('STOP');
             this.state++;
-
-            this.ampModOsc.start();
-            this.ampModOsc.disconnect();
-            this.ampModOsc.freq(20);
-            this.ampModOsc.amp(1);
-
-            //this.soundFile.setVolume(this.ampModOsc.scale(-1, 1, 0, 1));
-
         }
 
         else if(this.state == 3) {  //  stop playback
@@ -82,7 +79,7 @@ class Looper {
         }
     }
 
-    addClearButton() {
+    addClearButton() {  //  button to reset buffer
         this.clearButton = createButton('CLEAR');
         this.clearButton.position(this.buttonX + (this.buttonWidth/2), this.buttonY);
         this.clearButton.size(this.buttonWidth/2, this.buttonHeight);
@@ -97,6 +94,36 @@ class Looper {
             this.state = 0;
             this.clearButton.remove();
         });
+    }
+
+    addAmpModButton() { //  control amplitude modulation
+        this.ampModButton = createButton('AMP MOD ON')
+        this.ampModButton.position(0.9 * this.effButX, this.buttonY);
+        this.ampModButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+
+        this.ampModButton.mousePressed(() => {
+            this.ampModOsc.start();
+            this.ampModOsc.disconnect();
+            this.ampModOsc.freq(20);
+            this.ampModOsc.amp(1);
+
+            this.soundFile.setVolume(this.ampModOsc.scale(-1, 1, 0, 1));
+        })
+    }
+
+    addDelayButton() {  //  control delay output
+        this.delayButton = createButton('DELAY ON');
+        this.delayButton.position(this.effButX, this.buttonY);
+        this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+
+        this.delayButton.mousePressed(() => {
+            this.delay.process(this.soundFile);
+            this.delay.delayTime(0.55);
+            this.delay.feedback(0.6);
+
+
+        })
+        
 
     }
 

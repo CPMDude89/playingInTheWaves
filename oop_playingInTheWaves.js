@@ -2,6 +2,7 @@ let w = window.innerWidth;
 let h = window.innerHeight;
 let looper1, looper2, looper3, looper4, looper5;
 let recButX=(4 * w/5), recButY=(h/6), recButWidth=(w/10), recButHeight=(h/10);
+let effectButtonX = 3.5 * (w/5);
 
 function preload() {
         
@@ -11,19 +12,19 @@ function preload() {
 function setup() {
     createCanvas(w, h);
 
-    looper1 = new Looper(recButX, recButY, recButWidth, recButHeight);  //  here we go with the first looper object
+    looper1 = new Looper(recButX, recButY, recButWidth, recButHeight, effectButtonX);  //  here we go with the first looper object
     looper1.init();  //  initialize button and recorder
 
-    looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight);
+    looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     looper2.init();  //  initialize button and recorder
 
-    looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight);
+    looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
     looper3.init();  //  initialize button and recorder
 
-    looper4 = new Looper(recButX, 4 * recButY, recButWidth, recButHeight);
+    looper4 = new Looper(recButX, 4 * recButY, recButWidth, recButHeight, effectButtonX);
     looper4.init();  //  initialize button and recorder
 
-    looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight);
+    looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight, effectButtonX);
     looper5.init();  //  initialize button and recorder
 }
 
