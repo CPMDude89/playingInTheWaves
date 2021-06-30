@@ -26,7 +26,9 @@ class Looper {
 
         this.clearButton;
         this.ampModButton;
+        this.ampModActive = false;
         this.delayButton;
+        this.delayButtonActive = false;
     }
 
     //  set everything up
@@ -100,16 +102,32 @@ class Looper {
         this.ampModButton = createButton('AMP MOD ON')
         this.ampModButton.position(0.9 * this.effButX, this.buttonY);
         this.ampModButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+        
+        this.ampModOsc.start();
+        this.ampModOsc.disconnect();
+        this.ampModOsc.scale(-1, 1, 0, 1);
 
         this.ampModButton.mousePressed(() => {
-            this.ampModOsc.start();
-            this.ampModOsc.disconnect();
-            this.ampModOsc.freq(20);
-            this.ampModOsc.amp(1);
-
-            this.soundFile.setVolume(this.ampModOsc.scale(-1, 1, 0, 1));
-        })
+            if (!this.ampModActive) {
+                this.ampModOsc.start();
+                this.ampModOsc.freq(20);
+                this.ampModOsc.amp(1);
+                this.soundFile.setVolume(this.ampModOsc);
+    
+                this.ampModButton.html('AMP MOD OFF');
+                this.ampModActive = true;
+            }
+            
+            else {
+                this.ampModOsc.stop();
+                this.soundFile.setVolume(0.5);
+    
+                this.ampModButton.html('AMP MOD ON');
+                this.ampModActive = false;
+            }
+        });
     }
+
 
     addDelayButton() {  //  control delay output
         this.delayButton = createButton('DELAY ON');
@@ -117,11 +135,20 @@ class Looper {
         this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
 
         this.delayButton.mousePressed(() => {
-            this.delay.process(this.soundFile);
-            this.delay.delayTime(0.55);
-            this.delay.feedback(0.6);
+            if (!this.delayActive) {
+                this.delay.process(this.soundFile);
+                this.delay.delayTime(0.55);
+                this.delay.feedback(0.6);
+                this.delay.drywet(1);
 
+                this.delayButton.html('DELAY OFF');
+            }
+            
+            else {
+                this.delay.dryset(0);
 
+                this.delayButton.html('DELAY ON');
+            }
         })
         
 
