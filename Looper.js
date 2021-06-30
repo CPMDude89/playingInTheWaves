@@ -1,22 +1,24 @@
 class Looper {
     constructor(
         //  get variable input from user
-        recButX,
-        recButY,
-        recButSize
+        recButX,    //  button x-coordinate
+        recButY,    //  button y-coordinate
+        recButWidth,    //  button width
+        recButHeight    //  button height
     ) {
         //  define properties
         this.recButX = recButX;
         this.recButY = recButY;
-        this.recButSize = recButSize;
+        this.recButWidth = recButWidth;
+        this.recButHeight = recButHeight;
 
-        this.mic = new p5.AudioIn();
-        this.recorder = new p5.SoundRecorder();
-        this.soundFile = new p5.SoundFile();
-        this.state = 0;
-        this.osc = new p5.Oscillator();
-        this.recBut = createButton('START RECORD');
-        this.recBut.mousePressed(() => this.record());
+        this.mic = new p5.AudioIn();    //  user input source (computer mic)
+        this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
+        this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
+        this.state = 0; //  'state' variable used to control recBut functions through recording -> playback
+
+        this.recBut = createButton('START RECORD'); //  create button
+        this.recBut.mousePressed(() => this.record());  //  when button is clicked, start record process
 
 
     }
@@ -27,10 +29,7 @@ class Looper {
         this.recorder.setInput(this.mic);   //  connect microphone to recorder object
 
         this.recBut.position(this.recButX, this.recButY);   //  set up recorder button
-        this.recBut.size(this.recButSize);
-
-        this.osc.freq(200);
-        this.osc.amp(0.2);
+        this.recBut.size(this.recButWidth, this.recButHeight);
     }
     
     //  use rec button to record voice and play back 
