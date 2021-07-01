@@ -20,7 +20,7 @@ class Looper {
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
         this.ampModOsc = new p5.Oscillator();
         this.delay = new p5.Delay();
-        this.reverb = new p5.Reverb();
+        this.reverbFor = new p5.Reverb();
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -92,40 +92,44 @@ class Looper {
 
 
         this.clearButton.mousePressed(() => {  //  clear audio buffer and reset buttons
-            //console.log('asdl;kjasdfl;kjasdf');
-            this.soundFile.stop();
-            this.button.size(this.buttonWidth, this.buttonHeight);
-            this.soundFile = new p5.SoundFile();
-            this.button.html('START RECORD');
-            this.state = 0;
-            this.clearButton.remove();
+            this.soundFile.stop();  //  stop audio file
+            this.button.size(this.buttonWidth, this.buttonHeight);  //  re-size button to fill gap
+            this.soundFile = new p5.SoundFile();    //  intantiate new soundFile object
+            this.button.html('START RECORD');       
+            this.state = 0; //  reset state to restart record process
+
+            this.clearButton.remove();  //  get rid of buttons
+            this.reverbButton.remove();
+            this.ampModButton.remove();
+            this.delayButton.remove();
         });
     }
 
     addDelayButton() {  //  control delay output
-        this.delayButton = createButton('DELAY ON');
+        this.delayButton = createButton('DELAY ON');    //  create delay button
         this.delayButton.position(this.effButX, this.buttonY);
         this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
 
-        this.delayButton.mousePressed(() => {
-            if (!this.delayActive) {
-                this.delay.process(this.soundFile);
-                this.delay.delayTime(0.55);
-                this.delay.feedback(0.6);
-                this.delay.filter(4000);
-                this.delay.drywet(1);
+        this.delayButton.mousePressed(() => {   //  trigger delay
+            if (!this.delayActive) {    //  if delay is not active yet, make active
+                this.delay.process(this.soundFile); //  connect delay to soundFile output
+                this.delay.delayTime(0.55); //  delay time
+                this.delay.feedback(0.6);   //  feedback amount
+                this.delay.filter(2000);    //  lowpass filter (helpful with high feedback)
+                this.delay.drywet(1);   //  full volume
+                this.delay.setType('pingPong'); //  ping pong delay
 
-                this.delayButton.html('DELAY OFF');
+                this.delayButton.html('DELAY OFF'); //  change button text
 
-                this.delayActive = true;
+                this.delayActive = true;    //  flip boolean
             }
             
-            else {
-                this.delay.drywet(0);
+            else {  //  if delay is triggered, turn off
+                this.delay.drywet(0);   //  volume level: 0
 
                 this.delayButton.html('DELAY ON');
 
-                this.delayActive = false;
+                this.delayActive = false;   //  flip boolean
             }
         })
     }
@@ -137,8 +141,8 @@ class Looper {
 
         this.reverbButton.mousePressed(() => {
             if (!this.reverbActive) {
-                this.reverb.process(this.soundFile, 3, 2, false);
-                this.reverb.drywet(1);
+                this.reverbFor.process(this.soundFile, 3, 2);
+                this.reverbFor.drywet(1);
 
                 this.reverbButton.html('REVERB OFF');
 
@@ -146,13 +150,38 @@ class Looper {
             }
 
             else {
-                this.reverb.drywet(0);
+                this.reverbFor.drywet(0);
 
                 this.reverbButton.html('REVERB ON');
 
                 this.reverbActive = false;
             }
         })
+        /*  *********  test to make reverb go backwards - forwards
+            *********   doesn't work, once reverb is reversed, it will not go back
+
+        this.reverbReverseButton = createButton('REVERB BACKWARDS ON');
+        this.reverbReverseButton.position(0.9 * this.effButX, 1.5 * this.buttonY);
+        this.reverbReverseButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+        this.reverbReverseActive = false;
+
+        this.reverbReverseButton.mousePressed(() => {
+            if (!this.reverbReverseActive) {
+                this.reverb.set(3, 2, true);
+                this.reverbReverseButton.html('GO BACK TO NORMAL');
+                this.reverbReverseActive = true;
+            }
+
+            else {
+                this.reverb.disconnect();
+                this.reverb = new p5.Reverb();
+                this.reverb.set(3, 2, false);
+                this.reverb.drywet(1);
+                this.reverbReverseButton.html('MAKE QUIETER');
+                this.reverbReverseActive = false;
+            }
+        })
+        */
     }
 
     addAmpModButton() { //  control amplitude modulation

@@ -8,7 +8,6 @@ function preload() {
         
 }
 
-
 function setup() {
     createCanvas(w, h);
 
@@ -31,17 +30,19 @@ function setup() {
 function draw() {
     background(128, 128, 255);    //  draw background
 
-    textAlign(CENTER);  //  title
+    textAlign(CENTER);  //  page title
     textSize(45);
     text('Playing In The Waves: A Play-Based Approach to Generative Sound Design', w/2, h/11);
 
-    textAlign(LEFT);    //  name of track 1
+    textAlign(LEFT);    //  set up track names
     textSize(28);
-    text('Track 1', recButX, (recButY - (0.01 * recButY)));
+    text('Track 1', recButX, (recButY - (0.01 * recButY))); //  track names 1-5
     text('Track 2', recButX, (2*recButY - (0.01 * 2 * recButY)));
     text('Track 3', recButX, (3*recButY - (0.01 * 3 * recButY)));
     text('Track 4', recButX, (4*recButY - (0.01 * 4 * recButY)));
     text('Track 5', recButX, (5*recButY - (0.01 * 5 * recButY)));
+
+
 
 }
 
