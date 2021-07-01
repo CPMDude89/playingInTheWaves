@@ -20,15 +20,18 @@ class Looper {
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
         this.ampModOsc = new p5.Oscillator();
         this.delay = new p5.Delay();
+        this.reverb = new p5.Reverb();
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
 
         this.clearButton;
+        this.delayButton;
+        this.delayActive = false;
+        this.reverbButton;
+        this.reverbActive = false;
         this.ampModButton;
         this.ampModActive = false;
-        this.delayButton;
-        this.delayButtonActive = false;
     }
 
     //  set everything up
@@ -55,13 +58,14 @@ class Looper {
         else if (this.state == 1) {    //  stop recorder and send result to soundFile
             this.recorder.stop();   //  stop recorder
 
-            this.button.html('PLAY');
-            this.state++;
-            this.button.size(this.buttonWidth/2, this.buttonHeight);
+            this.button.html('PLAY');   //  reassign button text
+            this.state++;   //  increase state for record process
+            this.button.size(this.buttonWidth/2, this.buttonHeight);    //  make room for new buttons
 
-            this.addClearButton();
-            this.addAmpModButton();
-            this.addDelayButton();
+            this.addClearButton();  //  clear the buffer and start over
+            this.addDelayButton();  //  apply delay
+            this.addReverbButton(); //  apply reverb
+            this.addAmpModButton(); //  apply amplitude modulation
 
         }
 
@@ -98,9 +102,62 @@ class Looper {
         });
     }
 
+    addDelayButton() {  //  control delay output
+        this.delayButton = createButton('DELAY ON');
+        this.delayButton.position(this.effButX, this.buttonY);
+        this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+
+        this.delayButton.mousePressed(() => {
+            if (!this.delayActive) {
+                this.delay.process(this.soundFile);
+                this.delay.delayTime(0.55);
+                this.delay.feedback(0.6);
+                this.delay.filter(4000);
+                this.delay.drywet(1);
+
+                this.delayButton.html('DELAY OFF');
+
+                this.delayActive = true;
+            }
+            
+            else {
+                this.delay.drywet(0);
+
+                this.delayButton.html('DELAY ON');
+
+                this.delayActive = false;
+            }
+        })
+    }
+
+    addReverbButton() {
+        this.reverbButton = createButton('REVERB ON');
+        this.reverbButton.position(0.9 * this.effButX, this.buttonY);
+        this.reverbButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+
+        this.reverbButton.mousePressed(() => {
+            if (!this.reverbActive) {
+                this.reverb.process(this.soundFile, 3, 2, false);
+                this.reverb.drywet(1);
+
+                this.reverbButton.html('REVERB OFF');
+
+                this.reverbActive = true;
+            }
+
+            else {
+                this.reverb.drywet(0);
+
+                this.reverbButton.html('REVERB ON');
+
+                this.reverbActive = false;
+            }
+        })
+    }
+
     addAmpModButton() { //  control amplitude modulation
         this.ampModButton = createButton('AMP MOD ON')
-        this.ampModButton.position(0.9 * this.effButX, this.buttonY);
+        this.ampModButton.position(0.8 * this.effButX, this.buttonY);
         this.ampModButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
         
         this.ampModOsc.start();
@@ -127,33 +184,6 @@ class Looper {
             }
         });
     }
-
-
-    addDelayButton() {  //  control delay output
-        this.delayButton = createButton('DELAY ON');
-        this.delayButton.position(this.effButX, this.buttonY);
-        this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
-
-        this.delayButton.mousePressed(() => {
-            if (!this.delayActive) {
-                this.delay.process(this.soundFile);
-                this.delay.delayTime(0.55);
-                this.delay.feedback(0.6);
-                this.delay.drywet(1);
-
-                this.delayButton.html('DELAY OFF');
-            }
-            
-            else {
-                this.delay.dryset(0);
-
-                this.delayButton.html('DELAY ON');
-            }
-        })
-        
-
-    }
-
 
     
 }
