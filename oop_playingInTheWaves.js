@@ -1,6 +1,7 @@
 let w = window.innerWidth;
 let h = window.innerHeight;
 let looper1, looper2, looper3, looper4, looper5;
+let buttons1, buttons2, buttons3, buttons4, buttons5;
 let recButX=(4 * w/5), recButY=(h/6), recButWidth=(w/10), recButHeight=(h/10);
 let effectButtonX = 3.5 * (w/5);
 
@@ -13,6 +14,7 @@ function setup() {
 
     looper1 = new Looper(recButX, recButY, recButWidth, recButHeight, effectButtonX);  
     looper1.init();  //  initialize button and recorder
+    buttons1 = new Buttons(looper1.getEffButX(), looper1.getEffButX(), looper1.getEffButWidth(), looper1.getEffButHeight());
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     looper2.init();  
@@ -42,7 +44,8 @@ function draw() {
     text('Track 4', recButX, (4*recButY - (0.01 * 4 * recButY)));
     text('Track 5', recButX, (5*recButY - (0.01 * 5 * recButY)));
 
-
-
+    if (looper1.getState() > 1) {   //  once effect buttons are displayed
+        
+    }
 }
 

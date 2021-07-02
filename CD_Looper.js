@@ -18,6 +18,9 @@ class Looper {
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
         this.effButX = effButX;
+        this.effButY = buttonY;
+        this.effButWidth = 0.5 * this.buttonWidth;
+        this.effButHeight = 0.7 * this.buttonHeight;
 
         this.mic = new p5.AudioIn();    //  user input source (computer mic)
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
@@ -48,6 +51,28 @@ class Looper {
         this.button.size(this.buttonWidth, this.buttonHeight);
     }
     
+    // -------- GETTERS -------- //
+    getState() {
+        return this.state;
+    }
+    
+    getEffButX() {
+        return this.effButX;
+    }
+
+    getEffButY() {
+        return this.effButY;
+    }
+
+    getEffButWidth() {
+        return this.effButWidth;
+    }
+
+    getEffButHeight() {
+        return this.effButHeight;
+    }
+
+
     //  use rec button to record voice and play back 
     record() {
         userStartAudio();   //  ensure audio is good to go
@@ -113,7 +138,7 @@ class Looper {
     addDelayButton() {  //  control delay output
         this.delayButton = createButton('DELAY ON');    //  create delay button
         this.delayButton.position(this.effButX, this.buttonY);
-        this.delayButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
+        this.delayButton.size(this.effButWidth, this.effButHeight);
 
         this.delayButton.mousePressed(() => {   //  trigger delay
             if (!this.delayActive) {    //  if delay is not active yet, make active
