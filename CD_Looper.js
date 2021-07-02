@@ -1,3 +1,8 @@
+/**
+ * Class template for a single looper object
+ * Will take in user recorderings, and run them through effects
+ * This class will create the buttons to do all this, takes in coordinates as constructor arguments where the buttons go
+ */
 class Looper {
     constructor(
         //  get variable input from user
@@ -8,7 +13,7 @@ class Looper {
         effButX     //  effect button x-coordinate
     ) {
         //  define properties
-        this.buttonX = buttonX; //  properties from user input
+        this.buttonX = buttonX; //  apply user input to class-instance variables
         this.buttonY = buttonY;
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
@@ -127,7 +132,7 @@ class Looper {
             else {  //  if delay is triggered, turn off
                 this.delay.drywet(0);   //  volume level: 0
 
-                this.delayButton.html('DELAY ON');
+                this.delayButton.html('DELAY ON');  //  change button
 
                 this.delayActive = false;   //  flip boolean
             }

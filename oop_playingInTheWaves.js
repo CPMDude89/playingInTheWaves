@@ -11,20 +11,20 @@ function preload() {
 function setup() {
     createCanvas(w, h);
 
-    looper1 = new Looper(recButX, recButY, recButWidth, recButHeight, effectButtonX);  //  here we go with the first looper object
+    looper1 = new Looper(recButX, recButY, recButWidth, recButHeight, effectButtonX);  
     looper1.init();  //  initialize button and recorder
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper2.init();  //  initialize button and recorder
+    looper2.init();  
 
     looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper3.init();  //  initialize button and recorder
+    looper3.init();  
 
     looper4 = new Looper(recButX, 4 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper4.init();  //  initialize button and recorder
+    looper4.init();  
 
     looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper5.init();  //  initialize button and recorder
+    looper5.init();  
 }
 
 function draw() {
