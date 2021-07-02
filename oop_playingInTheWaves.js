@@ -19,10 +19,10 @@ function setup() {
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     //buttons2 = new Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
-    looper2.init(buttons2);  //  initialize button and recorder
+    looper2.init();
+    //looper2.init(buttons2);  //  initialize button and recorder
     //buttons2.init();  
     
-
     looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
     looper3.init();  
 

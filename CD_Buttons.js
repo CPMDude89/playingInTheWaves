@@ -40,6 +40,9 @@ class Buttons {
         
     }
 
+    // -------- GETTERS -------- //
+    //get
+
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
         if (this.looper.delayActive) {  //  ---- delay
             fill(0, 255, 0);
