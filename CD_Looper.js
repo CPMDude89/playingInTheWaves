@@ -148,7 +148,7 @@ class Looper {
             if (!this.delayActive) {    //  if delay is not active yet, make active
                 this.delay.process(this.soundFile); //  connect delay to soundFile output
                 this.delay.delayTime(0.55); //  delay time
-                this.delay.feedback(0.75);   //  feedback amount
+                this.delay.feedback(0.6);   //  feedback amount
                 this.delay.filter(2000);    //  lowpass filter (helpful with high feedback)
                 this.delay.drywet(1);   //  full volume
                 this.delay.setType('pingPong'); //  ping pong delay

@@ -15,39 +15,28 @@ class Buttons {
         this.parentButY = parentButY;
         this.parentButWidth = parentButWidth;
         this.parentButHeight = parentButHeight;
+        this.circleR = this.parentButHeight;
         this.looper = looper;
 
-        this.delayButX = parentButX;
+        this.delayButX = parentButX;    //  keep track of specific effect button x-coordinates
         this.reverbButX = 0.75 * parentButX;
         this.ampModButX = 0.5 * parentButX;
         
-        this.circleX = 300;
-        this.circleY = 300;
-        this.circleR = 100;
+        this.delayFilterLFO = new p5.Oscillator();
+        
+        
+        this.delayFilterLFOActive = false;
     }
 
-    drawCircle() {  //  draw test button
-        circle(this.circleX, this.circleY, this.circleR);
-    } 
-
-    changeFeedbackAmt(mX, mY) {   //  make delay's feedback 0.1
-        let d = dist(mX, mY, this.circleX, this.circleY);
-
-        if (d < this.circleR) {     //  if mouse is inside circle when clicked
-            console.log('BUTTON PRESSED');
-
-            this.looper.delay.connect(this.looper.reverbFor);
-        }
-        else {
-            console.log('OUTSIDE OF BUTTON PRESSED');
-
-            this.looper.delay.disconnect();
-            this.looper.delay.connect();
-        }
+    init() {
+        this.delayFilterLFO.start();    //  start up LFO
+        this.delayFilterLFO.disconnect();
+        this.delayFilterLFO.scale(-1, 1, 10, 5000);
+        
     }
 
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
-        if (this.looper.delayActive) {  //  delay
+        if (this.looper.delayActive) {  //  ---- delay
             fill(0, 255, 0);
             circle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
@@ -55,8 +44,7 @@ class Buttons {
             fill(255, 0, 0);
             circle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
-
-        if (this.looper.reverbActive) { //  reverb
+        if (this.looper.reverbActive) { //  ---- reverb
             fill(0, 255, 0);
             circle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
@@ -64,8 +52,7 @@ class Buttons {
             fill(255, 0, 0);
             circle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
-
-        if (this.looper.ampModActive) { //  amp mod
+        if (this.looper.ampModActive) { //  ---- amp mod
             fill(0, 255, 0);
             circle(.51 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
@@ -75,6 +62,35 @@ class Buttons {
         }
     }
 
+    drawDelayParamControls(mX = 0, mY = 0) {
+        let paramButX = 1.01 * this.parentButX;     //  set up coordinate variables for effect param control buttons
+        let paramButY = this.parentButY + (1.6 * this.parentButHeight);
+        textAlign(CENTER);  //  center label text with corresponding buttons
+        textSize(20);
+        
+
+        // ---- if clicked inside the circle    
+        let d = dist(mX, mY, paramButX, paramButY);
+        if (d < this.circleR) {     //  if mouse clicked inside circle, toggle delay filter LFO active boolean
+            this.delayFilterLFOActive ? this.delayFilterLFOActive = false : this.delayFilterLFOActive = true;
+        }
+        
+        if (this.delayFilterLFOActive) {   //  if filter LFO is active, turn button green   
+            fill(0, 255, 0);
+            this.delayFilterLFO.freq(2);
+            this.delayFilterLFO.amp(1);
+            this.looper.delay.filter(this.delayFilterLFO, 8);
+        }
+        else {      //  if filter LFO is inactive, turn button red
+            this.looper.delay.filter(4000, 1);
+        }
+
+        circle(paramButX, paramButY, this.circleR);
+        fill(0);
+        text('FILTER LFO', paramButX, paramButY + (1.1 * this.parentButHeight));
+
+
+    }
 
 
 }

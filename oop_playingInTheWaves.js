@@ -16,6 +16,7 @@ function setup() {
     looper1 = new Looper(recButX, recButY, recButWidth, recButHeight, effectButtonX);  
     buttons1 = new Buttons(looper1.getEffButX(), looper1.getEffButY(), looper1.getEffButWidth(), looper1.getEffButHeight(), looper1);
     looper1.init(buttons1);  //  initialize button and recorder
+    buttons1.init();
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     looper2.init();  
@@ -49,14 +50,11 @@ function draw() {
     fill(0, 179, 0);
 
     if (looper1.getState() > 1) {   //  once effect buttons are displayed
+        buttons1.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+ 
+        buttons1.drawDelayParamControls();     //  control delay filter LFO
+        canv.mousePressed(function() {buttons1.drawDelayParamControls(mouseX, mouseY);});
         
-        buttons1.drawCircle();
-
-        canv.mousePressed(function() {
-            buttons1.changeFeedbackAmt(mouseX, mouseY);
-        })
-
-        buttons1.effButAlerts();
     }
 
 }
