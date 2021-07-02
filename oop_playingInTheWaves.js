@@ -4,7 +4,6 @@ let looper1, looper2, looper3, looper4, looper5;
 let buttons1, buttons2, buttons3, buttons4, buttons5;
 let recButX=(4 * w/5), recButY=(h/6), recButWidth=(w/10), recButHeight=(h/10);
 let effectButtonX = 4.5 * (w/7);
-let drawBool = false;
 
 function preload() {
         
@@ -19,7 +18,10 @@ function setup() {
     buttons1.init();
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper2.init();  
+    //buttons2 = new Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
+    looper2.init(buttons2);  //  initialize button and recorder
+    //buttons2.init();  
+    
 
     looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
     looper3.init();  
@@ -53,9 +55,18 @@ function draw() {
         buttons1.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
  
         buttons1.drawDelayParamControls();     //  control delay filter LFO
-        canv.mousePressed(function() {buttons1.drawDelayParamControls(mouseX, mouseY);});
-        
+            canv.mousePressed(function() {buttons1.drawDelayParamControls(mouseX, mouseY);
+        });
     }
+    /*
+    if (looper2.getState() > 1) {   //  once effect buttons are displayed
+        buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+ 
+        buttons2.drawDelayParamControls();     //  control delay filter LFO
+        canv.mousePressed(function() {buttons2.drawDelayParamControls(mouseX, mouseY);});
+    }
+    */
+
 
 }
 
