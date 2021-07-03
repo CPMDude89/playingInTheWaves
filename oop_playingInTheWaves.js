@@ -24,18 +24,19 @@ function setup() {
     buttons2.init();  
     
     looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper3.init();  
+    buttons3 = new Buttons(looper3.getEffButX(), looper3.getEffButY(), looper3.getEffButWidth(), looper3.getEffButHeight(), looper3);
+    looper3.init(buttons3);
+    buttons3.init();  
 
     looper4 = new Looper(recButX, 4 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper4.init();  
+    buttons4 = new Buttons(looper4.getEffButX(), looper4.getEffButY(), looper4.getEffButWidth(), looper4.getEffButHeight(), looper4);
+    looper4.init(buttons4);  
+    buttons4.init();
 
     looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight, effectButtonX);
-    looper5.init();  
-
-    //  test
-    //let [top, bottom] = looper1.getRecButYDimensions();
-    //console.log('Top is: ' + top + '\nand Bottom is: ' + bottom);
-    //console.log(looper1.getrecButYDimensions());
+    buttons5 = new Buttons(looper5.getEffButX(), looper5.getEffButY(), looper5.getEffButWidth(), looper5.getEffButHeight(), looper5);
+    looper5.init(buttons5);  
+    buttons5.init();
 }
 
 function draw() {
@@ -64,9 +65,17 @@ function draw() {
         buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
     }
 
-    
+    if (looper3.getState() > 1 ) {   //  once effect buttons are displayed
+        buttons3.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+    }
 
+    if (looper4.getState() > 1 ) {   //  once effect buttons are displayed
+        buttons4.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+    }
 
+    if (looper5.getState() > 1 ) {   //  once effect buttons are displayed
+        buttons5.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+    }
 }
 
 
