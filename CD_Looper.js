@@ -56,6 +56,10 @@ class Looper {
     }
     
     // -------- GETTERS -------- //
+    getRecButYDimensions() {    //  get the y dimensions of the record/play button to narrow down the mousePressed()
+        return [this.buttonY, (this.buttonY + this.buttonHeight)];
+    }
+
     getState() {
         return this.state;
     }
