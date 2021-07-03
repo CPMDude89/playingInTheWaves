@@ -23,6 +23,8 @@ class Buttons {
         this.reverbButX = 0.75 * parentButX;
         this.ampModButX = 0.5 * parentButX;
 
+        this.delayRouteIntoReverbActive = false;
+        
         this.delayTimeLFO = new p5.Oscillator();
         this.delayTimeLFOActive = false;
 
@@ -49,6 +51,34 @@ class Buttons {
             fill(255, 0, 0);
             circle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
         }
+
+        if (this.delayRouteIntoReverbActive) {  //  ---- route delay to reverb
+            fill(0, 255, 0);
+            circle((0.15 * this.parentButWidth) + this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+        else {
+            fill(255, 0, 0);
+            circle((0.15 * this.parentButWidth) + this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+
+        if (this.delayTimeLFOActive) {  //  ---- delay time LFO
+            fill(0, 255, 0);
+            circle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+        else {
+            fill(255, 0, 0);
+            circle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+
+        if (this.delayFilterLFOActive) {  //  ---- delay filter LFO
+            fill(0, 255, 0);
+            circle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+        else {
+            fill(255, 0, 0);
+            circle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+        }
+
         if (this.looper.reverbActive) { //  ---- reverb
             fill(0, 255, 0);
             circle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
@@ -68,17 +98,38 @@ class Buttons {
     }
 
     makeControlButtons() {
+        // -------- ROUTE DELAY LOOP INTO REVERB -------- //
+        this.delayRouteIntoReverbBut = createButton('ROUTE TO\nREVERB');    //  make button
+        this.delayRouteIntoReverbBut.position(this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
+        this.delayRouteIntoReverbBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);   //  size
+        this.delayRouteIntoReverbBut.mousePressed(() => {this.delayRouteIntoReverbProcess();});     //  start event to toggle routing
+
         // -------- DELAY TIME LFO -------- //
         this.delayTimeLFOBut = createButton('TIME \nLFO');  //  make button
-        this.delayTimeLFOBut.position(this.delayButX, this.parentButY + 1.1 * this.parentButHeight);    //  position
-        this.delayTimeLFOBut.size(0.3 * this.parentButWidth, 1.5 * this.parentButHeight);   //  size
+        this.delayTimeLFOBut.position(1.075 * this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
+        this.delayTimeLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);   //  size
         this.delayTimeLFOBut.mousePressed(() => {this.delayTimeLFOProcess();});     //  start event to trigger effect control
 
         // -------- DELAY FILTER LFO -------- //
         this.delayFilterLFOBut = createButton('FILTER LFO');    //  make button
-        this.delayFilterLFOBut.position(1.1 * this.delayButX, this.parentButY + 1.1 * this.parentButHeight);    //  position
-        this.delayFilterLFOBut.size(0.3 * this.parentButWidth, 1.5 * this.parentButHeight); //  size
+        this.delayFilterLFOBut.position(1.15 * this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
+        this.delayFilterLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight); //  size
         this.delayFilterLFOBut.mousePressed(() => {this.delayFilterLFOProcess();});     // start event to trigger effect control
+    }
+
+    delayRouteIntoReverbProcess() {
+        if (!this.delayRouteIntoReverbActive) {
+            this.looper.delay.connect(this.looper.reverbFor);  //  connect delay output to reverb node
+            this.looper.reverbFor.drywet(1);
+
+            this.delayRouteIntoReverbActive = true; //  flip boolean
+        }
+        else {
+            this.looper.delay.disconnect(); //  disconnect delay from all outputs
+            this.looper.delay.connect();    //  connect delay back to master output
+
+            this.delayRouteIntoReverbActive = false;    //  flip boolean
+        }
     }
 
     delayTimeLFOProcess() {     //  ----    delay time LFO

@@ -77,22 +77,3 @@ function draw() {
         buttons5.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
     }
 }
-
-
-
-
-
-
-
-/*
-    if (looper2.getState() > 1) {   //  once effect buttons are displayed
-        buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
- 
-        buttons2.drawDelayParamControls();     //  control delay filter LFO
-
-        let [top, bottom] = looper2.getRecButYDimensions();
-        if (mouseY > top && mouseY < bottom) {
-            canv.mousePressed(function() {buttons2.drawDelayParamControls(mouseX, mouseY);});
-        }
-    }
-    */
