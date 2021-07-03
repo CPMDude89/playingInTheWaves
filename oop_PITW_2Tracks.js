@@ -16,13 +16,13 @@ function setup() {
     buttons1 = new Buttons(looper1.getEffButX(), looper1.getEffButY(), looper1.getEffButWidth(), looper1.getEffButHeight(), looper1);
     looper1.init(buttons1);  //  initialize button and recorder
     buttons1.init();
-
+    
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     buttons2 = new Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
     //looper2.init();
     looper2.init(buttons2);  //  initialize button and recorder
     buttons2.init();  
-    
+    /*
     looper3 = new Looper(recButX, 3 * recButY, recButWidth, recButHeight, effectButtonX);
     looper3.init();  
 
@@ -31,7 +31,7 @@ function setup() {
 
     looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight, effectButtonX);
     looper5.init();  
-
+    */
     //  test
     //let [top, bottom] = looper1.getRecButYDimensions();
     //console.log('Top is: ' + top + '\nand Bottom is: ' + bottom);
@@ -69,7 +69,7 @@ function draw() {
         }
         
     }
-
+    
     if (looper2.getState() > 1) {   //  once effect buttons are displayed
         buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
  
@@ -80,7 +80,7 @@ function draw() {
             canv.mousePressed(function() {buttons2.drawDelayParamControls(mouseX, mouseY);});
         }
     }
-
+    
 
 
 }
