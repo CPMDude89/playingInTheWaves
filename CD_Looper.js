@@ -29,6 +29,7 @@ class Looper {
         this.ampModOsc = new p5.Oscillator();
         this.delay = new p5.Delay();
         this.reverbFor = new p5.Reverb();
+        this.reverbBack = new p5.Reverb();
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -53,6 +54,8 @@ class Looper {
         this.button.size(this.buttonWidth, this.buttonHeight);
 
         this.buttons = _buttons;    //  connect this looper instance with it's own buttons instance
+
+        this.reverbBack.set(3, 2, true);
     }
     
     // -------- GETTERS -------- //
@@ -183,6 +186,9 @@ class Looper {
                 this.reverbFor.process(this.soundFile, 3, 2);
                 this.reverbFor.drywet(1);
 
+                this.reverbBack.process(this.soundFile, 3, 2, true);
+                this.reverbBack.drywet(0);
+
                 this.reverbButton.html('DEACTIVATE REVERB');
 
                 this.reverbActive = true;
@@ -196,31 +202,7 @@ class Looper {
                 this.reverbActive = false;
             }
         })
-        /*  *********  test to make reverb go backwards - forwards
-            *********   doesn't work, once reverb is reversed, it will not go back
-
-        this.reverbReverseButton = createButton('REVERB BACKWARDS ON');
-        this.reverbReverseButton.position(0.9 * this.effButX, 1.5 * this.buttonY);
-        this.reverbReverseButton.size(0.5 * this.buttonWidth, 0.7 * this.buttonHeight);
-        this.reverbReverseActive = false;
-
-        this.reverbReverseButton.mousePressed(() => {
-            if (!this.reverbReverseActive) {
-                this.reverb.set(3, 2, true);
-                this.reverbReverseButton.html('GO BACK TO NORMAL');
-                this.reverbReverseActive = true;
-            }
-
-            else {
-                this.reverb.disconnect();
-                this.reverb = new p5.Reverb();
-                this.reverb.set(3, 2, false);
-                this.reverb.drywet(1);
-                this.reverbReverseButton.html('MAKE QUIETER');
-                this.reverbReverseActive = false;
-            }
-        })
-        */
+       
     }
 
     addAmpModButton() { //  control amplitude modulation

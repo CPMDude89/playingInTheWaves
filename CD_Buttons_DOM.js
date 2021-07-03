@@ -38,6 +38,9 @@ class Buttons {
         this.delayFilterLFO = new p5.Oscillator();
         this.delayFilterLFOActive = false;        
         this.delayFilterLFOSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
+
+        this.reverbBackwardsActive = false;
+        this.reverbBackwardsSignal = new SignalCircle((0.15 * this.parentButWidth) + this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -65,9 +68,15 @@ class Buttons {
         
         //  reverb
         this.looper.reverbActive ? this.reverbSignal.drawActiveCircle() : this.reverbSignal.drawInactiveCircle();
+
+        //  reverse reverb
+        this.reverbBackwardsActive ? this.reverbBackwardsSignal.drawActiveCircle() : this.reverbBackwardsSignal.drawInactiveCircle();
             
         //  amp mod
         this.looper.ampModActive ? this.ampModSignal.drawActiveCircle() : this.ampModSignal.drawInactiveCircle();
+
+
+
     }
 
     makeControlButtons() {
@@ -88,11 +97,18 @@ class Buttons {
         this.delayFilterLFOBut.position(1.15 * this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
         this.delayFilterLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight); //  size
         this.delayFilterLFOBut.mousePressed(() => {this.delayFilterLFOProcess();});     // start event to trigger effect control
+
+        // -------- REVERB BACKWARDS -------- //
+        this.reverbBackwardsBut = createButton('REVERSE\nREVERB');    //  make button
+        this.reverbBackwardsBut.position(this.reverbButX, this.parentButY + (1.1 * this.parentButHeight));  //  position
+        this.reverbBackwardsBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
+        this.reverbBackwardsBut.mousePressed(() => {this.reverbBackwardsProcess();});   //  switch reverbFor and reverbBack volumes
     }
 
     delayRouteIntoReverbProcess() {
         if (!this.delayRouteIntoReverbActive) {
-            this.looper.delay.connect(this.looper.reverbFor);  //  connect delay output to reverb node
+            this.looper.delay.connect(this.looper.reverbFor);  //  connect delay output to forward reverb node
+            this.looper.delay.connect(this.looper.reverbBack);  //  connect delay output to backward reverb node
             this.looper.reverbFor.drywet(1);
 
             this.delayRouteIntoReverbActive = true; //  flip boolean
@@ -133,6 +149,21 @@ class Buttons {
             this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
 
             this.delayFilterLFOActive = false;
+        }
+    }
+
+    reverbBackwardsProcess() {
+        if (!this.reverbBackwardsActive) {
+            this.looper.reverbFor.drywet(0);    //  turn down forwards reverb
+            this.looper.reverbBack.drywet(1);   //  turn up backwards reverb
+
+            this.reverbBackwardsActive = true;
+        }
+        else {
+            this.looper.reverbFor.drywet(1);    //  turn up forwards reverb
+            this.looper.reverbBack.drywet(0);   //  turn down backwards reverb
+
+            this.reverbBackwardsActive = false;
         }
     }
 }
