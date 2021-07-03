@@ -58,18 +58,24 @@ function draw() {
 
     if (looper1.getState() > 1 ) {   //  once effect buttons are displayed
         buttons1.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
- 
-        buttons1.drawDelayParamControls();     //  control delay filter LFO
-
-        let [top, bottom] = looper1.getRecButYDimensions();
-        //console.log('Top is: ' + top + '\nand Bottom is: ' + bottom);
-        if (mouseY > top && mouseY < bottom) {
-            //console.log('IN BETWEEN TOP AND BOTTOM');
-            canv.mousePressed(function() {buttons1.drawDelayParamControls(mouseX, mouseY);});
-        }
-        
     }
 
+    if (looper2.getState() > 1 ) {   //  once effect buttons are displayed
+        buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+    }
+
+    
+
+
+}
+
+
+
+
+
+
+
+/*
     if (looper2.getState() > 1) {   //  once effect buttons are displayed
         buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
  
@@ -80,8 +86,4 @@ function draw() {
             canv.mousePressed(function() {buttons2.drawDelayParamControls(mouseX, mouseY);});
         }
     }
-
-
-
-}
-
+    */

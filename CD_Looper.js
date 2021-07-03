@@ -105,6 +105,7 @@ class Looper {
             this.addReverbButton(); //  apply reverb
             this.addAmpModButton(); //  apply amplitude modulation
 
+            this.buttons.makeControlButtons();
         }
 
         else if (this.state == 2) { //  play back recording
