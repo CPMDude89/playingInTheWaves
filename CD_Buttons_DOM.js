@@ -23,13 +23,21 @@ class Buttons {
         this.reverbButX = 0.75 * parentButX;
         this.ampModButX = 0.5 * parentButX;
 
+        //  delay, reverb, amp mod signal circles
+        this.delaySignal = new SignalCircle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
+        this.reverbSignal = new SignalCircle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
+        this.ampModSignal = new SignalCircle(.51 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
+
         this.delayRouteIntoReverbActive = false;
+        this.routeDelToVerbSignal = new SignalCircle((0.15 * this.parentButWidth) + this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
         
         this.delayTimeLFO = new p5.Oscillator();
         this.delayTimeLFOActive = false;
+        this.delayTimeLFOSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
         this.delayFilterLFO = new p5.Oscillator();
         this.delayFilterLFOActive = false;        
+        this.delayFilterLFOSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -43,58 +51,23 @@ class Buttons {
     }
 
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
-        if (this.looper.delayActive) {  //  ---- delay
-            fill(0, 255, 0);
-            circle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle(1.01 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
+        //  delay
+        this.looper.delayActive ? this.delaySignal.drawActiveCircle() : this.delaySignal.drawInactiveCircle();
 
-        if (this.delayRouteIntoReverbActive) {  //  ---- route delay to reverb
-            fill(0, 255, 0);
-            circle((0.15 * this.parentButWidth) + this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle((0.15 * this.parentButWidth) + this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
+        // route delay to reverb
+        this.delayRouteIntoReverbActive ? this.routeDelToVerbSignal.drawActiveCircle() : this.routeDelToVerbSignal.drawInactiveCircle();
+      
+        //  delay time LFO
+        this.delayTimeLFOActive ? this.delayTimeLFOSignal.drawActiveCircle() : this.delayTimeLFOSignal.drawInactiveCircle();
 
-        if (this.delayTimeLFOActive) {  //  ---- delay time LFO
-            fill(0, 255, 0);
-            circle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
-
-        if (this.delayFilterLFOActive) {  //  ---- delay filter LFO
-            fill(0, 255, 0);
-            circle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-        }
-
-        if (this.looper.reverbActive) { //  ---- reverb
-            fill(0, 255, 0);
-            circle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle(.76 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
-        if (this.looper.ampModActive) { //  ---- amp mod
-            fill(0, 255, 0);
-            circle(.51 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
-        else {
-            fill(255, 0, 0);
-            circle(.51 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
-        }
+        //  delay filter LFO
+        this.delayFilterLFOActive ? this.delayFilterLFOSignal.drawActiveCircle() : this.delayFilterLFOSignal.drawInactiveCircle();
+        
+        //  reverb
+        this.looper.reverbActive ? this.reverbSignal.drawActiveCircle() : this.reverbSignal.drawInactiveCircle();
+            
+        //  amp mod
+        this.looper.ampModActive ? this.ampModSignal.drawActiveCircle() : this.ampModSignal.drawInactiveCircle();
     }
 
     makeControlButtons() {
