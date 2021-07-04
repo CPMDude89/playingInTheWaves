@@ -45,10 +45,10 @@ class Buttons {
         this.reverbLongTailActive = false;
         this.reverbLongTailSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.1 * this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
+        this.reverbAmpModActive = false;
+        this.reverbAmpModSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.2 * this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
-        //this.reverbLFO = new Analyzer(1, 100);
-        //this.reverbLFO = new p5.Oscillator();
-        //this.reverbLFOActive = false;
+
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -59,12 +59,6 @@ class Buttons {
         this.delayFilterLFO.start();    //  start up LFO
         this.delayFilterLFO.disconnect();
         this.delayFilterLFO.scale(-1, 1, 10, 5000);
-
-        //this.reverbLFO.start();
-        //this.reverbLFO.disconnect();
-        //this.reverbLFO.scale(-1, 1, 0, 1);
-        
-        //this.reverbLFO.setFreq(0.3);
     }
 
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
@@ -202,31 +196,11 @@ class Buttons {
             this.reverbLongTailActive = false;
         }
     }
+
+    
 }
 
 
 
 
 
-// -------- REVERB LFO -------- //
-        /*
-
-        // -------- REVERB ROUTE INTO DELAY -------- //
-        this.reverbRouteIntoDelayBut = createButton('ROUTE TO\nDELAY');
-        this.reverbRouteIntoDelayBut.position(1.2 * this.reverbButX, this.parentButY + (1.1 * this.parentButHeight));
-        this.reverbRouteIntoDelayBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
-        this.reverbRouteIntoDelayBut.mousePressed(() => {this.reverbRouteIntoDelayProcess();});
-
-        this.reverbLFOBut = createButton('REVERB\nLFO');
-        this.reverbLFOBut.position(1.1 * this.reverbButX, this.parentButY + (1.1 * this.parentButHeight));
-        this.reverbLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
-        this.reverbLFOBut.mousePressed(() => {this.reverbLFOProcess();});   //  not sure yet
-        
-
-        reverbLFOProcess() {
-            this.reverbLFO.freq(2);
-            this.reverbLFO.amp(1);
-    
-            //this.looper.reverbFor.amp(this.reverbLFO);
-        }
-        */

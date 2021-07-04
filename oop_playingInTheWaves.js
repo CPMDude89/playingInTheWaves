@@ -32,11 +32,6 @@ function setup() {
     buttons4 = new Buttons(looper4.getEffButX(), looper4.getEffButY(), looper4.getEffButWidth(), looper4.getEffButHeight(), looper4);
     looper4.init(buttons4);  
     buttons4.init();
-
-    looper5 = new Looper(recButX, 5 * recButY, recButWidth, recButHeight, effectButtonX);
-    buttons5 = new Buttons(looper5.getEffButX(), looper5.getEffButY(), looper5.getEffButWidth(), looper5.getEffButHeight(), looper5);
-    looper5.init(buttons5);  
-    buttons5.init();
 }
 
 function draw() {
@@ -53,27 +48,25 @@ function draw() {
     text('Track 2', recButX, (2*recButY - (0.01 * 2 * recButY)));
     text('Track 3', recButX, (3*recButY - (0.01 * 3 * recButY)));
     text('Track 4', recButX, (4*recButY - (0.01 * 4 * recButY)));
-    text('Track 5', recButX, (5*recButY - (0.01 * 5 * recButY)));
 
     fill(0, 179, 0);
-
+    
     if (looper1.getState() > 1 ) {   //  once effect buttons are displayed
         buttons1.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
     }
 
     if (looper2.getState() > 1 ) {   //  once effect buttons are displayed
         buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+      
     }
 
     if (looper3.getState() > 1 ) {   //  once effect buttons are displayed
         buttons3.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+        
     }
 
     if (looper4.getState() > 1 ) {   //  once effect buttons are displayed
         buttons4.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
-    }
-
-    if (looper5.getState() > 1 ) {   //  once effect buttons are displayed
-        buttons5.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+       
     }
 }
