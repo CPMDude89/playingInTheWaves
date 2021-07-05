@@ -141,12 +141,31 @@ class Buttons {
         this.ampModNewDepthBut.mousePressed(() => {this.ampModNewDepthProcess();});
     }
 
-    removeControlButtons() {
+    removeControlButtons() {    //  delete effect control buttons, and reset the active booleans to reset
+        this.looper.delayActive = false;
+        this.looper.reverbActive = false;
+        this.looper.ampModActive = false;
+        
         this.delayRouteIntoReverbBut.remove();
+        this.delayRouteIntoReverbActive = false;
+
         this.delayTimeLFOBut.remove();
+        this.delayTimeLFOActive = false;
+
         this.delayFilterLFOBut.remove();
+        this.delayFilterLFOActive = false;        
+
         this.reverbBackwardsBut.remove();
+        this.reverbBackwardsActive = false;
+
         this.reverbLongTailBut.remove();
+
+        this.ampModNewFreqBut.remove();
+
+        this.ampModFreqLFOBut.remove();
+        this.ampModFreqLFOActive = false;
+
+        this.ampModNewDepthBut.remove();
     }
 
     delayRouteIntoReverbProcess() {
