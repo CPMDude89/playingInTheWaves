@@ -143,11 +143,11 @@ class Looper {
             this.button.html('START RECORD');       
             this.state = 0; //  reset state to restart record process
 
-            this.clearButton.remove();  //  get rid of buttons
-            this.reverbButton.remove();
+            this.reverbButton.remove();     //  get rid of buttons
             this.ampModButton.remove();
             this.delayButton.remove();
             this.buttons.removeControlButtons();
+            this.clearButton.remove();  
         });
     }
 

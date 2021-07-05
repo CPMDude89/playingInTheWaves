@@ -175,9 +175,21 @@ function createFileButtons() {  //  clear outFile and make room to re-record
     fileClearButton = createButton('CLEAR');
     fileClearButton.position(recButX + (0.5 * recButWidth), recButY);
     fileClearButton.size(0.5 * recButWidth, recButHeight);
-    fileClearButton.mousePressed(function() {
+    fileClearButton.mousePressed(function() {   //  clear and reset record button
         outFile.stop()  //  just in case file is actively playing back when button is pressed
         recBut.size(recButWidth, recButHeight);     //  re-size main record button
-        
+        outFile = new p5.SoundFile();   //  reset sound file object with new assignment
+        recBut.html('RECORD CLIP');     //  reset button text
+        recState = 0;   //  reset record counter to reset whole record process
+
+        fileDownloadButton.remove();
+        fileClearButton.remove();
+    });
+
+    fileDownloadButton = createButton('DOWNLOAD');
+    fileDownloadButton.position(recButX + recButWidth, recButY);
+    fileDownloadButton.size(0.8 * recButWidth, recButHeight);
+    fileDownloadButton.mousePressed(function() {
+        outFile.save('Playing_In_The_Waves.wav');
     })
 }
