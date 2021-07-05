@@ -26,10 +26,13 @@ class Looper {
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
         this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
-        this.ampModOsc = new p5.Oscillator();
         this.delay = new p5.Delay();
         this.reverbFor = new p5.Reverb();
         this.reverbBack = new p5.Reverb();
+        this.ampModOsc = new p5.Oscillator();
+        this.ampModOsc.start();
+        this.ampModOsc.disconnect();
+        this.ampModOsc.scale(-1, 1, 0, 1);
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -144,6 +147,7 @@ class Looper {
             this.reverbButton.remove();
             this.ampModButton.remove();
             this.delayButton.remove();
+            this.buttons.removeControlButtons();
         });
     }
 
@@ -210,9 +214,7 @@ class Looper {
         this.ampModButton.position(0.5 * this.effButX, this.effButY);
         this.ampModButton.size(this.effButWidth, this.effButHeight);
         
-        this.ampModOsc.start();
-        this.ampModOsc.disconnect();
-        this.ampModOsc.scale(-1, 1, 0, 1);
+        
 
         this.ampModButton.mousePressed(() => {
             if (!this.ampModActive) {

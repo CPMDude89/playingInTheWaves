@@ -49,6 +49,7 @@ class Buttons {
         this.reverbAmpModSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.2 * this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
 
+
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -65,23 +66,27 @@ class Buttons {
         //  delay
         this.looper.delayActive ? this.delaySignal.drawActiveCircle() : this.delaySignal.drawInactiveCircle();
 
+        if (this.looper.delayActive) {
         // route delay to reverb
-        this.delayRouteIntoReverbActive ? this.routeDelToVerbSignal.drawActiveCircle() : this.routeDelToVerbSignal.drawInactiveCircle();
-      
-        //  delay time LFO
-        this.delayTimeLFOActive ? this.delayTimeLFOSignal.drawActiveCircle() : this.delayTimeLFOSignal.drawInactiveCircle();
+            this.delayRouteIntoReverbActive ? this.routeDelToVerbSignal.drawActiveCircle() : this.routeDelToVerbSignal.drawInactiveCircle();
+        
+            //  delay time LFO
+            this.delayTimeLFOActive ? this.delayTimeLFOSignal.drawActiveCircle() : this.delayTimeLFOSignal.drawInactiveCircle();
 
-        //  delay filter LFO
-        this.delayFilterLFOActive ? this.delayFilterLFOSignal.drawActiveCircle() : this.delayFilterLFOSignal.drawInactiveCircle();
+            //  delay filter LFO
+            this.delayFilterLFOActive ? this.delayFilterLFOSignal.drawActiveCircle() : this.delayFilterLFOSignal.drawInactiveCircle();
+        }
         
         //  reverb
         this.looper.reverbActive ? this.reverbSignal.drawActiveCircle() : this.reverbSignal.drawInactiveCircle();
+        
+        if (this.looper.reverbActive) {
+            //  reverse reverb
+            this.reverbBackwardsActive ? this.reverbBackwardsSignal.drawActiveCircle() : this.reverbBackwardsSignal.drawInactiveCircle();
 
-        //  reverse reverb
-        this.reverbBackwardsActive ? this.reverbBackwardsSignal.drawActiveCircle() : this.reverbBackwardsSignal.drawInactiveCircle();
-
-        //  reverb long tail
-        this.reverbLongTailActive ? this.reverbLongTailSignal.drawActiveCircle() : this.reverbLongTailSignal.drawInactiveCircle();
+            //  reverb long tail
+            this.reverbLongTailActive ? this.reverbLongTailSignal.drawActiveCircle() : this.reverbLongTailSignal.drawInactiveCircle();
+        }
             
         //  amp mod
         this.looper.ampModActive ? this.ampModSignal.drawActiveCircle() : this.ampModSignal.drawInactiveCircle();
@@ -118,82 +123,114 @@ class Buttons {
         this.reverbLongTailBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight); //  size
         this.reverbLongTailBut.mousePressed(() => {this.reverbLongTailProcess();}); //  set reverb with a long reverb time
 
+        // -------- AMP MOD NEW FREQ -------- //
+        this.ampModNewFreqBut = createButton('CHANGE\nFREQ');   //  randomize amp mod frequency
+        this.ampModNewFreqBut.position(this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
+        this.ampModNewFreqBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);  //  size
+        this.ampModNewFreqBut.mousePressed(() => {this.ampModNewFreqProcess();});   //  with every click, input a new frequency to oscillator
+    }
+
+    removeControlButtons() {
+        this.delayRouteIntoReverbBut.remove();
+        this.delayTimeLFOBut.remove();
+        this.delayFilterLFOBut.remove();
+        this.reverbBackwardsBut.remove();
+        this.reverbLongTailBut.remove();
     }
 
     delayRouteIntoReverbProcess() {
-        if (!this.delayRouteIntoReverbActive) {
-            this.looper.delay.connect(this.looper.reverbFor);  //  connect delay output to forward reverb node
-            this.looper.delay.connect(this.looper.reverbBack);  //  connect delay output to backward reverb node
-            this.looper.reverbFor.drywet(1);
+        if (this.looper.delayActive) {  //  only trigger if delay is already going
+            if (!this.delayRouteIntoReverbActive) {
+                this.looper.delay.connect(this.looper.reverbFor);  //  connect delay output to forward reverb node
+                this.looper.delay.connect(this.looper.reverbBack);  //  connect delay output to backward reverb node
+                this.looper.reverbFor.drywet(1);
 
-            this.delayRouteIntoReverbActive = true; //  flip boolean
-        }
-        else {
-            this.looper.delay.disconnect(); //  disconnect delay from all outputs
-            this.looper.delay.connect();    //  connect delay back to master output
+                this.delayRouteIntoReverbActive = true; //  flip boolean
+            }
+            else {
+                this.looper.delay.disconnect(); //  disconnect delay from all outputs
+                this.looper.delay.connect();    //  connect delay back to master output
 
-            this.delayRouteIntoReverbActive = false;    //  flip boolean
+                this.delayRouteIntoReverbActive = false;    //  flip boolean
+            }
         }
     }
 
     delayTimeLFOProcess() {     //  ----    delay time LFO
-        if (!this.delayTimeLFOActive) {
-            this.delayTimeLFO.freq(0.2);    //  set lfo to 0.2 Hz
-            this.delayTimeLFO.amp(1);   //  all LFOs will be at amplitude of 1
-            this.looper.delay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
+        if (this.looper.delayActive) {  //  only trigger if delay is already going
+            if (!this.delayTimeLFOActive) {
+                this.delayTimeLFO.freq(0.2);    //  set lfo to 0.2 Hz
+                this.delayTimeLFO.amp(1);   //  all LFOs will be at amplitude of 1
+                this.looper.delay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
 
-            this.delayTimeLFOActive = true;     //  flip boolean
-        }
-        else {
-            this.delayTimeLFO.disconnect();     //  need to disconnect oscillator in order to get it off the delayTime param
-            this.looper.delay.delayTime(0.5);   //  set delay time to a fixed amount
+                this.delayTimeLFOActive = true;     //  flip boolean
+            }
+            else {
+                this.delayTimeLFO.disconnect();     //  need to disconnect oscillator in order to get it off the delayTime param
+                this.looper.delay.delayTime(0.5);   //  set delay time to a fixed amount
 
-            this.delayTimeLFOActive = false;    //  flip boolean
+                this.delayTimeLFOActive = false;    //  flip boolean
+            }
         }
     }
 
     delayFilterLFOProcess() {   //  ----    delay filter LFO
-        if (!this.delayFilterLFOActive) {
-            this.delayFilterLFO.freq(2);    //  set lfo speed   
-            this.delayFilterLFO.amp(1);     //  ensure all lfos are at full 'volume' to get full spread 
-            this.looper.delay.filter(this.delayFilterLFO, 7.5); //  apply lfo directly to filter cutoff here, with a Q of 7.5
+        if (this.looper.delayActive) {  //  only trigger if delay is already going
+            if (!this.delayFilterLFOActive) {
+                this.delayFilterLFO.freq(2);    //  set lfo speed   
+                this.delayFilterLFO.amp(1);     //  ensure all lfos are at full 'volume' to get full spread 
+                this.looper.delay.filter(this.delayFilterLFO, 7.5); //  apply lfo directly to filter cutoff here, with a Q of 7.5
 
-            this.delayFilterLFOActive = true;
-        }
-        else {
-            this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
+                this.delayFilterLFOActive = true;
+            }
+            else {
+                this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
 
-            this.delayFilterLFOActive = false;
+                this.delayFilterLFOActive = false;
+            }
         }
     }
 
     reverbBackwardsProcess() {
-        if (!this.reverbBackwardsActive) {
-            this.looper.reverbFor.drywet(0);    //  turn down forwards reverb
-            this.looper.reverbBack.drywet(1);   //  turn up backwards reverb
+        if (this.looper.reverbActive) {     //  only trigger if reverb is already going
+            if (!this.reverbBackwardsActive) {
+                this.looper.reverbFor.drywet(0);    //  turn down forwards reverb
+                this.looper.reverbBack.drywet(1);   //  turn up backwards reverb
 
-            this.reverbBackwardsActive = true;
-        }
-        else {
-            this.looper.reverbFor.drywet(1);    //  turn up forwards reverb
-            this.looper.reverbBack.drywet(0);   //  turn down backwards reverb
+                this.reverbBackwardsActive = true;
+            }
+            else {
+                this.looper.reverbFor.drywet(1);    //  turn up forwards reverb
+                this.looper.reverbBack.drywet(0);   //  turn down backwards reverb
 
-            this.reverbBackwardsActive = false;
+                this.reverbBackwardsActive = false;
+            }
         }
     }
 
     reverbLongTailProcess() {
-        if (!this.reverbLongTailActive) {
-            this.looper.reverbFor.set(10, 2, false);    
-            this.looper.reverbBack.set(10, 2, true);
+        if (this.looper.reverbActive) {     //  only trigger if reverb is already going
+            if (!this.reverbLongTailActive) {
+                this.looper.reverbFor.set(10, 2, false);    
+                this.looper.reverbBack.set(10, 2, true);
 
-            this.reverbLongTailActive = true;
+                this.reverbLongTailActive = true;
+            }
+            else {
+                this.looper.reverbFor.set(3, 2, false);
+                this.looper.reverbBack.set(3, 2, true);
+
+                this.reverbLongTailActive = false;
+            }
         }
-        else {
-            this.looper.reverbFor.set(3, 2, false);
-            this.looper.reverbBack.set(3, 2, true);
+    }
 
-            this.reverbLongTailActive = false;
+    ampModNewFreqProcess() {
+        if (this.looper.ampModActive) {
+            let f = Math.round(random(100));    //  new freq between 1 - 99
+            this.looper.ampModOsc.freq(f);    //  send new random freq into amp mod osc
+
+            return f;
         }
     }
 

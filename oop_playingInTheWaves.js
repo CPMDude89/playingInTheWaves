@@ -2,7 +2,7 @@ let w = window.innerWidth;
 let h = window.innerHeight;
 let looper1, looper2, looper3, looper4, looper5;
 let buttons1, buttons2, buttons3, buttons4, buttons5;
-let recButX=(4 * w/5), recButY=(h/6), recButWidth=(w/10), recButHeight=(h/10);
+let recButX=(4 * w/5), recButY=(h/5), recButWidth=(w/10), recButHeight=(h/10);
 let effectButtonX = 4.5 * (w/7);
 
 function preload() {
@@ -19,7 +19,6 @@ function setup() {
 
     looper2 = new Looper(recButX, 2 * recButY, recButWidth, recButHeight, effectButtonX);
     buttons2 = new Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
-    //looper2.init();
     looper2.init(buttons2);  //  initialize button and recorder
     buttons2.init();  
     
@@ -48,25 +47,50 @@ function draw() {
     text('Track 2', recButX, (2*recButY - (0.01 * 2 * recButY)));
     text('Track 3', recButX, (3*recButY - (0.01 * 3 * recButY)));
     text('Track 4', recButX, (4*recButY - (0.01 * 4 * recButY)));
+    
 
     fill(0, 179, 0);
-    
+    textSize(18);
     if (looper1.getState() > 1 ) {   //  once effect buttons are displayed
         buttons1.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+
+        if (looper1.ampModActive) {     //  print to screen the frequency value of the amp mod oscillator
+            let val = looper1.ampModOsc.getFreq();
+            fill(0);
+            text(val + " Hz", 1.02 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
+        }
     }
 
     if (looper2.getState() > 1 ) {   //  once effect buttons are displayed
         buttons2.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+
+        if (looper2.ampModActive) {     //  print to screen the frequency value of the amp mod oscillator
+            let val = looper2.ampModOsc.getFreq();
+            fill(0);
+            text(val + " Hz", 1.02 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
+        }
       
     }
 
     if (looper3.getState() > 1 ) {   //  once effect buttons are displayed
         buttons3.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+
+        if (looper3.ampModActive) {     //  print to screen the frequency value of the amp mod oscillator
+            let val = looper3.ampModOsc.getFreq();
+            fill(0);
+            text(val + " Hz", 1.02 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
+        }
         
     }
 
     if (looper4.getState() > 1 ) {   //  once effect buttons are displayed
         buttons4.effButAlerts();    //  draw signal lights if to keep track of effect activity/inactivity
+
+        if (looper4.ampModActive) {     //  print to screen the frequency value of the amp mod oscillator
+            let val = looper4.ampModOsc.getFreq();
+            fill(0);
+            text(val + " Hz", 1.02 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
+        }
        
     }
 }
