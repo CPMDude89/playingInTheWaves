@@ -58,6 +58,12 @@ function draw() {
             let val = looper1.ampModOsc.getFreq();
             fill(0);
             text(val + " Hz", 1.02 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
+
+            if (buttons1.ampModFreqLFOActive) {
+            let f = buttons1.ampModFreqLFO.getFreq().toFixed(2);
+            fill(0);
+            text(f + " Hz", 1.17 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
+            }
         }
     }
 
@@ -68,6 +74,12 @@ function draw() {
             let val = looper2.ampModOsc.getFreq();
             fill(0);
             text(val + " Hz", 1.02 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
+
+            if (buttons2.ampModFreqLFOActive) {
+                let f = buttons2.ampModFreqLFO.getFreq().toFixed(2);
+                fill(0);
+                text(f + " Hz", 1.17 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
+                }
         }
       
     }
@@ -79,6 +91,12 @@ function draw() {
             let val = looper3.ampModOsc.getFreq();
             fill(0);
             text(val + " Hz", 1.02 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
+
+            if (buttons3.ampModFreqLFOActive) {
+                let f = buttons3.ampModFreqLFO.getFreq().toFixed(2);
+                fill(0);
+                text(f + " Hz", 1.17 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
+                }
         }
         
     }
@@ -90,6 +108,12 @@ function draw() {
             let val = looper4.ampModOsc.getFreq();
             fill(0);
             text(val + " Hz", 1.02 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
+
+            if (buttons4.ampModFreqLFOActive) {
+                let f = buttons4.ampModFreqLFO.getFreq().toFixed(2);
+                fill(0);
+                text(f + " Hz", 1.17 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
+                }
         }
        
     }

@@ -48,7 +48,7 @@ class Buttons {
         this.reverbAmpModActive = false;
         this.reverbAmpModSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.2 * this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
-
+        this.ampModFreqLFOActive = false;
 
     }
 
@@ -128,6 +128,12 @@ class Buttons {
         this.ampModNewFreqBut.position(this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
         this.ampModNewFreqBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);  //  size
         this.ampModNewFreqBut.mousePressed(() => {this.ampModNewFreqProcess();});   //  with every click, input a new frequency to oscillator
+
+        // -------- AMP MOD FREQ LFO -------- //
+        this.ampModFreqLFOBut = createButton('FREQ\nLFO');  //  apply LFO to the amp mod osc freq parameter
+        this.ampModFreqLFOBut.position(1.15 * this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));
+        this.ampModFreqLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
+        this.ampModFreqLFOBut.mousePressed(() => {this.ampModFreqLFOProcess();});   //  apply LFO to osc's freq parameter
     }
 
     removeControlButtons() {
@@ -230,10 +236,44 @@ class Buttons {
             let f = Math.round(random(100));    //  new freq between 1 - 99
             this.looper.ampModOsc.freq(f);    //  send new random freq into amp mod osc
 
+            if (this.ampModFreqLFOActive) {
+                this.ampModFreqLFO = new p5.Oscillator();
+                this.ampModFreqLFO.start();
+                this.ampModFreqLFO.disconnect();
+                this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc.getFreq(), (1 + random()) * this.looper.ampModOsc.getFreq());
+                this.ampModFreqLFO.amp(1);
+                this.ampModFreqLFO.freq(random(2));
+
+                this.looper.ampModOsc.freq(this.ampModFreqLFO);
+            }
+
             return f;
         }
     }
 
+    ampModFreqLFOProcess() {
+        if (this.looper.ampModActive) {
+            if (!this.ampModFreqLFOActive) {
+                this.ampModFreqLFO = new p5.Oscillator();
+                this.ampModFreqLFO.start();
+                this.ampModFreqLFO.disconnect();
+                this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc.getFreq(), (1 + random()) * this.looper.ampModOsc.getFreq());
+                this.ampModFreqLFO.amp(1);
+                this.ampModFreqLFO.freq(random(2));
+
+                this.looper.ampModOsc.freq(this.ampModFreqLFO);
+
+                this.ampModFreqLFOActive = true;
+            }
+            else {
+                this.looper.ampModOsc.freq(Math.round(random(20)));
+
+                this.ampModFreqLFOActive = false;
+            }
+
+
+        }
+    }
     
 }
 

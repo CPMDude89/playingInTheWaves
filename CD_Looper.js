@@ -219,7 +219,7 @@ class Looper {
         this.ampModButton.mousePressed(() => {
             if (!this.ampModActive) {
                 this.ampModOsc.start();
-                this.ampModOsc.freq(20);
+                this.ampModOsc.freq(Math.round(random(20)));
                 this.ampModOsc.amp(1);
                 this.soundFile.setVolume(this.ampModOsc);
     
