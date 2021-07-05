@@ -59,7 +59,10 @@ function draw() {
             fill(0);
             text(val + " Hz", 1.02 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
 
-            if (buttons1.ampModFreqLFOActive) {
+            let a = looper1.ampModOsc.getAmp().toFixed(2);
+            text(a, 1.32 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
+
+            if (buttons1.ampModFreqLFOActive) { //  print to screen the frequency of the amp mod freq oscillator
             let f = buttons1.ampModFreqLFO.getFreq().toFixed(2);
             fill(0);
             text(f + " Hz", 1.17 * buttons1.ampModButX, buttons1.parentButY + (3.5 * buttons1.parentButHeight));
@@ -75,7 +78,10 @@ function draw() {
             fill(0);
             text(val + " Hz", 1.02 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
 
-            if (buttons2.ampModFreqLFOActive) {
+            let a = looper2.ampModOsc.getAmp().toFixed(2);
+            text(a, 1.32 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
+
+            if (buttons2.ampModFreqLFOActive) { //  print to screen the frequency of the amp mod freq oscillator
                 let f = buttons2.ampModFreqLFO.getFreq().toFixed(2);
                 fill(0);
                 text(f + " Hz", 1.17 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
@@ -92,7 +98,10 @@ function draw() {
             fill(0);
             text(val + " Hz", 1.02 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
 
-            if (buttons3.ampModFreqLFOActive) {
+            let a = looper3.ampModOsc.getAmp().toFixed(2);
+            text(a, 1.32 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
+
+            if (buttons3.ampModFreqLFOActive) { //  print to screen the frequency of the amp mod freq oscillator
                 let f = buttons3.ampModFreqLFO.getFreq().toFixed(2);
                 fill(0);
                 text(f + " Hz", 1.17 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
@@ -109,7 +118,10 @@ function draw() {
             fill(0);
             text(val + " Hz", 1.02 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
 
-            if (buttons4.ampModFreqLFOActive) {
+            let a = looper4.ampModOsc.getAmp().toFixed(2);
+            text(a, 1.32 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
+
+            if (buttons4.ampModFreqLFOActive) { //  print to screen the frequency of the amp mod freq oscillator
                 let f = buttons4.ampModFreqLFO.getFreq().toFixed(2);
                 fill(0);
                 text(f + " Hz", 1.17 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));

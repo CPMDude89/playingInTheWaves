@@ -49,7 +49,6 @@ class Buttons {
         this.reverbAmpModSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.2 * this.reverbButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
         this.ampModFreqLFOActive = false;
-
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -134,6 +133,12 @@ class Buttons {
         this.ampModFreqLFOBut.position(1.15 * this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));
         this.ampModFreqLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
         this.ampModFreqLFOBut.mousePressed(() => {this.ampModFreqLFOProcess();});   //  apply LFO to osc's freq parameter
+
+        // -------- AMP MOD NEW DEPTH -------- //
+        this.ampModNewDepthBut = createButton('NEW\nDEPTH');    //  apply new amp mod depth
+        this.ampModNewDepthBut.position(1.3 * this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));
+        this.ampModNewDepthBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
+        this.ampModNewDepthBut.mousePressed(() => {this.ampModNewDepthProcess();});
     }
 
     removeControlButtons() {
@@ -217,13 +222,13 @@ class Buttons {
     reverbLongTailProcess() {
         if (this.looper.reverbActive) {     //  only trigger if reverb is already going
             if (!this.reverbLongTailActive) {
-                this.looper.reverbFor.set(10, 2, false);    
+                this.looper.reverbFor.set(10, 2, false);    //  set reverb time to 10 seconds
                 this.looper.reverbBack.set(10, 2, true);
 
                 this.reverbLongTailActive = true;
             }
             else {
-                this.looper.reverbFor.set(3, 2, false);
+                this.looper.reverbFor.set(3, 2, false);     //  set reverb time back to 3 seconds
                 this.looper.reverbBack.set(3, 2, true);
 
                 this.reverbLongTailActive = false;
@@ -233,10 +238,9 @@ class Buttons {
 
     ampModNewFreqProcess() {
         if (this.looper.ampModActive) {
-            let f = Math.round(random(100));    //  new freq between 1 - 99
-            this.looper.ampModOsc.freq(f);    //  send new random freq into amp mod osc
+            this.looper.ampModOsc.freq(Math.round(random(100)));    //  send new random freq into amp mod osc
 
-            if (this.ampModFreqLFOActive) {
+            if (this.ampModFreqLFOActive) {     //  if amp mod frequency LFO is active, reset the LFO modulating that frequency
                 this.ampModFreqLFO = new p5.Oscillator();
                 this.ampModFreqLFO.start();
                 this.ampModFreqLFO.disconnect();
@@ -246,22 +250,20 @@ class Buttons {
 
                 this.looper.ampModOsc.freq(this.ampModFreqLFO);
             }
-
-            return f;
         }
     }
 
-    ampModFreqLFOProcess() {
+    ampModFreqLFOProcess() {    //  apply LFO output to the amp mod oscillator
         if (this.looper.ampModActive) {
-            if (!this.ampModFreqLFOActive) {
-                this.ampModFreqLFO = new p5.Oscillator();
+            if (!this.ampModFreqLFOActive) {    //  because .scale() can't be called more than once per sketch, 
+                this.ampModFreqLFO = new p5.Oscillator();   //  have to create a new p5.Oscillator every time user wants to change the frequency
                 this.ampModFreqLFO.start();
                 this.ampModFreqLFO.disconnect();
                 this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc.getFreq(), (1 + random()) * this.looper.ampModOsc.getFreq());
                 this.ampModFreqLFO.amp(1);
                 this.ampModFreqLFO.freq(random(2));
 
-                this.looper.ampModOsc.freq(this.ampModFreqLFO);
+                this.looper.ampModOsc.freq(this.ampModFreqLFO);     //  apply LFO output to carrier amp mod oscillator
 
                 this.ampModFreqLFOActive = true;
             }
@@ -270,11 +272,14 @@ class Buttons {
 
                 this.ampModFreqLFOActive = false;
             }
-
-
         }
     }
-    
+
+    ampModNewDepthProcess() {   //  change amp mod LFO depth (oscillator amplitude)
+        if (this.looper.ampModActive) {
+            this.looper.ampModOsc.amp(random());
+        }
+    }
 }
 
 
