@@ -18,10 +18,10 @@
         this.buttonY = buttonY;
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
-        this.effButX = effButX;
-        this.effButWidth = 0.5 * this.buttonWidth;
-        this.effButHeight = 0.8 * this.buttonHeight;
-        this.effButY = this.buttonY;
+        this.effButX = 1.18 * effButX;
+        this.effButWidth = 0.1 * this.buttonWidth;
+        this.effButHeight = 0.5 * this.buttonHeight;
+        this.effButY = this.buttonY + (1.2 * buttonHeight);
 
         this.mic = mic;    //  user input source (computer mic)
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object

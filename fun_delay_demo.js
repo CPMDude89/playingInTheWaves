@@ -2,9 +2,9 @@ let w = window.innerWidth, h = window.innerHeight;
 let looper1, looper2;
 let buttons1, buttons2;
 let inMic;
-let bigButX=(2 * (w/3)), bigButY=(h/4), bigButWidth=(w/5), bigButHeight=(h/5);
+let bigButX=(0.15 * w), bigButY=(0.2 * h), bigButWidth=(0.75 * w), bigButHeight=(h/5);
 let effectButtonX = 1.5 * (w/3);
-let recBut, recButX=(w/12), recButY=bigButY, recButWidth=(w/10), recButHeight=(h/10), recState=0, outFile, fileClearButton, fileDownloadButton;
+let recBut, recButX=(w/12), recButY=(0.1 * h), recButWidth=(w/10), recButHeight=(h/13), recState=0, outFile, fileClearButton, fileDownloadButton;
 
 
 function setup() {
@@ -16,7 +16,7 @@ function setup() {
     looper1.init(buttons1);  //  initialize button and recorder
     buttons1.init();
 
-    looper2 = new Looper(bigButX, 2 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
+    looper2 = new Looper(bigButX, 3 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
     buttons2 = new FunButtons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
     looper2.init(buttons2);  //  initialize button and recorder
     buttons2.init();
@@ -33,8 +33,10 @@ function setup() {
 function draw() {
     background(50, 200, 10);
 
-   
-
+    textSize(30);
+    fill(0);
+    textAlign(CENTER);
+    text('Playing In The Waves', 0.5 * w, 0.1 * h);
 }
 
 function recordOutput() {
