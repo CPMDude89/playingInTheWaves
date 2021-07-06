@@ -33,11 +33,7 @@ function setup() {
 function draw() {
     background(50, 200, 10);
 
-    textSize(30);
-    fill(0);
-    if(looper1.ampModActive) {
-        text(looper1.ampModOsc1.getFreq(), w/2, h/2);
-    }
+   
 
 }
 
