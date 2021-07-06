@@ -3,8 +3,8 @@ let looper1, looper2;
 let buttons1, buttons2;
 let inMic;
 let bigButX=(0.15 * w), bigButY=(0.2 * h), bigButWidth=(0.75 * w), bigButHeight=(h/5);
-let effectButtonX = 1.5 * (w/3);
-let recBut, recButX=(w/12), recButY=(0.1 * h), recButWidth=(w/10), recButHeight=(h/13), recState=0, outFile, fileClearButton, fileDownloadButton;
+let effectButtonX = 1.3 * bigButX;
+let recBut, recButX=(w/12), recButY=(0.1 * h), recButWidth=(0.3 * w), recButHeight=(h/15), recState=0, outFile, fileClearButton, fileDownloadButton;
 
 
 function setup() {

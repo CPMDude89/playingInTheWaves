@@ -18,8 +18,8 @@
         this.buttonY = buttonY;
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
-        this.effButX = 1.18 * effButX;
-        this.effButWidth = 0.1 * this.buttonWidth;
+        this.effButX = effButX;
+        this.effButWidth = 0.4 * this.buttonWidth;
         this.effButHeight = 0.5 * this.buttonHeight;
         this.effButY = this.buttonY + (1.2 * buttonHeight);
 
@@ -179,7 +179,7 @@
 
     addAmpModButton() { //  control amplitude modulation
         this.ampModButton = createButton('ACTIVATE FLUTTER')
-        this.ampModButton.position(0.65 * this.effButX, this.effButY);
+        this.ampModButton.position(3 * this.effButX, this.effButY);
         this.ampModButton.size(this.effButWidth, this.effButHeight);
 
         this.ampModButton.mousePressed(() => {
