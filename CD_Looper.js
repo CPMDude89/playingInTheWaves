@@ -10,7 +10,8 @@ class Looper {
         buttonY,    //  button y-coordinate
         buttonWidth,    //  button width
         buttonHeight,    //  button height
-        effButX     //  effect button x-coordinate
+        effButX,     //  effect button x-coordinate
+        mic     //  single input source
     ) {
         //  define properties
         this.buttonX = buttonX; //  apply user input to class-instance variables
@@ -22,7 +23,7 @@ class Looper {
         this.effButHeight = 0.3 * this.buttonHeight;
         this.effButY = this.buttonY - this.effButHeight;
 
-        this.mic = new p5.AudioIn();    //  user input source (computer mic)
+        this.mic = mic;    //  user input source (computer mic)
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
         this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
         this.state = 0; //  'state' variable used to control button functions through recording -> playback

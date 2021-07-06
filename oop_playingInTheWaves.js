@@ -2,6 +2,7 @@ let w = window.innerWidth;
 let h = window.innerHeight;
 let looper1, looper2, looper3, looper4, looper5;
 let buttons1, buttons2, buttons3, buttons4, buttons5;
+let inMic;
 let bigButX=(4 * w/5), bigButY=(h/5), bigButWidth=(w/10), bigButHeight=(h/10);
 let effectButtonX = 4.5 * (w/7);
 let recBut, recButX=(w/12), recButY=bigButY, recButWidth=(w/10), recButHeight=(h/10), recState=0, outFile, fileClearButton, fileDownloadButton;
@@ -12,23 +13,24 @@ function preload() {
 
 function setup() {
     canv = createCanvas(w, h);
+    inMic = new p5.AudioIn();
 
-    looper1 = new Looper(bigButX, bigButY, bigButWidth, bigButHeight, effectButtonX);  
+    looper1 = new Looper(bigButX, bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);  
     buttons1 = new Buttons(looper1.getEffButX(), looper1.getEffButY(), looper1.getEffButWidth(), looper1.getEffButHeight(), looper1);
     looper1.init(buttons1);  //  initialize button and recorder
     buttons1.init();
 
-    looper2 = new Looper(bigButX, 2 * bigButY, bigButWidth, bigButHeight, effectButtonX);
+    looper2 = new Looper(bigButX, 2 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
     buttons2 = new Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
     looper2.init(buttons2);  //  initialize button and recorder
     buttons2.init();  
     
-    looper3 = new Looper(bigButX, 3 * bigButY, bigButWidth, bigButHeight, effectButtonX);
+    looper3 = new Looper(bigButX, 3 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
     buttons3 = new Buttons(looper3.getEffButX(), looper3.getEffButY(), looper3.getEffButWidth(), looper3.getEffButHeight(), looper3);
     looper3.init(buttons3);
     buttons3.init();  
 
-    looper4 = new Looper(bigButX, 4 * bigButY, bigButWidth, bigButHeight, effectButtonX);
+    looper4 = new Looper(bigButX, 4 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
     buttons4 = new Buttons(looper4.getEffButX(), looper4.getEffButY(), looper4.getEffButWidth(), looper4.getEffButHeight(), looper4);
     looper4.init(buttons4);  
     buttons4.init();
