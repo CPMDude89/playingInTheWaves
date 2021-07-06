@@ -19,9 +19,9 @@
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
         this.effButX = effButX;
-        this.effButWidth = 1.4 * this.buttonWidth;
-        this.effButHeight = 0.3 * this.buttonHeight;
-        this.effButY = this.buttonY - this.effButHeight;
+        this.effButWidth = 0.5 * this.buttonWidth;
+        this.effButHeight = 0.8 * this.buttonHeight;
+        this.effButY = this.buttonY;
 
         this.mic = mic;    //  user input source (computer mic)
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
@@ -104,8 +104,6 @@
             this.addClearButton();  //  clear the buffer and start over
             this.addDelayButton();  //  apply delay
             this.addAmpModButton(); //  apply amplitude modulation
-
-            this.buttons.makeControlButtons();
         }
 
         else if (this.state == 2) { //  play back recording
@@ -139,13 +137,12 @@
 
             this.ampModButton.remove();
             this.delayButton.remove();
-            this.buttons.removeControlButtons();
             this.clearButton.remove();  
         });
     }
 
     addDelayButton() {  //  control delay output
-        this.delayButton = createButton('ACTIVATE DELAY');    //  create delay button
+        this.delayButton = createButton('TAKE\nOFF');    //  create delay button
         this.delayButton.position(this.effButX, this.effButY);
         this.delayButton.size(this.effButWidth, this.effButHeight);
 
@@ -158,7 +155,7 @@
                 this.delay.drywet(1);   //  full volume
                 this.delay.setType('pingPong'); //  ping pong delay
 
-                this.delayButton.html('DEACTIVATE DELAY'); //  change button text
+                this.delayButton.html('LAND\nSPACESHIP'); //  change button text
 
                 this.delayActive = true;    //  flip boolean
             }
@@ -166,7 +163,7 @@
             else {  //  if delay is triggered, turn off
                 this.delay.drywet(0);   //  volume level: 0
 
-                this.delayButton.html('ACTIVATE DELAY');  //  change button
+                this.delayButton.html('TAKE OFF');  //  change button
 
                 this.delayActive = false;   //  flip boolean
             }
@@ -174,11 +171,9 @@
     }
 
     addAmpModButton() { //  control amplitude modulation
-        this.ampModButton = createButton('ACTIVATE AMP MOD')
-        this.ampModButton.position(0.5 * this.effButX, this.effButY);
+        this.ampModButton = createButton('ACTIVATE FLUTTER')
+        this.ampModButton.position(0.65 * this.effButX, this.effButY);
         this.ampModButton.size(this.effButWidth, this.effButHeight);
-        
-        
 
         this.ampModButton.mousePressed(() => {
             if (!this.ampModActive) {
@@ -187,7 +182,7 @@
                 this.ampModOsc.amp(1);
                 this.soundFile.setVolume(this.ampModOsc);
     
-                this.ampModButton.html('DEACTIVATE AMP MOD');
+                this.ampModButton.html('CALM DOWN');
                 this.ampModActive = true;
             }
             
@@ -195,7 +190,7 @@
                 this.ampModOsc.stop();
                 this.soundFile.setVolume(0.5);
     
-                this.ampModButton.html('ACTIVATE AMP MOD');
+                this.ampModButton.html('ACTIVATE FLUTTER');
                 this.ampModActive = false;
             }
         });

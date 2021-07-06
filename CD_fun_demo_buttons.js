@@ -27,14 +27,8 @@
         this.ampModSignal = new SignalCircle(.51 * this.parentButX, this.parentButY - (0.6 * this.parentButHeight), this.parentButHeight);
 
         this.delayTimeLFO = new p5.Oscillator();
-        this.delayTimeLFOActive = false;
-        this.delayTimeLFOSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.075 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
 
         this.delayFilterLFO = new p5.Oscillator();
-        this.delayFilterLFOActive = false;        
-        this.delayFilterLFOSignal = new SignalCircle((0.15 * this.parentButWidth) + 1.15 * this.delayButX, (3.35 * this.parentButHeight) + this.parentButY, 0.7 * this.parentButHeight);
-
-        this.ampModFreqLFOActive = false;
     }
 
     init() {    //  set up functions and objects that can only be called once
@@ -50,67 +44,9 @@
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
         //  delay
         this.looper.delayActive ? this.delaySignal.drawActiveCircle() : this.delaySignal.drawInactiveCircle();
-
-        if (this.looper.delayActive) {
-            //  delay time LFO
-            this.delayTimeLFOActive ? this.delayTimeLFOSignal.drawActiveCircle() : this.delayTimeLFOSignal.drawInactiveCircle();
-
-            //  delay filter LFO
-            this.delayFilterLFOActive ? this.delayFilterLFOSignal.drawActiveCircle() : this.delayFilterLFOSignal.drawInactiveCircle();
-        }
             
         //  amp mod
         this.looper.ampModActive ? this.ampModSignal.drawActiveCircle() : this.ampModSignal.drawInactiveCircle();
-    }
-
-    makeControlButtons() {
-        // -------- DELAY TIME LFO -------- //
-        this.delayTimeLFOBut = createButton('TIME \nLFO');  //  make button
-        this.delayTimeLFOBut.position(1.075 * this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
-        this.delayTimeLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);   //  size
-        this.delayTimeLFOBut.mousePressed(() => {this.delayTimeLFOProcess();});     //  start event to trigger effect control
-
-        // -------- DELAY FILTER LFO -------- //
-        this.delayFilterLFOBut = createButton('FILTER LFO');    //  make button
-        this.delayFilterLFOBut.position(1.15 * this.delayButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
-        this.delayFilterLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight); //  size
-        this.delayFilterLFOBut.mousePressed(() => {this.delayFilterLFOProcess();});     // start event to trigger effect control
-
-        // -------- AMP MOD NEW FREQ -------- //
-        this.ampModNewFreqBut = createButton('CHANGE\nFREQ');   //  randomize amp mod frequency
-        this.ampModNewFreqBut.position(this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));    //  position
-        this.ampModNewFreqBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);  //  size
-        this.ampModNewFreqBut.mousePressed(() => {this.ampModNewFreqProcess();});   //  with every click, input a new frequency to oscillator
-
-        // -------- AMP MOD FREQ LFO -------- //
-        this.ampModFreqLFOBut = createButton('FREQ\nLFO');  //  apply LFO to the amp mod osc freq parameter
-        this.ampModFreqLFOBut.position(1.15 * this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));
-        this.ampModFreqLFOBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
-        this.ampModFreqLFOBut.mousePressed(() => {this.ampModFreqLFOProcess();});   //  apply LFO to osc's freq parameter
-
-        // -------- AMP MOD NEW DEPTH -------- //
-        this.ampModNewDepthBut = createButton('NEW\nDEPTH');    //  apply new amp mod depth
-        this.ampModNewDepthBut.position(1.3 * this.ampModButX, this.parentButY + (1.1 * this.parentButHeight));
-        this.ampModNewDepthBut.size(0.3 * this.parentButWidth, 1.8 * this.parentButHeight);
-        this.ampModNewDepthBut.mousePressed(() => {this.ampModNewDepthProcess();});
-    }
-
-    removeControlButtons() {    //  delete effect control buttons, and reset the active booleans to reset
-        this.looper.delayActive = false;
-        this.looper.ampModActive = false;
-
-        this.delayTimeLFOBut.remove();
-        this.delayTimeLFOActive = false;
-
-        this.delayFilterLFOBut.remove();
-        this.delayFilterLFOActive = false;        
-
-        this.ampModNewFreqBut.remove();
-
-        this.ampModFreqLFOBut.remove();
-        this.ampModFreqLFOActive = false;
-
-        this.ampModNewDepthBut.remove();
     }
 
     delayTimeLFOProcess() {     //  ----    delay time LFO
