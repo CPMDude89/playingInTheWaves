@@ -34,11 +34,11 @@
     init() {    //  set up functions and objects that can only be called once
         this.delayTimeLFO.start();
         this.delayTimeLFO.disconnect();
-        this.delayTimeLFO.scale(-1, 1, 0, 1);
+        this.delayTimeLFO.scale(-1, 1, 0.001, 1);
 
         this.delayFilterLFO.start();    //  start up LFO
         this.delayFilterLFO.disconnect();
-        this.delayFilterLFO.scale(-1, 1, 1, 7000);
+        this.delayFilterLFO.scale(-1, 1, 1, 4000);
     }
 
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
@@ -51,24 +51,20 @@
 
     delayTimeLFOProcess() {     //  ----    delay time LFO
         if (this.looper.delayActive) {  //  if delay is active
-            this.delayTimeLFO.freq(random(0.5));    //  set lfo to 0.2 Hz
+            this.delayTimeLFO.freq(random(0.25));    //  set lfo to a very low number
             this.delayTimeLFO.amp(1);   //  all LFOs will be at amplitude of 1
-            this.looper.delay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
-        }
-        else {
-            this.delayTimeLFO.disconnect();     //  need to disconnect oscillator in order to get it off the delayTime param
-            this.looper.delay.delayTime(0.5);   //  set delay time to a fixed amount
+            this.looper.crazyDelay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
         }
     }
 
     delayFilterLFOProcess() {   //  ----    delay filter LFO
         if (this.looper.delayActive) {  //  if delay is active
-            this.delayFilterLFO.freq(random());    //  set lfo speed   
-            this.delayFilterLFO.amp(1);     //  ensure all lfos are at full 'volume' to get full spread 
-            this.looper.delay.filter(this.delayFilterLFO, 6); //  apply lfo directly to filter cutoff here, with a Q of 7.5
+            this.delayFilterLFO.freq(random(0.7));    //  set lfo speed   
+            this.delayFilterLFO.amp(0.6);     //  ensure all lfos are at full 'volume' to get full spread 
+            this.looper.crazyDelay.filter(this.delayFilterLFO, 5); //  apply lfo directly to filter cutoff here, with a Q of 7.5
         }
-        else {
-            this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
+        else if (this.looper.delayState == 2) {
+            this.looper.crazyDelay.filter(4500, 1);  //  change filter cutoff to a static amount
         }
     }
 

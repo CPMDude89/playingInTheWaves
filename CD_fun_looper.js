@@ -28,6 +28,8 @@
         this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
         this.delay = new p5.Delay();
+        this.crazyDelay = new p5.Delay();
+        this.delayState = 0;
         
         this.ampModOsc1 = new p5.Oscillator();
         this.ampModOsc1.start();
@@ -146,34 +148,62 @@
     }
 
     addDelayButton() {  //  control delay output
-        this.delayButton = createButton('TAKE\nOFF');    //  create delay button
+        this.delayButton = createButton('DELAY');    //  create delay button
         this.delayButton.position(this.effButX, this.effButY);
         this.delayButton.size(this.effButWidth, this.effButHeight);
 
         this.delayButton.mousePressed(() => {   //  trigger delay
-            if (!this.delayActive) {    //  if delay is not active yet, make active
+            if (!this.delayActive && this.delayState == 0) {    //  if delay is not active yet, make active
+                this.delay.connect();
                 this.delay.process(this.soundFile); //  connect delay to soundFile output
-                this.delay.delayTime(0.55); //  delay time
+                this.delay.delayTime(random()); //  random delay time
                 this.delay.feedback(0.65);   //  feedback amount
                 this.delay.filter(2000);    //  lowpass filter (helpful with high feedback)
                 this.delay.drywet(1);   //  full volume
                 this.delay.setType('pingPong'); //  ping pong delay
 
-                this.delayButton.html('LAND\nSPACESHIP'); //  change button text
+                this.delayButton.html('CRAZY\nDELAY'); //  change button text
 
                 this.delayActive = true;    //  flip boolean
+                this.delayState++;
             }
-            
-            else {  //  if delay is triggered, turn off
-                this.delay.drywet(0);   //  volume level: 0
 
-                this.delayButton.html('TAKE OFF');  //  change button
+            else if (this.delayActive && this.delayState == 1) {
+                this.soundFile.disconnect();
+                this.soundFile.connect(this.delay);
+
+                //this.soundFile.connect(this.crazyDelay);
+                this.crazyDelay.connect();
+                this.crazyDelay.process(this.delay);
+                this.crazyDelay.delayTime(random());
+                this.crazyDelay.feedback(0.55);   //  feedback amount
+                this.crazyDelay.filter(4000);    //  lowpass filter (helpful with high feedback)
+                this.crazyDelay.drywet(1.0);   //  full volume
+
+                this.buttons.delayTimeLFOProcess();
+                this.buttons.delayFilterLFOProcess();
+
+                this.delayButton.html('DEACTIVATE');
+                this.delayState++;
+
+            }
+
+            else if (this.delayActive && this.delayState == 2) {  //  if delay is triggered, turn off
+                this.soundFile.connect();
+
+                this.delay.disconnect()
+                this.crazyDelay.disconnect();
+
+                this.buttons.delayFilterLFOProcess();
+
+                this.delay.drywet(0);   //  volume level: 0
+                this.crazyDelay.drywet(0);
+
+                this.delayButton.html('DELAY');  //  change button
 
                 this.delayActive = false;   //  flip boolean
+                this.delayState = 0;
             }
-
-            this.buttons.delayTimeLFOProcess();
-            this.buttons.delayFilterLFOProcess();
         })
     }
 
@@ -189,6 +219,8 @@
                 this.ampModOsc1.freq(f);
                 this.ampModOsc1.amp(1);
                 this.soundFile.setVolume(this.ampModOsc1);
+
+                this.buttons.ampModFreqLFOProcess();
     
                 this.ampModButton.html('CALM DOWN');
                 this.ampModActive = true;
@@ -202,7 +234,7 @@
                 this.ampModActive = false;
             }
 
-            this.buttons.ampModFreqLFOProcess();
+            
         });
     }
 
