@@ -28,10 +28,14 @@
         this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
         this.delay = new p5.Delay();
-        this.ampModOsc = new p5.Oscillator();
-        this.ampModOsc.start();
-        this.ampModOsc.disconnect();
-        this.ampModOsc.scale(-1, 1, 0, 1);
+        
+        this.ampModOsc1 = new p5.Oscillator();
+        this.ampModOsc1.start();
+        this.ampModOsc1.disconnect();
+        this.ampModOsc1.scale(-1, 1, 0, 1);
+        this.ampModOsc1.amp(1);
+        this.ampModOsc1.freq(Math.round(random(10)));
+        
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -167,6 +171,9 @@
 
                 this.delayActive = false;   //  flip boolean
             }
+
+            this.buttons.delayTimeLFOProcess();
+            this.buttons.delayFilterLFOProcess();
         })
     }
 
@@ -177,22 +184,25 @@
 
         this.ampModButton.mousePressed(() => {
             if (!this.ampModActive) {
-                this.ampModOsc.start();
-                this.ampModOsc.freq(Math.round(random(20)));
-                this.ampModOsc.amp(1);
-                this.soundFile.setVolume(this.ampModOsc);
+                this.ampModOsc1.start();
+                let f = Math.round(random(20));
+                this.ampModOsc1.freq(f);
+                this.ampModOsc1.amp(1);
+                this.soundFile.setVolume(this.ampModOsc1);
     
                 this.ampModButton.html('CALM DOWN');
                 this.ampModActive = true;
             }
             
             else {
-                this.ampModOsc.stop();
+                this.ampModOsc1.stop();
                 this.soundFile.setVolume(0.5);
     
                 this.ampModButton.html('ACTIVATE FLUTTER');
                 this.ampModActive = false;
             }
+
+            this.buttons.ampModFreqLFOProcess();
         });
     }
 

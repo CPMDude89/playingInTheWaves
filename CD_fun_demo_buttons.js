@@ -38,7 +38,7 @@
 
         this.delayFilterLFO.start();    //  start up LFO
         this.delayFilterLFO.disconnect();
-        this.delayFilterLFO.scale(-1, 1, 10, 5000);
+        this.delayFilterLFO.scale(-1, 1, 1, 7000);
     }
 
     effButAlerts() {    //  draw signal circles to determine if effect is active: red == off, green == on
@@ -50,87 +50,38 @@
     }
 
     delayTimeLFOProcess() {     //  ----    delay time LFO
-        if (this.looper.delayActive) {  //  only trigger if delay is already going
-            if (!this.delayTimeLFOActive) {
-                this.delayTimeLFO.freq(0.2);    //  set lfo to 0.2 Hz
-                this.delayTimeLFO.amp(1);   //  all LFOs will be at amplitude of 1
-                this.looper.delay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
-
-                this.delayTimeLFOActive = true;     //  flip boolean
-            }
-            else {
-                this.delayTimeLFO.disconnect();     //  need to disconnect oscillator in order to get it off the delayTime param
-                this.looper.delay.delayTime(0.5);   //  set delay time to a fixed amount
-
-                this.delayTimeLFOActive = false;    //  flip boolean
-            }
+        if (this.looper.delayActive) {  //  if delay is active
+            this.delayTimeLFO.freq(random(0.5));    //  set lfo to 0.2 Hz
+            this.delayTimeLFO.amp(1);   //  all LFOs will be at amplitude of 1
+            this.looper.delay.delayTime(this.delayTimeLFO); //  apply lfo to delay time
+        }
+        else {
+            this.delayTimeLFO.disconnect();     //  need to disconnect oscillator in order to get it off the delayTime param
+            this.looper.delay.delayTime(0.5);   //  set delay time to a fixed amount
         }
     }
 
     delayFilterLFOProcess() {   //  ----    delay filter LFO
-        if (this.looper.delayActive) {  //  only trigger if delay is already going
-            if (!this.delayFilterLFOActive) {
-                this.delayFilterLFO.freq(2);    //  set lfo speed   
-                this.delayFilterLFO.amp(1);     //  ensure all lfos are at full 'volume' to get full spread 
-                this.looper.delay.filter(this.delayFilterLFO, 7.5); //  apply lfo directly to filter cutoff here, with a Q of 7.5
-
-                this.delayFilterLFOActive = true;
-            }
-            else {
-                this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
-
-                this.delayFilterLFOActive = false;
-            }
+        if (this.looper.delayActive) {  //  if delay is active
+            this.delayFilterLFO.freq(random());    //  set lfo speed   
+            this.delayFilterLFO.amp(1);     //  ensure all lfos are at full 'volume' to get full spread 
+            this.looper.delay.filter(this.delayFilterLFO, 6); //  apply lfo directly to filter cutoff here, with a Q of 7.5
         }
-    }
-
-    ampModNewFreqProcess() {
-        if (this.looper.ampModActive) {
-            this.looper.ampModOsc.freq(Math.round(random(100)));    //  send new random freq into amp mod osc
-
-            if (this.ampModFreqLFOActive) {     //  if amp mod frequency LFO is active, reset the LFO modulating that frequency
-                this.ampModFreqLFO = new p5.Oscillator();
-                this.ampModFreqLFO.start();
-                this.ampModFreqLFO.disconnect();
-                this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc.getFreq(), (1 + random()) * this.looper.ampModOsc.getFreq());
-                this.ampModFreqLFO.amp(1);
-                this.ampModFreqLFO.freq(random(2));
-
-                this.looper.ampModOsc.freq(this.ampModFreqLFO);
-            }
+        else {
+            this.looper.delay.filter(4500, 1);  //  change filter cutoff to a static amount
         }
     }
 
     ampModFreqLFOProcess() {    //  apply LFO output to the amp mod oscillator
-        if (this.looper.ampModActive) {
-            if (!this.ampModFreqLFOActive) {    //  because .scale() can't be called more than once per sketch, 
-                this.ampModFreqLFO = new p5.Oscillator();   //  have to create a new p5.Oscillator every time user wants to change the frequency
-                this.ampModFreqLFO.start();
-                this.ampModFreqLFO.disconnect();
-                this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc.getFreq(), (1 + random()) * this.looper.ampModOsc.getFreq());
-                this.ampModFreqLFO.amp(1);
-                this.ampModFreqLFO.freq(random(2));
+        if (this.looper.ampModActive) { //  because .scale() can't be called more than once per sketch, 
+            this.ampModFreqLFO = new p5.Oscillator();   //  have to create a new p5.Oscillator every time user wants to change the frequency
+            this.ampModFreqLFO.start();
+            this.ampModFreqLFO.disconnect();
+            this.ampModFreqLFO.scale(-1, 1, random() * this.looper.ampModOsc1.getFreq(), (1 + random()) * this.looper.ampModOsc1.getFreq());
+            this.ampModFreqLFO.amp(1);
+            this.ampModFreqLFO.freq(random());
 
-                this.looper.ampModOsc.freq(this.ampModFreqLFO);     //  apply LFO output to carrier amp mod oscillator
-
-                this.ampModFreqLFOActive = true;
-            }
-            else {
-                this.looper.ampModOsc.freq(Math.round(random(20)));
-
-                this.ampModFreqLFOActive = false;
-            }
-        }
-    }
-
-    ampModNewDepthProcess() {   //  change amp mod LFO depth (oscillator amplitude)
-        if (this.looper.ampModActive) {
-            this.looper.ampModOsc.amp(random());
+            this.looper.ampModOsc1.freq(this.ampModFreqLFO);     //  apply LFO output to carrier amp mod oscillator
         }
     }
 }
-
-
-
-
-
