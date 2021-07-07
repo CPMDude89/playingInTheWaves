@@ -34,7 +34,6 @@ class Looper {
         this.ampModOsc.start();
         this.ampModOsc.disconnect();
         this.ampModOsc.scale(-1, 1, 0, 1);
-        this.warpOsc = new p5.Oscillator();
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -46,8 +45,6 @@ class Looper {
         this.reverbActive = false;
         this.ampModButton;
         this.ampModActive = false;
-        this.warpButton;
-        this.warpActive = false;
 
         this.buttons;
     }
@@ -114,7 +111,6 @@ class Looper {
             this.addDelayButton();  //  apply delay
             this.addReverbButton(); //  apply reverb
             this.addAmpModButton(); //  apply amplitude modulation
-            this.addWarpButton();   //  add button to alter playback speed and duration of buffer
 
             this.buttons.makeControlButtons();
         }
@@ -240,23 +236,4 @@ class Looper {
             }
         });
     }
-
-    addWarpButton() {
-        this.warpButton = createButton('ACTIVATE WARPING');
-        this.warpButton.position(0.25 * this.effButX, this.effButY);
-        this.warpButton.size(this.effButWidth, this.effButHeight);
-
-        this.warpButton.mousePressed(() => {
-            if (!this.warpActive) {
-                console.log('WARPING')
-
-                this.warpActive = true;
-            }
-            else {
-                this.warpActive = false;
-            }
-        });
-    }
-
-    
 }

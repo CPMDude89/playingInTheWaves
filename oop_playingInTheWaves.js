@@ -97,8 +97,7 @@ function draw() {
                 fill(0);
                 text(f + " Hz", 1.17 * buttons2.ampModButX, buttons2.parentButY + (3.5 * buttons2.parentButHeight));
                 }
-        }
-      
+        }      
     }
 
     if (looper3.getState() > 1 ) {   //  once effect buttons are displayed
@@ -118,7 +117,6 @@ function draw() {
                 text(f + " Hz", 1.17 * buttons3.ampModButX, buttons3.parentButY + (3.5 * buttons3.parentButHeight));
                 }
         }
-        
     }
 
     if (looper4.getState() > 1 ) {   //  once effect buttons are displayed
@@ -138,7 +136,6 @@ function draw() {
                 text(f + " Hz", 1.17 * buttons4.ampModButX, buttons4.parentButY + (3.5 * buttons4.parentButHeight));
                 }
         }
-       
     }
 }
 
