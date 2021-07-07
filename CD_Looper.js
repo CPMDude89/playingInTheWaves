@@ -34,6 +34,7 @@ class Looper {
         this.ampModOsc.start();
         this.ampModOsc.disconnect();
         this.ampModOsc.scale(-1, 1, 0, 1);
+        this.warpOsc = new p5.Oscillator();
 
         this.button = createButton('START RECORD'); //  create button
         this.button.mousePressed(() => this.record());  //  when button is clicked, start record process
@@ -45,6 +46,8 @@ class Looper {
         this.reverbActive = false;
         this.ampModButton;
         this.ampModActive = false;
+        this.warpButton;
+        this.warpActive = false;
 
         this.buttons;
     }
@@ -54,7 +57,7 @@ class Looper {
         this.mic.start();   //  set up input source
         this.recorder.setInput(this.mic);   //  connect microphone to recorder object
 
-        this.button.position(this.buttonX, this.buttonY);   //  set up recorder button
+        this.button.position(this.buttonX, this.buttonY);   //  set up main button
         this.button.size(this.buttonWidth, this.buttonHeight);
 
         this.buttons = _buttons;    //  connect this looper instance with it's own buttons instance
@@ -111,6 +114,7 @@ class Looper {
             this.addDelayButton();  //  apply delay
             this.addReverbButton(); //  apply reverb
             this.addAmpModButton(); //  apply amplitude modulation
+            this.addWarpButton();   //  add button to alter playback speed and duration of buffer
 
             this.buttons.makeControlButtons();
         }
@@ -207,11 +211,10 @@ class Looper {
                 this.reverbActive = false;
             }
         })
-       
     }
 
     addAmpModButton() { //  control amplitude modulation
-        this.ampModButton = createButton('ACTIVATE AMP MOD')
+        this.ampModButton = createButton('ACTIVATE AMP MOD');
         this.ampModButton.position(0.5 * this.effButX, this.effButY);
         this.ampModButton.size(this.effButWidth, this.effButHeight);
         
@@ -234,6 +237,23 @@ class Looper {
     
                 this.ampModButton.html('ACTIVATE AMP MOD');
                 this.ampModActive = false;
+            }
+        });
+    }
+
+    addWarpButton() {
+        this.warpButton = createButton('ACTIVATE WARPING');
+        this.warpButton.position(0.25 * this.effButX, this.effButY);
+        this.warpButton.size(this.effButWidth, this.effButHeight);
+
+        this.warpButton.mousePressed(() => {
+            if (!this.warpActive) {
+                console.log('WARPING')
+
+                this.warpActive = true;
+            }
+            else {
+                this.warpActive = false;
             }
         });
     }

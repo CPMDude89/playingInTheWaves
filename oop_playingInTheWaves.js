@@ -5,7 +5,7 @@ let buttons1, buttons2, buttons3, buttons4, buttons5;
 let inMic;
 let bigButX=(4 * w/5), bigButY=(h/5), bigButWidth=(w/10), bigButHeight=(h/10);
 let effectButtonX = 4.5 * (w/7);
-let recBut, recButX=(w/12), recButY=bigButY, recButWidth=(w/10), recButHeight=(h/10), recState=0, outFile, fileClearButton, fileDownloadButton;
+let recBut, recButX=(0.02 * w), recButY=bigButY, recButWidth=(w/14), recButHeight=(h/10), recState=0, outFile, fileClearButton, fileDownloadButton;
 
 function preload() {
         
