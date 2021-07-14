@@ -237,3 +237,85 @@ class Looper {
         });
     }
 }
+
+/**
+ * Basic record button class, will also handle playback clear button
+ */
+
+class RecordButton {
+    constructor(
+        //  get variable input from user
+        buttonX,    //  button x-coordinate
+        buttonY,    //  button y-coordinate
+        buttonWidth,    //  button width
+        buttonHeight,    //  button height
+        mic     //  single input source
+    ) {
+        //  define properties
+        this.buttonX = buttonX; //  apply user input to class-instance variables
+        this.buttonY = buttonY;
+        this.buttonWidth = buttonWidth;
+        this.buttonHeight = buttonHeight;
+
+        this.mic = mic;    //  user input source (computer mic)
+        this.mic.start();   //  turn on user input
+
+        this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
+        this.recorder.setInput(this.mic);
+        
+        this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
+        this.state = 0; //  'state' variable used to control button functions through recording -> playback
+
+        this.recorderButton = createButton('RECORD');    //  set up recording button
+        this.recorderButton.position(recButX, recButY);
+        this.recorderButton.size(recButWidth, recButHeight);
+        this.recorderButton.mousePressed(() => this.recordAudio());
+
+        this.recordActive = false;
+        this.showButtonsActive = false;
+    }
+
+    recordAudio() {
+        userStartAudio();   //  ensure browser audio is functioning
+    
+        if (this.state == 0 && this.mic.enabled) {
+            //  wait 120 ms to get past mouse click
+            setTimeout(() => this.recorder.record(this.soundFile), 120);     //  record user input into buffer
+            this.recorderButton.html('FINISH RECORDING');  //  change button text
+            this.recordActive = true;    //  switch boolean to trigger recording light
+            this.state++;  //  change state to move record process to next step
+        }
+    
+        else if (this.state == 1) {
+            this.recorder.stop();    //  stop record process
+            this.recorderButton.html('PLAY');    //  change button text
+            this.recordActive = false;   //  switch boolean to remove recording light
+            this.state++;    //  change state to move record process to next step
+            this.showButtons();  //  show clear and amp mod buttons
+        }
+    
+        else if (this.state == 2) {
+            this.soundFile.loop();   //  play recorded audio
+            this.recorderButton.html('STOP');    //  change button text
+            this.state++;    //  change state to allow user to stop audio
+        }
+    
+        else if (this.state == 3) {
+            this.soundFile.stop();   //  stop recorded audio
+            this.recorderButton.html('PLAY');
+            this.state--;    //  change state to allow user to play audio
+        }
+    }
+    
+    showButtons() {
+        /*
+        ampModButton = createButton('ACTIVATE\nAMP MOD')   //  set up amplitude modulation on/off button
+        ampModButton.position(AMButX, AMButY);
+        ampModButton.size(AMButWidth, AMButHeight);
+        ampModButton.mousePressed(activateAmpMod);
+*/
+
+console.log("here we are");
+
+    }
+}
