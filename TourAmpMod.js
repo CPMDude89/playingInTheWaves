@@ -11,11 +11,9 @@ let w = window.innerWidth;
 let h = window.innerHeight;
 let mic, recorder, soundFile, recordButton;
 let recButX=(0.11 * w), recButY=(0.25 * h), recButWidth=(0.1 * w), recButHeight=(0.1 * h);
-let ampModButton, AMButWidth=recButWidth, AMButHeight=recButHeight, AMButX=(recButX + (1.15 * AMButWidth) ), AMButY=(recButY);
-let state = 0;
-let ampModActive = false;
-let osc;
-
+let lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWidth=(0.03 * w), lfoVizRectHeight=(0.6 * h);
+let analyzer;
+let lfoFreqSlider, sliderWidth=(0.2 * w);
 
 function setup() {
     createCanvas(w, h);     //  make p5 canvas
@@ -23,17 +21,14 @@ function setup() {
     inMic = new p5.AudioIn(); //  set up audio input (computer mic)
     inMic.start();
 
-    recordButton = new RecordButton(recButX, recButY, recButWidth, recButHeight, inMic);
-    /*
-    osc = new p5.Oscillator();  //  create modulator signal
-    osc.start();
-    osc.disconnect();   //  remove oscillator from main output
-    osc.scale(-1, 1, 0, 1);     //  scale oscillator to make more sense in terms of amplitude
-    osc.freq(15);
-    osc.amp(1);
+    recordButton = new AmplitudeModulation(recButX, recButY, recButWidth, recButHeight, inMic);
 
-*/
+    analyzer = new Analyzer(0, 1);
+    analyzer.setFreq(2);
 
+    lfoFreqSlider = createSlider(0.08, 40, 2, 0.01);
+    lfoFreqSlider.size(sliderWidth);
+    lfoFreqSlider.position(lfoVizRectX - (sliderWidth / 2), 0.8 * lfoVizRectY);
 }
 
 function draw() {
@@ -49,25 +44,20 @@ function draw() {
         circle((recButX + (0.5 * recButWidth)), (recButY - (0.4 * recButHeight)), 0.4 * recButHeight);
     }
 
+    fill(0);
+    rect(lfoVizRectX, lfoVizRectY, lfoVizRectWidth, lfoVizRectHeight);
 
-}
+    if (recordButton.ampModActive) {
+        analyzer.setFreq(lfoFreqSlider.value());
+
+        let gain = analyzer.process();  //  assign output of amp mod osc to variable
+
+        recordButton.soundFile.setVolume(gain, 0.01);   //  apply amp mod osc output to soundFile amplitude
+
+        fill(100, 50, 150);
+        circle((0.5 * lfoVizRectWidth) + lfoVizRectX, map(gain, 0, 1, (lfoVizRectY + lfoVizRectHeight), lfoVizRectY), 1.75 * lfoVizRectWidth);
 
 
-/*
-function activateAmpMod() {     //  apply LFO output to soundFile's amplitude
-    if (!ampModActive) {    //  if amp mod is not active, apply LFO to gain and flip boolean
-        osc.start();
-        recordButton.soundFile.setVolume(osc);   //  apply output oscillator to audio files volume
-        ampModButton.html('DEACTIVATE\nAMP MOD');
-        ampModActive = true;
-    }
-
-    else {    //  if amp mod is active, turn it off and flip boolean
-        osc.stop();
-        recordButton.soundFile.setVolume(1.0);   //  set audio file's gain to static number
-        ampModButton.html('ACTIVATE\nAMP MOD');
-        ampModActive = false;
     }
 
 }
-*/

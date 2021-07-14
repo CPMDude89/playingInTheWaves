@@ -262,7 +262,7 @@ class RecordButton {
 
         this.recorder = new p5.SoundRecorder(); //  p5 sound recorder object
         this.recorder.setInput(this.mic);
-        
+
         this.soundFile = new p5.SoundFile();    //  p5 SoundFile object for audio buffer
         this.state = 0; //  'state' variable used to control button functions through recording -> playback
 
@@ -272,7 +272,6 @@ class RecordButton {
         this.recorderButton.mousePressed(() => this.recordAudio());
 
         this.recordActive = false;
-        this.showButtonsActive = false;
     }
 
     recordAudio() {
@@ -308,14 +307,72 @@ class RecordButton {
     }
     
     showButtons() {
-        /*
-        ampModButton = createButton('ACTIVATE\nAMP MOD')   //  set up amplitude modulation on/off button
-        ampModButton.position(AMButX, AMButY);
-        ampModButton.size(AMButWidth, AMButHeight);
-        ampModButton.mousePressed(activateAmpMod);
-*/
+        this.clearButton = createButton('CLEAR');
+        this.clearButton.size(0.5 * this.buttonWidth, this.buttonHeight);
+        this.clearButton.position((this.buttonX - (0.75 * this.buttonWidth)), this.buttonY);
+        this.clearButton.mousePressed(() => {
+            this.soundFile.stop();
+            this.soundFile = new p5.SoundFile();
+            this.recorderButton.html('RECORD');
+            this.state = 0;
 
-console.log("here we are");
+            this.clearButton.remove();
+        })
 
+    }
+}
+
+/**
+ * Hopefully this will inherit from record button class
+ * 
+ */
+
+class AmplitudeModulation extends RecordButton {
+    constructor (
+         //  get variable input from user
+         buttonX,    //  button x-coordinate
+         buttonY,    //  button y-coordinate
+         buttonWidth,    //  button width
+         buttonHeight,    //  button height
+         mic     //  single input source
+    ) {
+        super(buttonX, buttonY, buttonWidth, buttonHeight, mic);
+
+        this.AMButWidth=this.buttonWidth; 
+        this.AMButHeight=this.buttonHeight; 
+        this.AMButX=(this.buttonX + (1.15 * this.AMButWidth) ); 
+        this.AMButY=(this.buttonY);
+
+        this.ampModActive = false;        
+    }
+
+    showButtons() {
+        this.clearButton = createButton('CLEAR');
+        this.clearButton.size(0.5 * this.buttonWidth, this.buttonHeight);
+        this.clearButton.position((this.buttonX - (0.75 * this.buttonWidth)), this.buttonY);
+        this.clearButton.mousePressed(() => {
+            this.soundFile.stop();
+            this.soundFile = new p5.SoundFile();
+            this.recorderButton.html('RECORD');
+            this.state = 0;
+
+            this.clearButton.remove();
+        })
+
+        this.ampModButton = createButton('ACTIVATE\nAMP MOD');
+        this.ampModButton.position(this.AMButX, this.AMButY);
+        this.ampModButton.size(this.AMButWidth, this.AMButHeight);
+        this.ampModButton.mousePressed(() => {
+            if (!this.ampModActive) {    //  if amp mod is not active, apply LFO to gain and flip boolean
+                this.ampModButton.html('DEACTIVATE\nAMP MOD');
+                this.ampModActive = true;
+            }
+        
+            else {    //  if amp mod is active, turn it off and flip boolean
+                this.soundFile.setVolume(1.0);   //  set audio file's gain to static number
+                this.ampModButton.html('ACTIVATE\nAMP MOD');
+                this.ampModActive = false;
+            }
+        })
     }
 }
