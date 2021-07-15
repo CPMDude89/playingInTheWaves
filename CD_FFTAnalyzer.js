@@ -14,20 +14,30 @@ class Analyzer {
         low,    //  scaled output low end
         high,   //  scaled output high end
     ) {
-        this.osc = new p5.Oscillator('sine');   
-        this.osc.start();
-        this.osc.disconnect();
-        this.osc.amp(1);
-
-        this.fft = new p5.FFT();
-        this.fft.setInput(this.osc);
-
         this.low = low;
         this.high = high;
+
+        this.analyzedOsc = new p5.Oscillator('sine');   
+        this.scaledOsc = new p5.Oscillator('sine');
+
+        this.analyzedOsc.start();
+        this.scaledOsc.start();
+
+        this.analyzedOsc.disconnect();
+        this.scaledOsc.disconnect();
+
+        this.analyzedOsc.amp(1);
+
+        this.scaledOsc.scale(-1, 1, this.low, this.high);
+        this.scaledOsc.amp(1);
+        
+        this.fft = new p5.FFT();
+        this.fft.setInput(this.analyzedOsc);
     }
 
     setFreq(f) {    //  always call this before process()!!!!!
-        this.osc.freq(f);   //  set oscillator frequency
+        this.analyzedOsc.freq(f);   //  set oscillator frequency
+        this.scaledOsc.freq(f);   //  set oscillator frequency
     }
     process() {     //  call this in the draw loop
         let waveform = this.fft.waveform();     //  creates a snapshot of amplitude values along the time domain

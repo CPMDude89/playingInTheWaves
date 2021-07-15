@@ -219,7 +219,8 @@ class Looper {
         this.ampModButton.mousePressed(() => {
             if (!this.ampModActive) {
                 this.ampModOsc.start();
-                this.ampModOsc.freq(Math.round(random(20)));
+                //this.ampModOsc.freq(Math.round(random(20)));
+                this.ampModOsc.freq(0.1);
                 this.ampModOsc.amp(1);
                 this.soundFile.setVolume(this.ampModOsc);
     
@@ -238,7 +239,9 @@ class Looper {
     }
 }
 
+
 /**
+ * =========================================================================================================================================
  * Basic record button class, will also handle playback clear button
  */
 
@@ -335,6 +338,7 @@ class AmplitudeModulation extends RecordButton {
          buttonWidth,    //  button width
          buttonHeight,    //  button height
          mic     //  single input source
+
     ) {
         super(buttonX, buttonY, buttonWidth, buttonHeight, mic);
 
@@ -342,6 +346,8 @@ class AmplitudeModulation extends RecordButton {
         this.AMButHeight=this.buttonHeight; 
         this.AMButX=(this.buttonX + (1.15 * this.AMButWidth) ); 
         this.AMButY=(this.buttonY);
+
+        this.analyzer = new Analyzer(0, 1);
 
         this.ampModActive = false;        
     }
@@ -366,6 +372,11 @@ class AmplitudeModulation extends RecordButton {
             if (!this.ampModActive) {    //  if amp mod is not active, apply LFO to gain and flip boolean
                 this.ampModButton.html('DEACTIVATE\nAMP MOD');
                 this.ampModActive = true;
+
+                this.soundFile.setVolume(this.analyzer.scaledOsc);   //  apply amp mod osc output to soundFile amplitude
+                //this.soundFile.setVolume(this.testOsc.scale(-1, 1, 0, 1));
+
+
             }
         
             else {    //  if amp mod is active, turn it off and flip boolean
