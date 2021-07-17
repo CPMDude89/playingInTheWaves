@@ -55,6 +55,7 @@ function setup() {
     lfoFreqSlider = createSlider(0.1, 50, 2, 0.1);      //  amp mod freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
+    lfoFreqSlider.hide();
     
 }
 
@@ -193,6 +194,7 @@ function triggerAmpMod() {
 
         ampModLFO.start();      //  activate LFO to modulate volume
 
+        lfoFreqSlider.show();
         ampModActive = true;    //  flip button boolean
     }
 
@@ -204,6 +206,7 @@ function triggerAmpMod() {
         ampModLFO.phase = 90;   //  reset LFO phase back to safe place
         ampModLFO.amplitude.rampTo(1, 0.3);     //  bring LFO depth back up 
         
+        lfoFreqSlider.hide();
         ampModActive = false;
     }
 }
