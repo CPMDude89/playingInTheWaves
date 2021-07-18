@@ -12,6 +12,7 @@ let w = window.innerWidth;
 let h = window.innerHeight;
 let mic, recorder, audioBuffer, recordButton, data, blob, player;
 let recButX=(0.11 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
+let clearBut;
 let state = 0;
 let lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.6 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
@@ -70,6 +71,7 @@ function setup() {
 function draw() {
     background(0, 150, 80);     // nice shade of forest green
 
+    noStroke();
     textAlign(CENTER);  //  set up page title
     textSize(40);
     fill(0);       
@@ -88,6 +90,8 @@ function draw() {
         ampModLFO.frequency.rampTo(lfoFreqSlider.value(), 0.05);
         
         fill(100, 50, 150); //  nice purple color
+        stroke(0);
+        strokeWeight(2);
         //  set output of amp mod lfo to the y-axis of ball to visualize amp mod
         //circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(gain, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
         let AMBuffer = LFOWave.getValue();
@@ -95,6 +99,7 @@ function draw() {
         circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(y, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
         
         fill(0);
+        noStroke();
         textSize(40);
         text('Amplitude modulation is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.38 * h);
         
@@ -105,7 +110,7 @@ function draw() {
     rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
 
     stroke(255);        //  set up wave visualizer
-    strokeWeight(2);
+    strokeWeight(3);
     noFill();
     let buffer = volNodeWave.getValue();  //  assign variable for array to analyze
 
@@ -166,8 +171,15 @@ async function recordIn() {
 }
 
 function showControls() {
-
-    
+    clearBut = createButton('START\nOVER');
+    clearBut.position(recButX - (0.7 * recButWd), recButY);
+    clearBut.size(0.5 * recButWd, recButHt);
+    clearBut.mousePressed(function() {
+        recordButton.html('RECORD');
+        player.stop();
+        state = 0;
+        clearBut.remove();
+    });
 }
 
 function triggerTestTone() {
