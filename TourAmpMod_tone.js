@@ -19,6 +19,7 @@ let soundVizX=0.5 * w, soundVizY=0.7 * h, soundVizWd=0.45 * w, soundVizHt=0.5 * 
 let testToneButton, testTone, testToneActive=false;
 let ampModButton, ampModLFO, ampModActive = false;
 let volNode;
+let volNodeWave, LFOWave;
 
 function setup() {
     createCanvas(w, h);     //  make p5 canvas
@@ -52,6 +53,13 @@ function setup() {
     ampModButton.size(recButWd, recButHt);
     ampModButton.mousePressed(triggerAmpMod);
 
+    volNodeWave = new Tone.Waveform();
+    volNodeWave.size = 2048;
+    volNode.connect(volNodeWave);
+
+    LFOWave = new Tone.Waveform();
+    ampModLFO.connect(LFOWave);
+
     lfoFreqSlider = createSlider(0.1, 50, 2, 0.1);      //  amp mod freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
@@ -72,66 +80,54 @@ function draw() {
         circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
     }
 
-    fill(0);
+    fill(0);        //  set up LFO visualizer
     rectMode(CORNER);
-    rect(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt);
+    rect(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt);     //  LFO visualizer vertical bar
 
-    if (ampModActive) {
+    if (ampModActive) {     //  LFO visualizer
         ampModLFO.frequency.rampTo(lfoFreqSlider.value(), 0.05);
-        /*
-        recordButton.analyzer.setFreq(lfoFreqSlider.value());    //  continuously check for new frequency
-
-        let gain = recordButton.analyzer.process();  //  assign output of amp mod osc to variable    
-
         
-
         fill(100, 50, 150); //  nice purple color
         //  set output of amp mod lfo to the y-axis of ball to visualize amp mod
-        circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(gain, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
+        //circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(gain, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
+        let AMBuffer = LFOWave.getValue();
+        let y = AMBuffer[0];
+        circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(y, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
         
         fill(0);
         textSize(40);
         text('Amplitude modulation is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.38 * h);
-        */
+        
     }
 
     fill(0);    //  black
     rectMode(CENTER);   //  align rectangle to center
     rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
 
-    if (state > 1) {
-        /*
-        let spectrum = fft.analyze();
-        stroke(100, 50, 150)
-        
-        for (let i = 0; i < spectrum.length; i++) {
-            let x = map(i, 0, spectrum.length, soundVizX - (0.5 * soundVizWd), soundVizX + (0.5 * soundVizWd));
+    stroke(255);        //  set up wave visualizer
+    strokeWeight(2);
+    noFill();
+    let buffer = volNodeWave.getValue();  //  assign variable for array to analyze
 
-            let y = map(spectrum[i], 0, 255, soundVizY + (0.5 * soundVizHt), soundVizY - (0.5 * soundVizHt));
-
-            line(x, soundVizY + (0.5 * soundVizHt), x, y);
+    let start = 0;      //  find the starting point to stabalize wave
+    for (let i = 1; i < buffer.length; i++) {
+        if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
+            start = i;                              //  by finding the two places in the buffer that go from negative to positive 
+            break;      //  break out of loop
         }
-        
-        
-        
-        noFill();   //  set up for vertex
-        beginShape();
-        stroke(255);
-
-        for (let i = 0; i < wave.length; i++) {
-            let x = map(i, 0, wave.length, soundVizX - (0.5 * soundVizWd), soundVizX + (0.5 * soundVizWd));   //  get x value
-
-            let y = map(wave[i], -1, 1, soundVizY - soundVizHt, soundVizY + soundVizHt);     //  get y value
-
-            vertex(x, y);
-        }
-
-        endShape();
-        noStroke();
-        */
     }
+    let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
 
+    beginShape()    //  begin custom vertex shape
+    for (let i = start; i < end; i++) {   //  iterate over returned array    
+        let x = map(i, start, end, (soundVizX - (0.5 * soundVizWd)), (soundVizX + (0.5 * soundVizWd)));   
+        let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
+
+        vertex(x,y);    //  assign to point in custom vertex shape
+    }
+    endShape();     //  finish custom vertex shape
 }
+
 
 async function recordIn() {
     if (state == 0) {       //  begin recording
