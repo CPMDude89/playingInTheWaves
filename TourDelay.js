@@ -16,7 +16,8 @@ let clearBut;
 let state = 0;
 let lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.6 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
-let soundVizX=0.5 * w, soundVizY=0.7 * h, soundVizWd=0.45 * w, soundVizHt=0.5 * h;
+let soundVizX_fund=0.3 * w, soundVizY=0.7 * h, soundVizWd=0.3 * w, soundVizHt=0.5 * h;
+let soundVizX_delay=0.67 * w;
 let volNode, delayVolNode;
 let delay, delayBut, delayActive=false, delayTimeLFO, delayTimeLFOBut, delayTimeLFOActive=false;
 let fundWave, delayWave;
@@ -70,6 +71,12 @@ function setup() {
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
     lfoFreqSlider.hide();
+
+    fundWave = new Tone.Waveform();
+    volNode.connect(fundWave);
+
+    delayWave = new Tone.Waveform();
+    delayVolNode.connect(delayWave);
 }
 
 function draw() {
@@ -106,6 +113,56 @@ function draw() {
         text('Delay time LFO is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.34 * h);
         text('Delay time is: ' + y.toFixed(2) + ' seconds long', 0.5 * w, 0.38 * h);
         
+    }
+
+    fill(0);    //  black
+    rectMode(CENTER);   //  align rectangle to center
+    rect(soundVizX_fund, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
+    rect(soundVizX_delay, soundVizY, soundVizWd, soundVizHt);    
+
+    stroke(255);        //  set up wave visualizer
+    strokeWeight(3);
+    noFill();
+    let buffer = fundWave.getValue();  //  assign variable for array to analyze
+
+    let start = 0;      //  find the starting point to stabalize wave
+    for (let i = 1; i < buffer.length; i++) {
+        if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
+            start = i;                              //  by finding the two places in the buffer that go from negative to positive 
+            break;      //  break out of loop
+        }
+    }
+    let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
+
+    beginShape()    //  begin custom vertex shape
+    for (let i = start; i < end; i++) {   //  iterate over returned array    
+        let x = map(i, start, end, (soundVizX_fund - (0.5 * soundVizWd)), (soundVizX_fund + (0.5 * soundVizWd)));   
+        let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
+
+        vertex(x,y);    //  assign to point in custom vertex shape
+    }
+    endShape();     //  finish custom vertex shape
+
+    if (delayActive) {      //  add delay line visualizer -----------------------------------------------------------------------------------------------
+        let buffer = delayWave.getValue();  //  assign variable for array to analyze
+
+    let start = 0;      //  find the starting point to stabalize wave
+    for (let i = 1; i < buffer.length; i++) {
+        if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
+            start = i;                              //  by finding the two places in the buffer that go from negative to positive 
+            break;      //  break out of loop
+        }
+    }
+    let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
+
+    beginShape()    //  begin custom vertex shape
+    for (let i = start; i < end; i++) {   //  iterate over returned array    
+        let x = map(i, start, end, (soundVizX_delay - (0.5 * soundVizWd)), (soundVizX_delay + (0.5 * soundVizWd)));   
+        let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
+
+        vertex(x,y);    //  assign to point in custom vertex shape
+    }
+    endShape();     //  finish custom vertex shape
     }
 }
 
