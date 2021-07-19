@@ -67,7 +67,7 @@ function setup() {
     LFOWave = new Tone.Waveform();
     delayTimeLFO.connect(LFOWave);
 
-    lfoFreqSlider = createSlider(0.01, 1.5, 0.05, 0.001);      //  delay time LFO freq slider
+    lfoFreqSlider = createSlider(0.01, 1, 0.05, 0.001);      //  delay time LFO freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
     lfoFreqSlider.hide();
