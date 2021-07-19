@@ -2,6 +2,8 @@
  * Here is the Delay component of the 'tour'
  * User can record into a buffer or pick from an available sound, which will then go into a delay line
  * The delay time will be connected to an LFO as well
+ * The delay line is running from program load, so the button will just toggle its volume bus up and down
+ * This way, the delay will fade out naturally if turned off
  * 
  * Both the original input and the delay line will be visualized
  * hopefully
@@ -16,7 +18,7 @@ let lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoV
 let lfoFreqSlider, sliderWd=(0.6 * w);
 let soundVizX=0.5 * w, soundVizY=0.7 * h, soundVizWd=0.45 * w, soundVizHt=0.5 * h;
 let volNode, delayVolNode;
-let delay, delayTimeLFO;
+let delay, delayBut, delayActive=false, delayTimeLFO, delayTimeLFOBut, delayTimeLFOActive=false;
 let fundWave, delayWave;
 
 
@@ -24,7 +26,9 @@ function setup() {
     createCanvas(w, h);
 
     volNode = new Tone.Volume().toDestination();
-    delayVolNode = new Tone.Volume().toDestination();
+    delayVolNode = new Tone.Volume({
+        volume: -100
+    }).toDestination();
 
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input
@@ -37,6 +41,16 @@ function setup() {
     recordButton.size(recButWd, recButHt);
     recordButton.mousePressed(recordIn);    
 
+    delayBut = createButton('ACTIVATE DELAY');
+    delayBut.position((2 * recButWd) + recButX, recButY);
+    delayBut.size(recButWd, recButHt);
+    delayBut.mousePressed(triggerDelay);
+
+    delayTimeLFOBut = createButton('ACTIVATE DELAY TIME LFO');
+    delayTimeLFOBut.position((3.5 * recButWd) + recButX, recButY);
+    delayTimeLFOBut.size(recButWd, recButHt);
+    delayTimeLFOBut.mousePressed(triggerDelayTimeLFO);
+
     delay = new Tone.FeedbackDelay({
         feedback: 0.5,
         wet: 1
@@ -48,9 +62,6 @@ function setup() {
         min: 0.001,
         max: 0.95
     }).connect(delay.delayTime);
-
-    delayTimeLFO.start();
-
 }
 
 function draw() {
@@ -83,7 +94,7 @@ async function recordIn() {
         blob = URL.createObjectURL(data);   //  save the result of the recoder object into a blob and assign it a url object
         audioBuffer = new Tone.ToneAudioBuffer(blob);    //  create a new audio buffer and assign it to the url object. Finally the recording is in an audio buffer
         player = new Tone.Player(audioBuffer).connect(volNode);  //  connect recording to Tone player and route player to master output
-        player.connect(delay);      //  connect
+        player.connect(delay);      //  connect Tone player to delay node
 
         showControls();
 
@@ -117,4 +128,30 @@ function showControls() {
         state = 0;
         clearBut.remove();
     });
+}
+
+function triggerDelay() {   //  switch delay on/off
+    if (!delayActive) {   //  if not already on
+        delayVolNode.volume.rampTo(0, 0.1); //  ramp delay volume up to normal in 100 ms
+        delayBut.html('DEACTIVATE DELAY');
+        delayActive = true;
+    }
+    else {  //  if already on
+        delayVolNode.volume.rampTo(-100, 0.1);  //  ramp delay volume down to silent in 100 ms
+        delayBut.html('ACTIVATE DELAY');
+        delayActive = false;
+    }
+}
+
+function triggerDelayTimeLFO() {    //  switch delay time LFO on/off
+    if (!delayTimeLFOActive) {  //  if lfo is off, turn on
+        delayTimeLFO.start();
+        delayTimeLFOBut.html('DEACTIVATE DELAY TIME LFO');
+        delayTimeLFOActive = true;
+    }
+    else {  //  if LFO is on, turn off
+        delayTimeLFO.stop();
+        delayTimeLFOBut.html('ACTIVATE DELAY TIME LFO');
+        delayTimeLFOActive = false;
+    }
 }
