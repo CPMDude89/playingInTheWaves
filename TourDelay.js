@@ -62,6 +62,14 @@ function setup() {
         min: 0.001,
         max: 0.95
     }).connect(delay.delayTime);
+
+    LFOWave = new Tone.Waveform();
+    delayTimeLFO.connect(LFOWave);
+
+    lfoFreqSlider = createSlider(0.01, 1.5, 0.05, 0.001);      //  delay time LFO freq slider
+    lfoFreqSlider.size(sliderWd);
+    lfoFreqSlider.position(0.2 * w, 0.4 * h);
+    lfoFreqSlider.hide();
 }
 
 function draw() {
@@ -76,6 +84,28 @@ function draw() {
     if (state == 1) {     //  if button is recording
         fill(255, 0, 0);    //  red for record light
         circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    fill(0);        //  set up LFO visualizer
+    rectMode(CORNER);
+    rect(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt);     //  LFO visualizer vertical bar
+    if (delayTimeLFOActive) {     //  LFO visualizer
+        delayTimeLFO.frequency.rampTo(lfoFreqSlider.value(), 0.05);
+        
+        fill(100, 50, 150); //  nice purple color
+        stroke(0);
+        strokeWeight(2);
+        //  set output of delay time lfo to the y-axis of ball to visualize LFO
+        let LFOBuffer = LFOWave.getValue();
+        let y = LFOBuffer[0];
+        circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(y, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
+        
+        fill(0);
+        noStroke();
+        textSize(34);
+        text('Delay time LFO is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.34 * h);
+        text('Delay time is: ' + y.toFixed(2) + ' seconds long', 0.5 * w, 0.38 * h);
+        
     }
 }
 
@@ -146,11 +176,13 @@ function triggerDelay() {   //  switch delay on/off
 function triggerDelayTimeLFO() {    //  switch delay time LFO on/off
     if (!delayTimeLFOActive) {  //  if lfo is off, turn on
         delayTimeLFO.start();
+        lfoFreqSlider.show();
         delayTimeLFOBut.html('DEACTIVATE DELAY TIME LFO');
         delayTimeLFOActive = true;
     }
     else {  //  if LFO is on, turn off
         delayTimeLFO.stop();
+        lfoFreqSlider.hide();
         delayTimeLFOBut.html('ACTIVATE DELAY TIME LFO');
         delayTimeLFOActive = false;
     }

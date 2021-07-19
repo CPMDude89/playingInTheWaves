@@ -102,7 +102,6 @@ function draw() {
         noStroke();
         textSize(40);
         text('Amplitude modulation is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.38 * h);
-        
     }
 
     fill(0);    //  black
