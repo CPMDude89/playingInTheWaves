@@ -8,17 +8,18 @@
 
 let w=window.innerWidth, h=window.innerHeight;
 let mic, recorder, audioBuffer, recordButton, data, blob, player;
-let recButX=(0.11 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
+let recButX=(0.425 * w), recButY=(0.14 * h), recButWd=(0.15 * w), recButHt=(0.1 * h);
 let clearBut;
 let state = 0;
 let bufferArray;
 let volNode;
-let soundVizX=0.5 * w, soundVizY=0.65 * h, soundVizWd=0.75 * w, soundVizHt=0.55 * h;
+let soundVizX=0.5 * w, soundVizY=0.6 * h, soundVizWd=0.75 * w, soundVizHt=0.65 * h;
 let leftSide = soundVizX - (0.5 * soundVizWd);
 let rightSide = soundVizX + (0.5 * soundVizWd);
 let topSide = soundVizY - (0.5 * soundVizHt);
 let bottomSide = soundVizY + (0.5 * soundVizHt);
-let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0;
+let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset = 1.0;
+let playActive=false;
 
 function setup() {
     canv = createCanvas(w, h);
@@ -50,14 +51,16 @@ function draw() {
 
     if (state == 1) {     //  if button is recording
         fill(255, 0, 0);    //  red for record light
-        circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+        circle((recButX + (1.25 * recButWd)), (recButY + (0.5 * recButHt)), 0.4 * recButHt);
     }
     
-    fill(0);    //  black
-    rectMode(CENTER);   //  align rectangle to center
-    rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
 
     if (state > 1) {
+        fill(0);    //  black
+        rectMode(CENTER);   //  align rectangle to center
+        rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
+        
+
         stroke(255);
         strokeWeight(1);
 
@@ -71,9 +74,61 @@ function draw() {
         }
         endShape();
 
-        stroke(250, 100, 50);
+        stroke(255, 0, 0);
         line(startLine, topSide, startLine, bottomSide); //  start line
         line(endLine, topSide, endLine, bottomSide);   //  end line
+
+        textSize(30);
+        stroke(0);
+        if (playActive) {
+            text('Click anywhere on black box to STOP playback.', 0.5 * w, 0.85 * topSide);
+        }
+        else {
+            text('Click anywhere on black box to START playback.', 0.5 * w, 0.85 * topSide);
+        }
+    }
+
+    // if there is an audio buffer to mess with and mouse is inside visualizer
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1 && playActive) {    
+        let mousePos = map(mouseX, leftSide, rightSide, 0, 1);  //  percentage x-axis in rectangle
+
+        let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
+
+        maxOffset = 0.3;
+        if (maxOffset >= bufferTimeInSeconds) {
+            maxOffset = bufferTimeInSeconds;
+        }
+        offset = map(mouseY, topSide, bottomSide, 0.012, maxOffset);     //  dynamically set offset to y-axis
+
+        start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
+
+        end = start + offset;  //  loop length of 0.2 sec
+
+        if (start > (bufferTimeInSeconds - offset)) {   //  range control
+            start = bufferTimeInSeconds - offset;
+        }
+
+        if (end > bufferTimeInSeconds) {    //  range control
+            end = bufferTimeInSeconds;
+        }
+
+        player.setLoopPoints(start, end);   //  set loop to start point + offset
+
+        offsetPercent = offset / bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
+        offsetPercentInPixels = soundVizWd * offsetPercent;     //  percent of visualization window
+
+        startLine = mouseX;
+        endLine = mouseX + (soundVizWd * offsetPercent);
+
+        if (endLine > rightSide) {  //  range control
+            endLine = rightSide;
+        }
+        if (startLine < leftSide) { //  range control
+            startLine = leftSide;
+        }
+        if (startLine > (rightSide - offsetPercentInPixels)) {  //  range control
+            startLine = rightSide - offsetPercentInPixels;
+        }   
     }
 
     
@@ -97,13 +152,14 @@ async function recordIn() {
         });    
         
         player = new Tone.Player(audioBuffer).connect(volNode);  //  connect recording to Tone player and route player to master output
+        player.loop = true;
 
         showControls();
 
         recordButton.html('PLAY RECORDING');    //  change button text
         state = 2;
     }
-
+    /*
     else if (state == 2) {      //  play recording
         player.loop = true; //  set player to loop output
         player.start();   //  play back recording
@@ -118,55 +174,49 @@ async function recordIn() {
         recordButton.html('PLAY RECORDING');
         state = 2;
     }
+    */
 }
 
 function showControls() {
+    recordButton.hide();
+
     clearBut = createButton('START\nOVER');
-    clearBut.position(recButX - (0.7 * recButWd), recButY);
-    clearBut.size(0.5 * recButWd, recButHt);
+    clearBut.position(soundVizX - (soundVizWd * 0.5 ), 0.06 * h);
+    clearBut.size(0.5 * recButWd, 0.5 * recButHt);
     clearBut.mousePressed(function() {
+        recordButton.show();
+        
         recordButton.html('RECORD');
         player.stop();
         state = 0;
         clearBut.remove();
     });
 }
+/*
+function mousePressed() {
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
+        player.loop = true;
+        player.start();
+    }
+}
 
-function mouseDragged() {
-    // if there is an audio buffer to mess with and mouse is inside visualizer
-    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {    
-        let mousePos = map(mouseX, leftSide, rightSide, 0, 1);  //  percentage x-axis in rectangle
+function mouseReleased() {
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
+        player.stop();
+    }
+}
+*/
 
-        let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
-
-        start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
-
-        end = start + offset;  //  loop length of 0.2 sec
-
-        if (start > (bufferTimeInSeconds - offset)) {   //  range control
-            start = bufferTimeInSeconds - offset;
+//function mouseDragged() {
+function mouseClicked() {
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
+        if (!playActive) {
+            player.start();
+            playActive = true;
         }
-
-        if (end > bufferTimeInSeconds) {    //  range control
-            end = bufferTimeInSeconds;
+        else {
+            player.stop();
+            playActive = false;
         }
-
-        offsetPercent = offset / bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
-        offsetPercentInPixels = soundVizWd * offsetPercent;     //  percent of visualization window
-
-        startLine = mouseX;
-        endLine = mouseX + (soundVizWd * offsetPercent);
-
-        if (endLine > rightSide) {  //  range control
-            endLine = rightSide;
-        }
-        if (startLine < leftSide) { //  range control
-            startLine = leftSide;
-        }
-        if (startLine > (rightSide - offsetPercentInPixels)) {  //  range control
-            startLine = rightSide - offsetPercentInPixels;
-        }
-
-        player.setLoopPoints(start, end);   //  set loop to start point + offset
     }
 }
