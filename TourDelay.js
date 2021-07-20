@@ -134,7 +134,7 @@ function draw() {
     }
     let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
 
-    beginShape()    //  begin custom vertex shape
+    beginShape();    //  begin custom vertex shape
     for (let i = start; i < end; i++) {   //  iterate over returned array    
         let x = map(i, start, end, (soundVizX_fund - (0.5 * soundVizWd)), (soundVizX_fund + (0.5 * soundVizWd)));   
         let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
