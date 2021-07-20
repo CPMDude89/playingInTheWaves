@@ -18,7 +18,7 @@ let leftSide = soundVizX - (0.5 * soundVizWd);
 let rightSide = soundVizX + (0.5 * soundVizWd);
 let topSide = soundVizY - (0.5 * soundVizHt);
 let bottomSide = soundVizY + (0.5 * soundVizHt);
-let start, end, startLine=0, endLine=0, lineOffset=0, offsetPercent=0;
+let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0;
 
 function setup() {
     canv = createCanvas(w, h);
@@ -71,9 +71,9 @@ function draw() {
         }
         endShape();
 
-        stroke(0, 200, 255);
-        line(mouseX, 0, mouseX, h); //  start line
-        line(endLine, 0, endLine, h);   //  end line
+        stroke(250, 100, 50);
+        line(startLine, topSide, startLine, bottomSide); //  start line
+        line(endLine, topSide, endLine, bottomSide);   //  end line
     }
 
     
@@ -141,18 +141,32 @@ function mouseDragged() {
 
         start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
 
-        end = start + 0.2;  //  loop length of 0.2 sec
-        
-        offsetPercent = 0.2 / bufferTimeInSeconds;
+        end = start + offset;  //  loop length of 0.2 sec
 
+        if (start > (bufferTimeInSeconds - offset)) {   //  range control
+            start = bufferTimeInSeconds - offset;
+        }
+
+        if (end > bufferTimeInSeconds) {    //  range control
+            end = bufferTimeInSeconds;
+        }
+
+        offsetPercent = offset / bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
+        offsetPercentInPixels = soundVizWd * offsetPercent;     //  percent of visualization window
+
+        startLine = mouseX;
         endLine = mouseX + (soundVizWd * offsetPercent);
 
-        player.setLoopPoints(start, end);
-        
-        console.log('start line is: ' + start);
-        console.log('Total file length: '+ bufferTimeInSeconds);
-        //console.log(mousePos);
-        //console.log('mouseX is: ' + mouseX + ' and mousePos is: ' + mousePos);
-        //console.log(endLine);
+        if (endLine > rightSide) {  //  range control
+            endLine = rightSide;
+        }
+        if (startLine < leftSide) { //  range control
+            startLine = leftSide;
+        }
+        if (startLine > (rightSide - offsetPercentInPixels)) {  //  range control
+            startLine = rightSide - offsetPercentInPixels;
+        }
+
+        player.setLoopPoints(start, end);   //  set loop to start point + offset
     }
 }
