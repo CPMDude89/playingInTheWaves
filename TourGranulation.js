@@ -13,9 +13,15 @@ let clearBut;
 let state = 0;
 let bufferArray;
 let volNode;
+let soundVizX=0.5 * w, soundVizY=0.65 * h, soundVizWd=0.75 * w, soundVizHt=0.55 * h;
+let leftSide = soundVizX - (0.5 * soundVizWd);
+let rightSide = soundVizX + (0.5 * soundVizWd);
+let topSide = soundVizY - (0.5 * soundVizHt);
+let bottomSide = soundVizY + (0.5 * soundVizHt);
+let start, end, startLine=0, endLine=0, lineOffset=0, offsetPercent=0;
 
 function setup() {
-    createCanvas(w, h);
+    canv = createCanvas(w, h);
 
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input
@@ -47,23 +53,30 @@ function draw() {
         circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
     }
     
-    if (state > 1) {
-        stroke(0);
-        strokeWeight(2);
-        beginShape();
-        for (let i = 0; i < audioBuffer.toArray(0).length; i += 200) {
-            //console.log(audioBuffer.toArray(0)[i]);
-            let x = map(i, 0, audioBuffer.toArray(0).length, 0, w);
-            let y = map(audioBuffer.toArray(0)[i], -1, 1, h, 0);
+    fill(0);    //  black
+    rectMode(CENTER);   //  align rectangle to center
+    rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
 
-            if (audioBuffer.toArray(0)[i] > 1 || audioBuffer.toArray(0)[i] < -1) {
-                console.log(audioBuffer.toArray(0)[i]);
-            }
+    if (state > 1) {
+        stroke(255);
+        strokeWeight(1);
+
+        beginShape();
+        for (let i = 0; i < audioBuffer.toArray(0).length; i += 300) {
+
+            let x = map(i, 0, audioBuffer.toArray(0).length, leftSide, rightSide);
+            let y = map(audioBuffer.toArray(0)[i], -1, 1, bottomSide, topSide);
 
             vertex(x, y);
         }
         endShape();
+
+        stroke(0, 200, 255);
+        line(mouseX, 0, mouseX, h); //  start line
+        line(endLine, 0, endLine, h);   //  end line
     }
+
+    
 }
 
 
@@ -119,3 +132,27 @@ function showControls() {
     });
 }
 
+function mouseDragged() {
+    // if there is an audio buffer to mess with and mouse is inside visualizer
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {    
+        let mousePos = map(mouseX, leftSide, rightSide, 0, 1);  //  percentage x-axis in rectangle
+
+        let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
+
+        start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
+
+        end = start + 0.2;  //  loop length of 0.2 sec
+        
+        offsetPercent = 0.2 / bufferTimeInSeconds;
+
+        endLine = mouseX + (soundVizWd * offsetPercent);
+
+        player.setLoopPoints(start, end);
+        
+        console.log('start line is: ' + start);
+        console.log('Total file length: '+ bufferTimeInSeconds);
+        //console.log(mousePos);
+        //console.log('mouseX is: ' + mouseX + ' and mousePos is: ' + mousePos);
+        //console.log(endLine);
+    }
+}

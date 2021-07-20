@@ -112,7 +112,6 @@ function draw() {
         textSize(34);
         text('Delay time LFO is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.34 * h);
         text('Delay time is: ' + y.toFixed(2) + ' seconds long', 0.5 * w, 0.38 * h);
-        
     }
 
     fill(0);    //  black
