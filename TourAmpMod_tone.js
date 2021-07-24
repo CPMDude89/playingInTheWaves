@@ -18,7 +18,6 @@ let soundVizX=0.5 * w, soundVizY=0.7 * h, soundVizWd=0.45 * w, soundVizHt=0.5 * 
 let testToneButton, testTone, testToneActive=false;
 let ampModButton, ampModLFO, ampModActive = false;
 let volNode;
-let volNodeWave, LFOWave;
 
 function setup() {
     createCanvas(w, h);     //  make p5 canvas
@@ -28,7 +27,7 @@ function setup() {
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input 
 
-    samplerButton = new SamplerButton(mic, recButX, recButY, recButWd, recButHt);
+    samplerButton = new SamplerButton(recButX, recButY, recButWd, recButHt);
 
     samplerButton.player.connect(volNode);
     mic.connect(samplerButton.recorder);
