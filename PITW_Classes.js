@@ -144,3 +144,56 @@ class OscScope {
         endShape();     //  finish custom vertex shape
     }
 }
+
+
+/**
+ * This class is designed to make the current phase and frequency of an LFO visible.
+ * A ball moves up and down over a vertical rectangle, where the top of the rectangle is max phase, and bottom is min phase.
+ * At frequencies above 5Hz, the ball will loose coherence. But that's ok, it works so smoothly it's still effective.
+ * The draw() loop in p5.js tries to run at 60 fps always, and since the visualizer is called inside the draw() loop,
+ * it is limited to that frame rate
+ * 
+ * Needs to be included in html file with BOTH p5.js and Tone.js
+ * Make sure to do all the connections in the script this is used in
+ */
+class LFOVisualizer {
+    constructor (
+        Xpos,   //  x-axis coordinate
+        Ypos,   //  y-axis coordinate
+        rectWd, //  rectangle width
+        rectHt, //  rectangle height
+        ballRed,    //  visualizer red value
+        ballGreen,  //  visualizer green value
+        ballBlue    //  visualizer blue value
+    ) {
+        this.Xpos = Xpos;
+        this.Ypos = Ypos;
+        this.rectWd = rectWd;
+        this.rectHt = rectHt;
+        this.ballRGB = color(ballRed, ballGreen, ballBlue);
+
+        this.wave = new Tone.Waveform();    //  set up new waveform object to analyze LFO output, connect to LFO in script
+    }
+
+    setBallColor(r, g, b) {     //  change ball color
+        this.ballRGB = color(r, g, b);
+    }
+
+    process() {     //  call in draw() loop for lfo visualization
+        //  set up visualizer background (vertical rectangle)
+        fill(0);        //  black
+        rectMode(CORNER);   
+        rect(this.Xpos, this.Ypos, this.rectWd, this.rectHt);     //  LFO visualizer vertical bar
+
+        //  set up ball that represents LFO phase
+        fill(this.ballRGB); //  ball color
+        stroke(0);  //  black outline
+        strokeWeight(2);    //  set outline
+
+        //  set output of amp mod lfo to the y-axis of ball to visualize amp mod
+        let AMBuffer = this.wave.getValue();    //  get amplitude array snapshot of signal
+        let y = AMBuffer[0];    //  get first bin, this keeps the movement consistent
+        //  map values to p5.js 'circle' object
+        circle((0.5 * this.rectWd) + this.Xpos, map(y, 0, 1, (this.Ypos + this.rectHt), this.Ypos), 1.75 * this.rectWd);
+    }
+}
