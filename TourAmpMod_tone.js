@@ -17,17 +17,18 @@ let soundVizX=0.5 * w, soundVizY=0.68 * h, soundVizWd=0.55 * w, soundVizHt=0.57 
 let lfoVizRectX=(0.86 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.72 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
 let testToneButton, testTone, testToneActive=false;
-let ampModButton, ampModLFO, ampModActive = false;
+let ampModButton, ampModLFO, ampModActive = false, ampModHighFreq=false;
 let volNode;
 let sample1, sample1Active=false, sample2, sample2Active=false;
 let loop, transport;
 
 function preload() {
-    limiter = new Tone.Limiter(-1).toDestination();
+    limiter = new Tone.Limiter(0).toDestination();
     volNode = new Tone.Volume().connect(limiter);    //  primary output node
-    sample1 = new Tone.Player("./sounds/CD_waterBottle_shake_sustain_05.wav").connect(volNode);     //  stock samples
+    sample1 = new Tone.Player("./sounds/water_bottle_shake.wav").connect(volNode);     //  stock samples
     sample1.loop = true;
-    sample2 = new Tone.Player("./sounds/CD_boilingWater_hiss_01.wav").connect(volNode);
+    sample1.volume.value = 3;
+    sample2 = new Tone.Player("./sounds/waterFall.wav").connect(volNode);
     sample2.loop = true;
 }
 
@@ -68,7 +69,7 @@ function setup() {
     ampModButton.size(recButWd, recButHt);
     ampModButton.mousePressed(triggerAmpMod);
 
-    lfoFreqSlider = createSlider(0.1, 50, 2, 0.1);      //  amp mod freq slider
+    lfoFreqSlider = createSlider(0.1, 20, 2, 0.1);      //  amp mod freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.36 * h);
     lfoFreqSlider.hide();
@@ -116,7 +117,12 @@ function draw() {
         circle(((0.06 * w) + (0.5 * recButWd)), soundVizY - (0.55 * soundVizHt), 0.4 * recButHt);
         textSize(30);
         fill(0)
-        text('Test Tone wave type is:\n' + testTone.type, 0.11 * w, soundVizY)
+        text('Test Tone wave type is:\n' + testTone.type, 0.11 * w, 0.92 * soundVizY);
+        fill(220, 0, 50);
+        stroke(0);
+        strokeWeight(2);
+        textSize(30);
+        text('WARNING:\n Different wave types are\nnaturally different volumes.\nStart with a low volume when\nchanging wave types!', 0.11 * w, 1.15 * soundVizY)
     }
 
     if (ampModActive) {     //  if amplitude modulation is engaged, enable changing modulating frequency and show lfo viz
@@ -162,7 +168,7 @@ function triggerSample2() {
 function triggerTestTone() {
     if (!testToneActive) {
         testTone.start();
-        testTone.volume.rampTo(-2, 0.1);
+        testTone.volume.rampTo(-1, 0.1);
 
         testToneActive = true;
 
@@ -172,15 +178,19 @@ function triggerTestTone() {
         testToneTypeButton.mousePressed(() => {
             if (testTone.type == 'sine') {
                 testTone.type = 'triangle';
+                
             }
             else if (testTone.type == 'triangle') {
                 testTone.type = 'sawtooth';
+                testTone.volume.rampTo(-3, 0.1);
             }
             else if (testTone.type == 'sawtooth') {
                 testTone.type = 'square';
+                
             }
             else if (testTone.type == 'square') {
                 testTone.type = 'sine';
+                testTone.volume.rampTo(-1, 0.1);
             }
         });
     }
@@ -202,6 +212,28 @@ function triggerAmpMod() {
 
         lfoFreqSlider.show();
         ampModActive = true;    //  flip button boolean
+
+        freqButton = createButton('SWITCH TO HIGH FREQ');
+        freqButton.position((0.67 * w), recButY - (0.8 * recButHt));
+        freqButton.size(recButWd, 0.7 * recButHt);
+        freqButton.mousePressed(() => {
+            if (!ampModHighFreq) {
+                freqButton.html('SWITCH TO LOW FREQ');
+                lfoFreqSlider.remove();
+                lfoFreqSlider = createSlider(1, 500, 50, 0.1);      //  amp mod freq slider
+                lfoFreqSlider.size(sliderWd);
+                lfoFreqSlider.position(0.2 * w, 0.36 * h);
+                ampModHighFreq = true;
+            }
+            else {
+                freqButton.html('SWITCH TO HIGH FREQ');
+                lfoFreqSlider.remove();
+                lfoFreqSlider = createSlider(0.1, 20, 2, 0.1);      //  amp mod freq slider
+                lfoFreqSlider.size(sliderWd);
+                lfoFreqSlider.position(0.2 * w, 0.36 * h);
+                ampModHighFreq = false;
+            }
+        })
     }
 
     else {
