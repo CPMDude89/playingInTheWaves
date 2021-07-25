@@ -74,8 +74,8 @@ function setup() {
     lfoFreqSlider.position(0.2 * w, 0.36 * h);
     lfoFreqSlider.hide();
 
-    oscScope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048);    //  initialize oscilloscope 
-    volNode.connect(oscScope.wave); //  connect volume node out to oscilloscope
+    scope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048, false);    //  initialize oscilloscope 
+    volNode.connect(scope.wave); //  connect volume node out to oscilloscope
 
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);    //  initialize lfo visualizer
     ampModLFO.connect(lfoViz.wave);     //  connect amp mod lfo to visualizer
@@ -136,7 +136,7 @@ function draw() {
         lfoViz.process();  //  draw lfo visualizer
     }
 
-    oscScope.process(); //  draw oscilloscope to visualize sound
+    scope.process(); //  draw oscilloscope to visualize sound
 }
 
 function triggerSample1() {

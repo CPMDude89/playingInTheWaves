@@ -62,7 +62,6 @@ class SamplerButton {
             this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
             setTimeout(() => this.loop = new Tone.Loop((time) => {
                 this.player.start();
-                //this.output.triggerAttackRelease(this.player.buffer.length / this.player.buffer.sampleRate);
             }, (this.player.buffer.length / this.player.buffer.sampleRate)),
             200);
 
@@ -101,6 +100,86 @@ class SamplerButton {
         })
     }
 }
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+
+/**
+ * ForwardAndBackwardsSamplerButton class will extend the SamplerButton class
+ * 
+ * Main difference is this class has two players instead of one, and one will have a reversed buffer
+ * This is because Tone.js Player object will not accept a playback rate of > 0, like p5.sound will
+ * Instead of switching the playback rate to a negative number to go backwards, will fade volumes between 
+ * forwards and backwards running buffers
+ */
+class ForwardsAndBackwardsSamplerButton extends SamplerButton {
+    constructor (
+        Xpos,   //  x-axis coordinate
+        Ypos,   //  y-axis coordinate
+        butWd,  //  button width
+        butHt  //  button height
+    ) {
+        super(Xpos, Ypos, butWd, butHt);    //  inherit properties from parent class
+
+        this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
+
+        this.playerForward = new Tone.Player({  //  create forwards running player
+            fadeIn: 0.1,
+            fadeOut: 0.1,
+            reverse: false,
+            volume: 0
+        });
+        this.playerBackward = new Tone.Player({ //  create backwards running player
+            fadeIn: 0.1,
+            fadeOut: 0.1,
+            reverse: true,
+            volume: -100
+        });
+    }
+
+    async process() {
+        if (this.state == 'ready') {    //  if object is ready to record new audio in
+            setTimeout(() => {this.recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
+            this.button.html('STOP RECORDING');     //  change button text
+            this.state = 'recording';   //  change string to keep track of process
+        }
+
+        else if (this.state == 'recording') {       //  stop recording and store audio
+            let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
+            let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
+            this.playerForward.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
+            this.playerBackward.load(blob);     //  same but load it to a reversed player
+
+            setTimeout(() => this.loop = new Tone.Loop((time) => {
+                this.playerForward.start();
+                this.playerBackward.start();
+            }, (this.playerForward.buffer.length / this.playerForward.buffer.sampleRate)),
+            200);
+
+            this.button.html('PLAY RECORDING');     //  change button text
+            this.showControls();    //  send to function to show start over button
+            this.state = 'play';    //  change string to keep track of process
+        }
+
+        else if (this.state == 'play') {    //  play recorded audio buffer
+            this.button.html('STOP PLAYBACK');  //  change button text
+            this.state = 'stop';    //  change string to keep track of process
+            
+            this.loop.start();     //   start event loop 
+        }
+
+        else if (this.state = 'stop') {
+            this.player.stop();     //  stop playback
+            this.button.html('PLAY RECORDING');     //  change button text
+            this.state = 'play';    //  change string to keep track of process
+
+            this.playerForward.stop();     //  stop player
+            this.playerBackward.stop();     //  stop player
+            this.loop.stop();       //  stop event loop
+        }
+    }
+}
+//===================================================================================================================================================//
+//===================================================================================================================================================//
 
 /**
  * Class object for a p5.js/Tone.js combination oscilloscope. 
@@ -116,13 +195,15 @@ class OscScope {
         Ypos,   //  y-axis coordinate
         scopeWd,    //  visualizer width
         scopeHt,    //  visualizer height
-        binsAmt    //  number of bins for waveform analysis, needs to be a power of 2 
+        binsAmt,    //  number of bins for waveform analysis, needs to be a power of 2 
+        squareWindow      //  boolean to determine if window is a rectangle or square (square primarily for playback rate program)
     ) {
         this.Xpos = Xpos;
         this.Ypos = Ypos;
         this.scopeWd = scopeWd;
         this.scopeHt = scopeHt;
         this.binsAmt = binsAmt;
+        this.squareWindow = squareWindow;
 
         this.wave = new Tone.Waveform();    //  set up new Tone Waveform object to do the analysis
         this.wave.size = this.binsAmt;      //  amount of definition in the wave
@@ -131,7 +212,12 @@ class OscScope {
     process() {     //  draw oscilloscope
         fill(0);    //  black
         rectMode(CENTER);   //  align rectangle to center
-        rect(this.Xpos, this.Ypos, this.scopeWd, this.scopeHt);  //  create backdrop for waveform drawing
+        if (this.squareWindow) {
+            square(this.Xpos, this.Ypos, this.scopeWd);  //  create square backdrop for waveform drawing    
+        }
+        else {
+            rect(this.Xpos, this.Ypos, this.scopeWd, this.scopeHt);  //  create rectangular backdrop for waveform drawing
+        }
 
         stroke(255);        //  set up wave visualizer
         strokeWeight(3);
@@ -157,7 +243,8 @@ class OscScope {
         endShape();     //  finish custom vertex shape
     }
 }
-
+//===================================================================================================================================================//
+//===================================================================================================================================================//
 
 /**
  * This class is designed to make the current phase and frequency of an LFO visible.
