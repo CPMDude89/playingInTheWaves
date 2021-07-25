@@ -122,6 +122,7 @@ function draw() {
     if (delayActive) {
         fill(0, 0, 255);    //  blue
         circle(((0.48 * w) + recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+        delayScope.process();
     }
 
     if (sample1Active) {
@@ -146,7 +147,6 @@ function draw() {
 
     if (samplerButton.player.state == 'started' || sample1Active || sample2Active) {
         fundScope.process();
-        delayScope.process();
     }
 }
 
