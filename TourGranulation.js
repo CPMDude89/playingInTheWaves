@@ -153,6 +153,8 @@ async function recordIn() {
         
         player = new Tone.Player(audioBuffer).connect(volNode);  //  connect recording to Tone player and route player to master output
         player.loop = true;
+        player.fadeIn = 0.1;
+        player.fadeOut = 0.5;
 
         showControls();
 

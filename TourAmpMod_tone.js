@@ -20,9 +20,10 @@ let testToneButton, testTone, testToneActive=false;
 let ampModButton, ampModLFO, ampModActive = false;
 let volNode;
 let sample1, sample1Active=false, sample2, sample2Active=false;
+let loop, transport;
 
 function preload() {
-    limiter = new Tone.Limiter(0).toDestination();
+    limiter = new Tone.Limiter(-1).toDestination();
     volNode = new Tone.Volume().connect(limiter);    //  primary output node
     sample1 = new Tone.Player("./sounds/CD_waterBottle_shake_sustain_05.wav").connect(volNode);     //  stock samples
     sample1.loop = true;
@@ -77,6 +78,8 @@ function setup() {
 
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);    //  initialize lfo visualizer
     ampModLFO.connect(lfoViz.wave);     //  connect amp mod lfo to visualizer
+
+    Tone.Transport.start();     //  start Tone.Transport to set up events
 }
 
 function draw() {
@@ -111,6 +114,9 @@ function draw() {
     if (testToneActive) {   //  signal light for test tone
         fill(0, 0, 255);    //  blue
         circle(((0.06 * w) + (0.5 * recButWd)), soundVizY - (0.55 * soundVizHt), 0.4 * recButHt);
+        textSize(30);
+        fill(0)
+        text('Test Tone wave type is:\n' + testTone.type, 0.11 * w, soundVizY)
     }
 
     if (ampModActive) {     //  if amplitude modulation is engaged, enable changing modulating frequency and show lfo viz
@@ -156,14 +162,35 @@ function triggerSample2() {
 function triggerTestTone() {
     if (!testToneActive) {
         testTone.start();
+        testTone.volume.rampTo(-2, 0.1);
 
         testToneActive = true;
+
+        testToneTypeButton = createButton('CHANGE WAVE');
+        testToneTypeButton.position(0.06 * w, soundVizY - (0.5 * soundVizHt) + (1.2 * recButHt));
+        testToneTypeButton.size(recButWd, recButHt);
+        testToneTypeButton.mousePressed(() => {
+            if (testTone.type == 'sine') {
+                testTone.type = 'triangle';
+            }
+            else if (testTone.type == 'triangle') {
+                testTone.type = 'sawtooth';
+            }
+            else if (testTone.type == 'sawtooth') {
+                testTone.type = 'square';
+            }
+            else if (testTone.type == 'square') {
+                testTone.type = 'sine';
+            }
+        });
     }
 
     else {
+        testTone.volume.rampTo(-100, 0.1);
         testTone.stop("+0.05");
 
         testToneActive = false;
+        testToneTypeButton.remove();
     }
 }
 
