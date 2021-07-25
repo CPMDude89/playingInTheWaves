@@ -50,7 +50,7 @@ function draw() {
     fill(0);
     textAlign(CENTER);  //  page title
     textSize(45);
-    text('Playing In The Waves: A Play-Based Approach to Generative Sound Design', w/2, h/11);
+    text('Playing In The Waves: A Play-Based Approach to Sound Design', w/2, h/11);
 
     textAlign(LEFT);    //  set up track names
     textSize(28);
