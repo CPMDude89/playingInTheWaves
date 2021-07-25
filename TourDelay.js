@@ -10,52 +10,71 @@
  */
 
 let w = window.innerWidth, h = window.innerHeight;
-let mic, recorder, audioBuffer, recordButton, data, blob, player;
-let recButX=(0.11 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
-let clearBut;
-let state = 0;
-let lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.6 * h);
+let mic;
+let recButX=(0.08 * w), recButY=(0.18 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
+let lfoViz, lfoVizRectX=(0.85 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.6 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
 let soundVizX_fund=0.3 * w, soundVizY=0.7 * h, soundVizWd=0.3 * w, soundVizHt=0.5 * h;
 let soundVizX_delay=0.67 * w;
 let volNode, delayVolNode;
 let delay, delayBut, delayActive=false, delayTimeLFO, delayTimeLFOBut, delayTimeLFOActive=false;
 let fundWave, delayWave;
+let limiter, sample1, sample1Active=false, sample2, sample2Active=false, sample1Button, sample2Button;
+let samplerButton;
 
+
+function preload() {
+    limiter = new Tone.Limiter(0).toDestination();
+    sample1 = new Tone.Player('./sounds/Mike_Hayes_beat.wav');
+    sample1.loop = true;
+    sample2 = new Tone.Player('./sounds/snaps.wav');
+    sample2.loop = true;
+}
 
 function setup() {
     createCanvas(w, h);
 
-    volNode = new Tone.Volume().toDestination();
+    volNode = new Tone.Volume();
     delayVolNode = new Tone.Volume({
         volume: -100
-    }).toDestination();
+    }).connect(limiter);
 
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input
 
-    recorder = new Tone.Recorder();     //  set up Tone recorder
-    mic.connect(recorder);      //  connect microphone output to Tone recorder object
+    samplerButton = new SamplerButton(recButX, recButY, recButWd, recButHt);
+    samplerButton.player.connect(volNode);
 
-    recordButton = createButton('RECORD');      //  record button
-    recordButton.position(recButX, recButY);
-    recordButton.size(recButWd, recButHt);
-    recordButton.mousePressed(recordIn);    
+    mic.connect(samplerButton.recorder);      //  connect microphone output to Tone recorder object
 
     delayBut = createButton('ACTIVATE DELAY');
-    delayBut.position((2 * recButWd) + recButX, recButY);
+    delayBut.position((0.48 * w) + recButX, recButY);
     delayBut.size(recButWd, recButHt);
     delayBut.mousePressed(triggerDelay);
 
     delayTimeLFOBut = createButton('ACTIVATE DELAY TIME LFO');
-    delayTimeLFOBut.position((3.5 * recButWd) + recButX, recButY);
+    delayTimeLFOBut.position((6 * recButWd) + recButX, recButY);
     delayTimeLFOBut.size(recButWd, recButHt);
     delayTimeLFOBut.mousePressed(triggerDelayTimeLFO);
+
+    sample1.connect(volNode);
+    sample1Button = createButton('SAMPLE 1');
+    sample1Button.position(0.2 * w, recButY);
+    sample1Button.size(recButWd, recButHt);
+    sample1Button.mousePressed(triggerSample1);
+
+    sample2.connect(volNode);
+    sample2Button = createButton('SAMPLE 2');
+    sample2Button.position(0.32 * w, recButY);
+    sample2Button.size(recButWd, recButHt);
+    sample2Button.mousePressed(triggerSample2);
 
     delay = new Tone.FeedbackDelay({
         feedback: 0.5,
         wet: 1
     }).connect(delayVolNode);
+
+    volNode.fan(delay, limiter);
 
     delayTimeLFO = new Tone.LFO({
         amplitude: 1,
@@ -64,19 +83,21 @@ function setup() {
         max: 0.95
     }).connect(delay.delayTime);
 
-    LFOWave = new Tone.Waveform();
-    delayTimeLFO.connect(LFOWave);
-
-    lfoFreqSlider = createSlider(0.01, 1, 0.05, 0.001);      //  delay time LFO freq slider
+    lfoFreqSlider = createSlider(0.01, 0.6, 0.05, 0.001);      //  delay time LFO freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
     lfoFreqSlider.hide();
 
-    fundWave = new Tone.Waveform();
-    volNode.connect(fundWave);
+    lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);
+    delayTimeLFO.connect(lfoViz.wave);
 
-    delayWave = new Tone.Waveform();
-    delayVolNode.connect(delayWave);
+    fundScope = new OscScope(soundVizX_fund, soundVizY, soundVizWd, soundVizHt, 2048, false);
+    volNode.connect(fundScope.wave);
+
+    delayScope = new OscScope(soundVizX_delay, soundVizY, soundVizWd, soundVizHt, 2048, false);
+    delayVolNode.connect(delayScope.wave);
+
+    Tone.Transport.start();
 }
 
 function draw() {
@@ -88,132 +109,45 @@ function draw() {
     fill(0);       
     text('Playing In The Waves:\nDelay', 0.5 * w, 0.05 * h); //  page title
 
-    if (state == 1) {     //  if button is recording
+    if (samplerButton.state == 'recording') {     //  if button is recording
         fill(255, 0, 0);    //  red for record light
         circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
     }
 
-    fill(0);        //  set up LFO visualizer
-    rectMode(CORNER);
-    rect(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt);     //  LFO visualizer vertical bar
-    if (delayTimeLFOActive) {     //  LFO visualizer
+    if (samplerButton.player.state == 'started') {    //  if sampler button is playing
+        fill(0, 0, 255);    //  blue
+        circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }   
+
+    if (delayActive) {
+        fill(0, 0, 255);    //  blue
+        circle(((0.48 * w) + recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (sample1Active) {
+        fill(0, 0, 255);    //  blue
+        circle(((0.2 * w) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (sample2Active) {
+        fill(0, 0, 255);    //  blue
+        circle(((0.32 * w) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (delayTimeLFOActive) {
         delayTimeLFO.frequency.rampTo(lfoFreqSlider.value(), 0.05);
-        
-        fill(100, 50, 150); //  nice purple color
-        stroke(0);
-        strokeWeight(2);
-        //  set output of delay time lfo to the y-axis of ball to visualize LFO
-        let LFOBuffer = LFOWave.getValue();
-        let y = LFOBuffer[0];
-        circle((0.5 * lfoVizRectWd) + lfoVizRectX, map(y, 0, 1, (lfoVizRectY + lfoVizRectHt), lfoVizRectY), 1.75 * lfoVizRectWd);
-        
+        lfoViz.process();
         fill(0);
         noStroke();
         textSize(34);
-        text('Delay time LFO is at rate: ' + lfoFreqSlider.value() + ' Hz', 0.5 * w, 0.34 * h);
-        text('Delay time is: ' + y.toFixed(2) + ' seconds long', 0.5 * w, 0.38 * h);
+        text('Delay time LFO is at rate: ' + lfoFreqSlider.value().toFixed(2) + ' Hz', 0.5 * w, 0.34 * h);
+        text('Delay time is: ' + lfoViz.getLFOPhase() + ' seconds long', 0.5 * w, 0.38 * h);
     }
 
-    fill(0);    //  black
-    rectMode(CENTER);   //  align rectangle to center
-    rect(soundVizX_fund, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
-    rect(soundVizX_delay, soundVizY, soundVizWd, soundVizHt);    
-
-    stroke(255);        //  set up wave visualizer
-    strokeWeight(3);
-    noFill();
-    let buffer = fundWave.getValue();  //  assign variable for array to analyze
-
-    let start = 0;      //  find the starting point to stabalize wave
-    for (let i = 1; i < buffer.length; i++) {
-        if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
-            start = i;                              //  by finding the two places in the buffer that go from negative to positive 
-            break;      //  break out of loop
-        }
+    if (samplerButton.player.state == 'started' || sample1Active || sample2Active) {
+        fundScope.process();
+        delayScope.process();
     }
-    let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
-
-    beginShape();    //  begin custom vertex shape
-    for (let i = start; i < end; i++) {   //  iterate over returned array    
-        let x = map(i, start, end, (soundVizX_fund - (0.5 * soundVizWd)), (soundVizX_fund + (0.5 * soundVizWd)));   
-        let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
-
-        vertex(x,y);    //  assign to point in custom vertex shape
-    }
-    endShape();     //  finish custom vertex shape
-
-    if (delayActive) {      //  add delay line visualizer -----------------------------------------------------------------------------------------------
-        let buffer = delayWave.getValue();  //  assign variable for array to analyze
-
-    let start = 0;      //  find the starting point to stabalize wave
-    for (let i = 1; i < buffer.length; i++) {
-        if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
-            start = i;                              //  by finding the two places in the buffer that go from negative to positive 
-            break;      //  break out of loop
-        }
-    }
-    let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
-
-    beginShape()    //  begin custom vertex shape
-    for (let i = start; i < end; i++) {   //  iterate over returned array    
-        let x = map(i, start, end, (soundVizX_delay - (0.5 * soundVizWd)), (soundVizX_delay + (0.5 * soundVizWd)));   
-        let y = map(buffer[i], -1, 1, (soundVizY - (0.5 * soundVizHt)), (soundVizY + (0.5 * soundVizHt)));
-
-        vertex(x,y);    //  assign to point in custom vertex shape
-    }
-    endShape();     //  finish custom vertex shape
-    }
-}
-
-
-
-async function recordIn() {
-    if (state == 0) {       //  begin recording
-        setTimeout(function() {recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
-
-        recordButton.html('STOP RECORDING');        //  change button text
-        state = 1;      //  move record state through
-    }
-
-    else if (state == 1) {      //  stop recording
-        data = await recorder.stop();   //  end recording and return a javascript promise with the result in it
-        blob = URL.createObjectURL(data);   //  save the result of the recoder object into a blob and assign it a url object
-        audioBuffer = new Tone.ToneAudioBuffer(blob);    //  create a new audio buffer and assign it to the url object. Finally the recording is in an audio buffer
-        player = new Tone.Player(audioBuffer).connect(volNode);  //  connect recording to Tone player and route player to master output
-        player.connect(delay);      //  connect Tone player to delay node
-
-        showControls();
-
-        recordButton.html('PLAY RECORDING');    //  change button text
-        state = 2;
-    }
-
-    else if (state == 2) {      //  play recording
-        player.loop = true; //  set player to loop output
-        player.start();   //  play back recording
-
-        recordButton.html('STOP PLAYBACK');     //  change button text
-        state = 3;  //  more record state
-    }
-
-    else if (state == 3) {      //  stop playback
-        player.stop();    //    stop playing
-
-        recordButton.html('PLAY RECORDING');
-        state = 2;
-    }
-}
-
-function showControls() {
-    clearBut = createButton('START\nOVER');
-    clearBut.position(recButX - (0.7 * recButWd), recButY);
-    clearBut.size(0.5 * recButWd, recButHt);
-    clearBut.mousePressed(function() {
-        recordButton.html('RECORD');
-        player.stop();
-        state = 0;
-        clearBut.remove();
-    });
 }
 
 function triggerDelay() {   //  switch delay on/off
@@ -241,5 +175,31 @@ function triggerDelayTimeLFO() {    //  switch delay time LFO on/off
         lfoFreqSlider.hide();
         delayTimeLFOBut.html('ACTIVATE DELAY TIME LFO');
         delayTimeLFOActive = false;
+    }
+}
+
+function triggerSample1() {
+    if (!sample1Active) {
+        sample1.start();
+        sample1.volume.rampTo(0, 0.05);
+        sample1Active = true;
+    }
+    else {
+        sample1.volume.rampTo(-100, 0.05);
+        sample1.stop("+0.05");
+        sample1Active = false;
+    }
+}
+
+function triggerSample2() {
+    if (!sample2Active) {
+        sample2.start();
+        sample2.volume.rampTo(0, 0.05);
+        sample2Active = true;
+    }
+    else {
+        sample2.volume.rampTo(-100, 0.05);
+        sample2.stop("+0.05");
+        sample2Active = false;
     }
 }

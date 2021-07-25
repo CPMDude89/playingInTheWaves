@@ -78,7 +78,6 @@ class SamplerButton {
         }
 
         else if (this.state = 'stop') {
-            //this.player.stop();     //  stop playback
             this.button.html('PLAY RECORDING');     //  change button text
             this.state = 'play';    //  change string to keep track of process
 
@@ -207,6 +206,8 @@ class OscScope {
 
         this.wave = new Tone.Waveform();    //  set up new Tone Waveform object to do the analysis
         this.wave.size = this.binsAmt;      //  amount of definition in the wave
+
+
     }
 
     process() {     //  draw oscilloscope
@@ -279,6 +280,10 @@ class LFOVisualizer {
         this.ballRGB = color(r, g, b);
     }
 
+    getLFOPhase() { 
+        return this.wave.getValue()[0].toFixed(2);
+    }
+
     process() {     //  call in draw() loop for lfo visualization
         //  set up visualizer background (vertical rectangle)
         fill(0);        //  black
@@ -293,6 +298,7 @@ class LFOVisualizer {
         //  set output of amp mod lfo to the y-axis of ball to visualize amp mod
         let AMBuffer = this.wave.getValue();    //  get amplitude array snapshot of signal
         let y = AMBuffer[0];    //  get first bin, this keeps the movement consistent
+        
         //  map values to p5.js 'circle' object
         circle((0.5 * this.rectWd) + this.Xpos, map(y, 0, 1, (this.Ypos + this.rectHt), this.Ypos), 1.75 * this.rectWd);
     }
