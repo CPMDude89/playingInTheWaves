@@ -184,6 +184,7 @@
          recordButton.show();
          
          recordButton.html('RECORD');
+         loop.stop();
          player.stop();
          state = 0;
          clearBut.remove();
