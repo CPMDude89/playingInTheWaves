@@ -84,7 +84,7 @@ function setup() {
         max: 0.95
     }).connect(delay.delayTime);
 
-    lfoFreqSlider = createSlider(0.01, 0.6, 0.05, 0.001);      //  delay time LFO freq slider
+    lfoFreqSlider = createSlider(0.01, 0.4, 0.05, 0.001);      //  delay time LFO freq slider
     lfoFreqSlider.size(sliderWd);
     lfoFreqSlider.position(0.2 * w, 0.4 * h);
     lfoFreqSlider.hide();
