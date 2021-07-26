@@ -73,7 +73,7 @@ function setup() {
     sample2Button.mousePressed(triggerSample2); 
 
     textSize(50)
-    linkForward = createA('http://127.0.0.1:5500/TourAmpMod.html', 'NEXT TOUR STOP');
+    linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
     
 

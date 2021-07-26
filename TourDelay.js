@@ -98,10 +98,10 @@ function setup() {
     delayScope = new OscScope(soundVizX_delay, soundVizY, soundVizWd, soundVizHt, 2048, false);
     delayVolNode.connect(delayScope.wave);
 
-    linkBackward = createA('http://127.0.0.1:5500/TourAmpMod.html', 'PREVIOUS TOUR STOP');
+    linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
     
-    linkForward = createA('http://127.0.0.1:5500/TourGranulation.html', 'NEXT TOUR STOP');
+    linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourGranulation.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
 
     Tone.Transport.start();

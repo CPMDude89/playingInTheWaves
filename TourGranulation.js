@@ -39,7 +39,7 @@
  
      volNode = new Tone.Volume().toDestination();
 
-    linkBackward = createA('http://127.0.0.1:5500/TourDelay.html', 'PREVIOUS TOUR STOP');
+    linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
  }
  
