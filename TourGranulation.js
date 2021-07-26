@@ -22,6 +22,8 @@
  let playActive=false;
  let env;
  let linkBackward;
+ let startPoint, loopLength, loop;
+ let limiter;
  
  function setup() {
      canv = createCanvas(w, h);
@@ -38,9 +40,14 @@
      recordButton.mousePressed(recordIn);    
  
      volNode = new Tone.Volume().toDestination();
+     limiter = new Tone.Limiter(-2).connect(volNode);
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
+
+    loop = new Tone.Loop(playLoop, 0.3);
+
+    Tone.Transport.start();
  }
  
  function draw() {
@@ -92,18 +99,23 @@
      }
  
      // if there is an audio buffer to mess with and mouse is inside visualizer
-     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1 && playActive) {    
+     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {    
          let mousePos = map(mouseX, leftSide, rightSide, 0, 1);  //  percentage x-axis in rectangle
  
          let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
  
-         maxOffset = 0.3;
+         maxOffset = 0.5;
          if (maxOffset >= bufferTimeInSeconds) {
              maxOffset = bufferTimeInSeconds;
          }
-         offset = map(mouseY, topSide, bottomSide, 0.02, maxOffset);     //  dynamically set offset to y-axis
- 
+         offset = map(mouseY, bottomSide, topSide, 0.01, maxOffset);     //  dynamically set offset to y-axis
+         
+         if (loopLength != offset) {
+            loopLength = offset;
+         }
+         
          start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
+         startPoint = (mousePos * bufferTimeInSeconds);
  
          end = start + offset;  //  loop length of 0.2 sec
  
@@ -114,10 +126,6 @@
          if (end > bufferTimeInSeconds) {    //  range control
              end = bufferTimeInSeconds;
          }
- 
-         //player.setLoopPoints(start, end);   //  set loop to start point + offset
-         player.loopStart = start;
-         player.loopEnd = end;
  
          offsetPercent = offset / bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
          offsetPercentInPixels = soundVizWd * offsetPercent;     //  percent of visualization window
@@ -150,34 +158,20 @@
      else if (state == 1) {      //  stop recording
          data = await recorder.stop();   //  end recording and return a javascript promise with the result in it
          blob = URL.createObjectURL(data);   //  save the result of the recoder object into a blob and assign it a url object
-         
-         player = new Tone.GrainPlayer(blob).connect(volNode);  //  connect recording to Tone player and route player to master output
-         player.loop = true;
-         player.overlap = 0.05;
-         player.grainSize = 0.1;
-         //player.playbackRate = 0.8;
+         player = new Tone.Player(blob).connect(limiter);  //  connect recording to Tone player and route player to master output
+         //player = new Tone.GrainPlayer(blob).connect(volNode);  //  connect recording to Tone player and route player to master output
+         //player.overlap = 0.02;
+         //player.grainSize = 0.05;
+         //player.playbackRate = 0.95;
+         player.fadeIn = 0.02;
+         player.fadeOut = 0.02;
+
  
          showControls();
  
          recordButton.html('PLAY RECORDING');    //  change button text
          state = 2;
      }
-     /*
-     else if (state == 2) {      //  play recording
-         player.start();   //  play back recording
- 
-         recordButton.html('STOP PLAYBACK');     //  change button text
-         state = 3;  //  more record state
-     }
- 
-     else if (state == 3) {      //  stop playback
-         player.stop();    //    stop playing
- 
-         recordButton.html('PLAY RECORDING');
-         state = 2;
-     }
-     */
-     
  }
  
  function showControls() {
@@ -195,31 +189,27 @@
          clearBut.remove();
      });
  }
- /*
- function mousePressed() {
-     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
-         player.loop = true;
-         player.start();
-     }
- }
  
- function mouseReleased() {
-     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
-         player.stop();
-     }
- }
- */
- 
- //function mouseDragged() {
  function mouseClicked() {
      if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
          if (!playActive) {
-             player.start();
+
+            loop.start();
              playActive = true;
          }
          else {
+             loop.stop();
              player.stop();
              playActive = false;
          }
      }
+ }
+
+ function playLoop(time) {
+    
+    player.start(0, startPoint);
+    //let stopTime = "+" + loopLength;
+    //player.stop(stopTime);
+
+    loop.interval = loopLength;
  }

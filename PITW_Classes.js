@@ -197,6 +197,7 @@ class GranulationSamplerButton extends SamplerButton {
         super(Xpos, Ypos, butWd, butHt);    //  inherit properties from parent class
         this.playLength = 0;
         this.startPoint = 0;    //  set up starting point for player
+
     }
 
     setLoopLength(_interval) {
@@ -218,10 +219,10 @@ class GranulationSamplerButton extends SamplerButton {
         else if (this.state == 'recording') {       //  stop recording and store audio
             let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
             let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
-            this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
+            this.player = new Tone.GrainPlayer(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
             
             setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.player.start(this.startPoint);
+                this.player.start(0, this.startPoint, this.playLength);
             }, (this.player.buffer.length / this.player.buffer.sampleRate)),
             200);
 

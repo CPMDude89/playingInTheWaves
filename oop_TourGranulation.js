@@ -97,11 +97,11 @@ function draw() {
             //  total length in seconds of audio file
             let bufferTimeInSeconds = samplerButton.player.buffer.length / samplerButton.player.buffer.sampleRate;   
 
-            maxOffset = 0.3;
+            maxOffset = 0.4;
             if (maxOffset >= bufferTimeInSeconds) {
                 maxOffset = bufferTimeInSeconds;
             }
-            offset = map(mouseY, topSide, bottomSide, 0.012, maxOffset);     //  dynamically set offset to y-axis
+            offset = map(mouseY, topSide, bottomSide, 0.03, maxOffset);     //  dynamically set offset to y-axis
 
             start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
 
