@@ -36,8 +36,8 @@ class SamplerButton {
 
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
-            fadeIn: 0.1,
-            fadeOut: 0.1
+            fadeIn: 0.15,
+            fadeOut: 0.15
         }); //  Tone player object to handle playback
         
         this.state = 'ready';   //  string to keep track of recording process and playback
@@ -179,7 +179,89 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
 }
 //===================================================================================================================================================//
 //===================================================================================================================================================//
+/**
+ * GranulationSamplerButton will extend SamplerButton base class
+ * 
+ * Will get constant data in from p5.js draw() loop to adjust loop length.
+ * Loop will start AND stop to take advantage of fadeIn and fadeOut methods in the Tone Player object
+ * 
+ * If that doesn't work, there will be a following LFO that will control the amplitude itself
+ */
+class GranulationSamplerButton extends SamplerButton {
+    constructor (
+        Xpos,   //  x-axis coordinate
+        Ypos,   //  y-axis coordinate
+        butWd,  //  button width
+        butHt  //  button height
+    ) {
+        super(Xpos, Ypos, butWd, butHt);    //  inherit properties from parent class
+        this.playLength = 0;
+        this.startPoint = 0;    //  set up starting point for player
+    }
 
+    setLoopLength(_interval) {
+        this.playLength = _interval;
+        this.loop.interval = _interval;
+    }
+
+    setStartPoint(_point) {
+        this.startPoint = _point;
+    }
+
+    async process() {
+        if (this.state == 'ready') {    //  if object is ready to record new audio in
+            setTimeout(() => {this.recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
+            this.button.html('STOP RECORDING');     //  change button text
+            this.state = 'recording';   //  change string to keep track of process
+        }
+
+        else if (this.state == 'recording') {       //  stop recording and store audio
+            let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
+            let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
+            this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
+            
+            setTimeout(() => this.loop = new Tone.Loop((time) => {
+                this.player.start(this.startPoint);
+            }, (this.player.buffer.length / this.player.buffer.sampleRate)),
+            200);
+
+            this.button.html('PLAY RECORDING');     //  change button text
+            this.showControls();    //  send to function to show start over button
+            this.state = 'play';    //  change string to keep track of process
+        }
+
+        else if (this.state == 'play') {    //  play recorded audio buffer
+            this.button.html('STOP PLAYBACK');  //  change button text
+            this.state = 'stop';    //  change string to keep track of process
+            
+            this.loop.start();     //   start event loop 
+        }
+
+        else if (this.state = 'stop') {
+            this.button.html('PLAY RECORDING');     //  change button text
+            this.state = 'play';    //  change string to keep track of process
+
+            this.player.stop();     //  stop player
+            this.loop.stop();       //  stop event loop
+        }
+    }
+
+    showControls() {
+        this.clearButton = createButton('START OVER');  //  create button to restart process
+        this.clearButton.position(this.Xpos - (0.6 * this.butWd), this.Ypos);   
+        this.clearButton.size(0.5 * this.butWd, this.butHt);
+        this.clearButton.mousePressed(() => {
+            this.button.html('RECORD');
+            this.player.stop();
+            this.loop.stop();
+            this.state = 'ready';
+            this.clearButton.remove();
+        })
+    }
+}
+
+//===================================================================================================================================================//
+//===================================================================================================================================================//
 /**
  * Class object for a p5.js/Tone.js combination oscilloscope. 
  * Needs to be included in html file with BOTH p5.js and Tone.js

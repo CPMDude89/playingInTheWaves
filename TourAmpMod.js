@@ -21,6 +21,7 @@ let ampModButton, ampModLFO, ampModActive = false, ampModHighFreq=false;
 let volNode;
 let sample1, sample1Active=false, sample2, sample2Active=false;
 let loop, transport;
+let linkForward, linkBackward;
 
 function preload() {
     limiter = new Tone.Limiter(0).toDestination();
@@ -79,6 +80,12 @@ function setup() {
 
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);    //  initialize lfo visualizer
     ampModLFO.connect(lfoViz.wave);     //  connect amp mod lfo to visualizer
+
+    linkBackward = createA('http://127.0.0.1:5500/TourPlayRate.html', 'PREVIOUS TOUR STOP');
+    linkBackward.position(0.05 * w, 0.05 * h);
+    
+    linkForward = createA('http://127.0.0.1:5500/TourDelay.html', 'NEXT TOUR STOP');
+    linkForward.position(0.8 * w, 0.05 * h);
 
     Tone.Transport.start();     //  start Tone.Transport to set up events
 }

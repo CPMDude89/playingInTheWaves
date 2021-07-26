@@ -21,6 +21,7 @@ let delay, delayBut, delayActive=false, delayTimeLFO, delayTimeLFOBut, delayTime
 let fundWave, delayWave;
 let limiter, sample1, sample1Active=false, sample2, sample2Active=false, sample1Button, sample2Button;
 let samplerButton;
+let linkForward, linkBackward;
 
 
 function preload() {
@@ -96,6 +97,12 @@ function setup() {
 
     delayScope = new OscScope(soundVizX_delay, soundVizY, soundVizWd, soundVizHt, 2048, false);
     delayVolNode.connect(delayScope.wave);
+
+    linkBackward = createA('http://127.0.0.1:5500/TourAmpMod.html', 'PREVIOUS TOUR STOP');
+    linkBackward.position(0.05 * w, 0.05 * h);
+    
+    linkForward = createA('http://127.0.0.1:5500/TourGranulation.html', 'NEXT TOUR STOP');
+    linkForward.position(0.8 * w, 0.05 * h);
 
     Tone.Transport.start();
 }

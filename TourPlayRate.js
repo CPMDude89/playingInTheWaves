@@ -13,6 +13,7 @@ let volNode, volNodeWave;
 let shifter;
 let sample1Button, sample1Active=false, sample2Button, sample2Active=false;
 let seekLoop;
+let linkForward;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
@@ -71,6 +72,12 @@ function setup() {
     sample2Button.size(recButWd, recButHt);
     sample2Button.mousePressed(triggerSample2); 
 
+    textSize(50)
+    linkForward = createA('http://127.0.0.1:5500/TourAmpMod.html', 'NEXT TOUR STOP');
+    linkForward.position(0.8 * w, 0.05 * h);
+    
+
+
     Tone.Transport.start();
 }
 
@@ -82,6 +89,7 @@ function draw() {
     textSize(40);
     fill(0);       
     text('Playing In The Waves:\nPlayback Rate and Pitch Shift', 0.5 * w, 0.05 * h); //  page title
+
 
     if (samplerButton.state == 'recording') {     //  if button is recording
         fill(255, 0, 0);    //  red for record light
