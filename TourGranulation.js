@@ -162,7 +162,7 @@
          recordButton.html('PLAY RECORDING');    //  change button text
          state = 2;
      }
-     
+     /*
      else if (state == 2) {      //  play recording
          player.start();   //  play back recording
  
@@ -176,11 +176,12 @@
          recordButton.html('PLAY RECORDING');
          state = 2;
      }
+     */
      
  }
  
  function showControls() {
-     //recordButton.hide();
+     recordButton.hide();
  
      clearBut = createButton('START\nOVER');
      clearBut.position(soundVizX - (soundVizWd * 0.5 ), 0.06 * h);
