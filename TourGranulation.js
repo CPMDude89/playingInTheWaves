@@ -8,7 +8,8 @@
 
 let w=window.innerWidth, h=window.innerHeight;
 let mic, recorder, recordButton, data, blob, player;
-let recButX=(0.425 * w), recButY=(0.14 * h), recButWd=(0.15 * w), recButHt=(0.1 * h);
+let recButX=(0.08 * w), recButY=(0.14 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
+let sampButX=(0.9 * w), sampButY=(0.1 * h), sampButWd=(0.05 * w), sampButHt=(0.08 * h);
 let clearBut;
 let state = 0;
 let bufferArray;
@@ -18,16 +19,19 @@ let leftSide = soundVizX - (0.5 * soundVizWd);
 let rightSide = soundVizX + (0.5 * soundVizWd);
 let topSide = soundVizY - (0.5 * soundVizHt);
 let bottomSide = soundVizY + (0.5 * soundVizHt);
-let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset = 0.5, minOffset=0.01;
+let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset, minOffset=0.01;
 let playActive=false;
 let env;
 let linkBackward;
 let loopStartPoint, loopLength, loop;
 let limiter;
+let newBuffer, newFileButton;
 
 function preload() {
     volNode = new Tone.Volume().toDestination();
     limiter = new Tone.Limiter(-2).connect(volNode);
+    sample1 = new Tone.ToneAudioBuffer("./sounds/groove_clip.wav");
+    sample2 = new Tone.ToneAudioBuffer("./sounds/metal_water_bottle.wav");
 }
 
 function setup() {
@@ -43,6 +47,16 @@ function setup() {
     recordButton.position(recButX, recButY);
     recordButton.size(recButWd, recButHt);
     recordButton.mousePressed(recordIn);    
+
+    sample1Button = createButton('SAMPLE 1');
+    sample1Button.position(sampButX, sampButY);
+    sample1Button.size(sampButWd, sampButHt);
+    sample1Button.mousePressed(triggerSample1);
+
+    sample2Button = createButton('SAMPLE 2');
+    sample2Button.position(sampButX, 2.5 * sampButY);
+    sample2Button.size(sampButWd, sampButHt);
+    sample2Button.mousePressed(triggerSample2);
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
@@ -106,9 +120,11 @@ function draw() {
         let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
 
         //  if recorded clip length is less than maximum loop size, set max loop size to clip length
-        if (maxOffset >= bufferTimeInSeconds) {
-            maxOffset = bufferTimeInSeconds;
-        }
+        //if (maxOffset >= bufferTimeInSeconds) {
+        //    maxOffset = bufferTimeInSeconds;
+        //}
+
+        maxOffset = 0.3 * bufferTimeInSeconds;
 
         //  offset is loop length, and dynamically set loop length to mouse's Y-axis position inside the visualizer
         offset = map(mouseY, bottomSide, topSide, minOffset, maxOffset); 
@@ -144,7 +160,12 @@ function draw() {
 }
 
 async function recordIn() {
-    if (state == 0) {       //  begin recording
+    if (state == 0 || state == 3) {       //  begin recording
+        if (loop.state == 'started') {
+            loop.stop();
+            player.stop();
+        }
+
         setTimeout(function() {recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
 
         recordButton.html('STOP RECORDING');        //  change button text
@@ -169,7 +190,7 @@ function showControls() {
     recordButton.hide();
 
     clearBut = createButton('START\nOVER');
-    clearBut.position(soundVizX - (soundVizWd * 0.5 ), 0.1 * h);
+    clearBut.position(recButX - (recButWd * 0.6), recButY);
     clearBut.size(0.5 * recButWd, recButHt);
     clearBut.mousePressed(function() {
         recordButton.show();
@@ -204,4 +225,18 @@ function playLoop(time) {
 player.start(0, loopStartPoint);
 
 loop.interval = loopLength;
+}
+
+function triggerSample1() {
+    state = 3;
+    player = new Tone.Player(sample1).connect(limiter);  //  connect recording to Tone player and route player to master output
+    player.fadeIn = 0.02;
+    player.fadeOut = 0.02;
+}
+
+function triggerSample2() {
+    state = 3;
+    player = new Tone.Player(sample2).connect(limiter);  //  connect recording to Tone player and route player to master output
+    player.fadeIn = 0.02;
+    player.fadeOut = 0.02;
 }

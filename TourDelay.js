@@ -81,7 +81,8 @@ function setup() {
         amplitude: 1,
         frequency: 0.05,
         min: 0.001,
-        max: 0.95
+        max: 0.95,
+        phase: 90
     }).connect(delay.delayTime);
 
     lfoFreqSlider = createSlider(0.01, 0.4, 0.05, 0.001);      //  delay time LFO freq slider
