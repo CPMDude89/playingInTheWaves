@@ -185,7 +185,6 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
  * Will get constant data in from p5.js draw() loop to adjust loop length.
  * Loop will start AND stop to take advantage of fadeIn and fadeOut methods in the Tone Player object
  * 
- * If that doesn't work, there will be a following LFO that will control the amplitude itself
  */
 class GranulationSamplerButton extends SamplerButton {
     constructor (
