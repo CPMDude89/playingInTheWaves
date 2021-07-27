@@ -71,6 +71,7 @@ function setup() {
     sample2Button.mousePressed(triggerSample2);
 
     delay = new Tone.FeedbackDelay({
+        delayTime: 0.5,
         feedback: 0.5,
         wet: 1
     }).connect(delayVolNode);
@@ -83,7 +84,8 @@ function setup() {
         min: 0.001,
         max: 0.95,
         phase: 90
-    }).connect(delay.delayTime);
+    //}).connect(delay.delayTime);
+    });
 
     lfoFreqSlider = createSlider(0.01, 0.4, 0.05, 0.001);      //  delay time LFO freq slider
     lfoFreqSlider.size(sliderWd);
@@ -173,14 +175,18 @@ function triggerDelay() {   //  switch delay on/off
 
 function triggerDelayTimeLFO() {    //  switch delay time LFO on/off
     if (!delayTimeLFOActive) {  //  if lfo is off, turn on
+        delayTimeLFO.connect(delay.delayTime);
         delayTimeLFO.start();
         lfoFreqSlider.show();
         delayTimeLFOBut.html('DEACTIVATE DELAY TIME LFO');
         delayTimeLFOActive = true;
     }
     else {  //  if LFO is on, turn off
+        delayTimeLFO.disconnect();
+        delayTimeLFO.connect(lfoViz.wave);
         delayTimeLFO.stop();
         lfoFreqSlider.hide();
+        delay.delayTime.value = 0.5;
         delayTimeLFOBut.html('ACTIVATE DELAY TIME LFO');
         delayTimeLFOActive = false;
     }
