@@ -7,7 +7,7 @@
  */
 
 let w=window.innerWidth, h=window.innerHeight;
-let mic, recorder, recordButton, data, blob, player;
+let mic, recorder, recordButton, data, blob, player, player2;
 let recButX=(0.08 * w), recButY=(0.14 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
 let sampButX=(0.9 * w), sampButY=(0.1 * h), sampButWd=(0.05 * w), sampButHt=(0.08 * h);
 let clearBut;
@@ -23,7 +23,7 @@ let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=
 let playActive=false;
 let env;
 let linkBackward;
-let loopStartPoint, loopLength, loop;
+let loopStartPoint, loopLength, clip, changeLoop1=true, changeLoop2=false, alternateLoopButton;
 let limiter;
 let newBuffer, newFileButton;
 
@@ -48,6 +48,22 @@ function setup() {
     recordButton.size(recButWd, recButHt);
     recordButton.mousePressed(recordIn);    
 
+    /*
+    alternateLoopButton = createButton('SWITCH');
+    alternateLoopButton.position(0.04 * w, soundVizY + (0.38 * soundVizHt));
+    alternateLoopButton.size(sampButWd, sampButHt);
+    alternateLoopButton.mousePressed(() => {
+        if (changeLoop1) {
+            changeLoop1 = false;
+            changeLoop2 = true;
+        }
+        else if (changeLoop2) {
+            changeLoop1 = true;
+            changeLoop2 = false;
+        }
+    })
+    */
+
     sample1Button = createButton('SAMPLE 1');
     sample1Button.position(sampButX, sampButY);
     sample1Button.size(sampButWd, sampButHt);
@@ -61,7 +77,7 @@ function setup() {
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
 
-    loop = new Tone.Loop(playLoop, 0.3);    //  this is the loop to time granulation
+    clip = new Tone.Loop(playclip, 0.3);    //  this is the loop to time granulation
 
     Tone.Transport.start();     //  start Tone.js timing architecture
 }
@@ -78,6 +94,16 @@ function draw() {
     if (state == 1) {     //  if button is recording
         fill(255, 0, 0);    //  red for record light
         circle((recButX + (1.25 * recButWd)), (recButY + (0.5 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (clip.state == 'started') {
+        fill(0);
+        textSize(20);
+        noStroke();
+        text('LOOP 1', 0.06 * w, soundVizY - (0.4 * soundVizHt));
+
+        fill(255, 153, 0);
+        circle(0.06 * w, soundVizY - (0.48 * soundVizHt), 0.4 * recButHt);
     }
     
 
@@ -99,9 +125,7 @@ function draw() {
         }
         endShape();
 
-        stroke(255, 0, 0);
-        line(startLine, topSide, startLine, bottomSide); //  start line
-        line(endLine, topSide, endLine, bottomSide);   //  end line
+        
 
         textSize(30);
         stroke(0);
@@ -119,12 +143,7 @@ function draw() {
 
         let bufferTimeInSeconds = player.buffer.length / player.buffer.sampleRate;   //  total length in seconds of audio file
 
-        //  if recorded clip length is less than maximum loop size, set max loop size to clip length
-        //if (maxOffset >= bufferTimeInSeconds) {
-        //    maxOffset = bufferTimeInSeconds;
-        //}
-
-        maxOffset = 0.3 * bufferTimeInSeconds;
+        maxOffset = 0.3 * bufferTimeInSeconds;  //  dynamically sets maximum loop length to 1/3 of total clip length
 
         //  offset is loop length, and dynamically set loop length to mouse's Y-axis position inside the visualizer
         offset = map(mouseY, bottomSide, topSide, minOffset, maxOffset); 
@@ -157,12 +176,16 @@ function draw() {
             startLine = rightSide - offsetPercentInPixels;
         }   
     }
+
+    stroke(255, 0, 0);
+        line(startLine, topSide, startLine, bottomSide); //  start line
+        line(endLine, topSide, endLine, bottomSide);   //  end line
 }
 
 async function recordIn() {
     if (state == 0 || state == 3) {       //  begin recording
-        if (loop.state == 'started') {
-            loop.stop();
+        if (clip.state == 'started') {
+            clip.stop();
             player.stop();
         }
 
@@ -196,7 +219,7 @@ function showControls() {
         recordButton.show();
         
         recordButton.html('RECORD');
-        loop.stop();
+        clip.stop();
         player.stop();
         state = 0;
         clearBut.remove();
@@ -206,12 +229,12 @@ function showControls() {
 function mouseClicked() {
     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
         if (!playActive) {
-            loop.start();
+            clip.start();
             playActive = true;
         }
 
         else {
-            loop.stop();
+            clip.stop();
             player.stop();
             playActive = false;
         }
@@ -221,10 +244,10 @@ function mouseClicked() {
 //  here is the loop that adjusts the Tone.js Player object's start() method. Somehow, the playLoop's interval being adjusted kicks
 //  in the player object's fadeOut. No idea how this works. This solution was a total accident. Adding stop() to the playLoop
 //  or having the start() function get a duration parameter resulted in no fade out about 50% of the time
-function playLoop(time) {       
-player.start(0, loopStartPoint);
+function playclip(time) {       
+        player.start(0, loopStartPoint);
 
-loop.interval = loopLength;
+        clip.interval = loopLength;
 }
 
 function triggerSample1() {

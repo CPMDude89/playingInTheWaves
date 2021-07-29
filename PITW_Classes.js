@@ -186,78 +186,83 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
  * Loop will start AND stop to take advantage of fadeIn and fadeOut methods in the Tone Player object
  * 
  */
-class GranulationSamplerButton extends SamplerButton {
+class GranulationSlicer {
     constructor (
-        Xpos,   //  x-axis coordinate
-        Ypos,   //  y-axis coordinate
-        butWd,  //  button width
-        butHt  //  button height
+       left,    //  left side of the visualizer
+       right,   //  right side of the visualizer
+       top,     //  top side of the visualizer
+       bottom,   //  bottom side of the visualizer
+       vizWidth,     //  width of visualizer
+       lineColorR,    //  color of slice lines
+       lineColorG,    //  color of slice lines
+       lineColorB    //  color of slice lines
     ) {
-        super(Xpos, Ypos, butWd, butHt);    //  inherit properties from parent class
-        this.playLength = 0;
-        this.startPoint = 0;    //  set up starting point for player
+       this.left = left;
+       this.right = right;
+       this.top = top;
+       this.bottom = bottom;
+       this.vizWidth = vizWidth;
+       this.lineColor = color(lineColorR, lineColorG, lineColorB);
 
+       this.player = new Tone.Player();
+       this.slice = new Tone.Loop(() => this.playSlice(), 0.3);
+
+       this.minOffset = 0.01;
     }
 
-    setLoopLength(_interval) {
-        this.playLength = _interval;
-        this.loop.interval = _interval;
-    }
+    process() {
+        this.mousePos = map(mouseX, this.left, this.right, 0, 1);  //  percentage x-axis in rectangle
+ 
+        this.bufferTimeInSeconds = this.player.buffer.length / this.player.buffer.sampleRate;   //  total length in seconds of audio file
 
-    setStartPoint(_point) {
-        this.startPoint = _point;
-    }
+        this.maxOffset = 0.3 * this.bufferTimeInSeconds;  //  dynamically sets maximum loop length to 1/3 of total clip length
 
-    async process() {
-        if (this.state == 'ready') {    //  if object is ready to record new audio in
-            setTimeout(() => {this.recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
-            this.button.html('STOP RECORDING');     //  change button text
-            this.state = 'recording';   //  change string to keep track of process
+        //  offset is loop length, and dynamically set loop length to mouse's Y-axis position inside the visualizer
+        this.offset = map(mouseY, this.bottom, this.top, this.minOffset, this.maxOffset); 
+        
+        //  this sends down to the grain loop, to dynamically re-size loop length depending on y-axis position. Only if a change has been made
+        if (this.loopLength != this.offset) {
+        this.loopLength = this.offset;
+        }
+        
+        this.loopStartPoint = (this.mousePos * this.bufferTimeInSeconds);
+
+        if (this.loopStartPoint > (this.bufferTimeInSeconds - this.offset)) {   //  range control
+            this.loopStartPoint = this.bufferTimeInSeconds - this.offset;
         }
 
-        else if (this.state == 'recording') {       //  stop recording and store audio
-            let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
-            let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
-            this.player = new Tone.GrainPlayer(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
-            
-            setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.player.start(0, this.startPoint, this.playLength);
-            }, (this.player.buffer.length / this.player.buffer.sampleRate)),
-            200);
+        this.offsetPercent = this.offset / this.bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
+        this.offsetPercentInPixels = this.vizWidth * this.offsetPercent;     //  percent of visualization window
 
-            this.button.html('PLAY RECORDING');     //  change button text
-            this.showControls();    //  send to function to show start over button
-            this.state = 'play';    //  change string to keep track of process
+        this.startLine = mouseX;     //  assign graphics lines to mouse coordinates
+        this.endLine = mouseX + (this.vizWidth * this.offsetPercent);
+
+        if (this.endLine > this.right) {  //  range control
+            this.endLine = this.right;
         }
-
-        else if (this.state == 'play') {    //  play recorded audio buffer
-            this.button.html('STOP PLAYBACK');  //  change button text
-            this.state = 'stop';    //  change string to keep track of process
-            
-            this.loop.start();     //   start event loop 
+        if (this.startLine < this.left) { //  range control
+            this.startLine = this.left;
         }
-
-        else if (this.state = 'stop') {
-            this.button.html('PLAY RECORDING');     //  change button text
-            this.state = 'play';    //  change string to keep track of process
-
-            this.player.stop();     //  stop player
-            this.loop.stop();       //  stop event loop
-        }
+        if (this.startLine > (this.right - this.offsetPercentInPixels)) {  //  range control
+            this.startLine = this.right - this.offsetPercentInPixels;
+        }   
+    }
+        //  draw slice lines on visualizer
+        drawLines() {
+        stroke(this.lineColor);
+        line(this.startLine, this.top, this.startLine, this.bottom); //  start line
+        line(this.endLine, this.top, this.endLine, this.bottom);   //  end line
     }
 
-    showControls() {
-        this.clearButton = createButton('START OVER');  //  create button to restart process
-        this.clearButton.position(this.Xpos - (0.6 * this.butWd), this.Ypos);   
-        this.clearButton.size(0.5 * this.butWd, this.butHt);
-        this.clearButton.mousePressed(() => {
-            this.button.html('RECORD');
-            this.player.stop();
-            this.loop.stop();
-            this.state = 'ready';
-            this.clearButton.remove();
-        })
+    //  here is the loop that adjusts the Tone.js Player object's start() method. Somehow, the playLoop's interval being adjusted kicks
+    //  in the player object's fadeOut. No idea how this works. This solution was a total accident. Adding stop() to the playLoop
+    //  or having the start() function get a duration parameter resulted in no fade out about 50% of the time
+    playSlice(time) {       
+        this.player.start(0, this.loopStartPoint);
+
+        this.slice.interval = this.loopLength;
     }
+    
 }
 
 //===================================================================================================================================================//

@@ -6,241 +6,242 @@
  * 
  */
 
-let w=window.innerWidth, h=window.innerHeight;
-let mic;
-let recButX=(0.425 * w), recButY=(0.14 * h), recButWd=(0.15 * w), recButHt=(0.1 * h);
-let volNode;
-let soundVizX=0.5 * w, soundVizY=0.6 * h, soundVizWd=0.75 * w, soundVizHt=0.65 * h;
-let leftSide = soundVizX - (0.5 * soundVizWd);
-let rightSide = soundVizX + (0.5 * soundVizWd);
-let topSide = soundVizY - (0.5 * soundVizHt);
-let bottomSide = soundVizY + (0.5 * soundVizHt);
-let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset = 1.0;
-
-function preload() {
-    limiter = new Tone.Limiter(0).toDestination();
-    volNode = new Tone.Volume().connect(limiter);
-}
-
+ let w=window.innerWidth, h=window.innerHeight;
+ let mic, recorder, recordButton, data, blob, player, player2;
+ let recButX=(0.08 * w), recButY=(0.14 * h), recButWd=(0.1 * w), recButHt=(0.1 * h);
+ let sampButX=(0.9 * w), sampButY=(0.1 * h), sampButWd=(0.05 * w), sampButHt=(0.08 * h);
+ let clearBut;
+ let state = 0;
+ let bufferArray;
+ let volNode;
+ let soundVizX=0.5 * w, soundVizY=0.6 * h, soundVizWd=0.75 * w, soundVizHt=0.65 * h;
+ let leftSide = soundVizX - (0.5 * soundVizWd);
+ let rightSide = soundVizX + (0.5 * soundVizWd);
+ let topSide = soundVizY - (0.5 * soundVizHt);
+ let bottomSide = soundVizY + (0.5 * soundVizHt);
+ let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset, minOffset=0.01;
+ let playActive=false, slicerFreeze=false;
+ let env;
+ let linkBackward;
+ let loopStartPoint, loopLength, clip, changeSlice1=true, changeSlice2=false, slicer2Button, slicer, slicer2;
+ let limiter;
+ let newBuffer, newFileButton;
+ 
+ function preload() {
+     volNode = new Tone.Volume().toDestination();
+     limiter = new Tone.Limiter(-2).connect(volNode);
+     sample1 = new Tone.ToneAudioBuffer("./sounds/groove_clip.wav");
+     sample2 = new Tone.ToneAudioBuffer("./sounds/metal_water_bottle.wav");
+ }
+ 
 function setup() {
     canv = createCanvas(w, h);
 
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input
 
-    samplerButton = new GranulationSamplerButton(recButX, recButY, recButWd, recButHt);
-    mic.connect(samplerButton.recorder);      //  connect microphone output to Tone recorder object    
-    samplerButton.player.connect(volNode);
+    recorder = new Tone.Recorder();     //  set up Tone recorder
+    mic.connect(recorder);      //  connect microphone output to Tone recorder object
 
-    Tone.Transport.start();     //  need this line to make Sampler Button class work
+    recordButton = createButton('RECORD');      //  record button
+    recordButton.position(recButX, recButY);
+    recordButton.size(recButWd, recButHt);
+    recordButton.mousePressed(recordIn);    
+    
+
+    slicer = new GranulationSlicer(leftSide, rightSide, topSide, bottomSide, soundVizWd, 255, 153, 0);
+    slicer.player.connect(limiter);
+
+    slicer2 = new GranulationSlicer(leftSide, rightSide, topSide, bottomSide, soundVizWd, 204, 0, 204);
+    slicer2.player.connect(limiter);
+
+    slicer2Button = createButton('SLICE 2');
+    slicer2Button.position(0.04 * w, soundVizY);
+    slicer2Button.size(sampButWd, sampButHt);
+    slicer2Button.mousePressed(triggerSlicer2);
+
+    sample1Button = createButton('SAMPLE 1');
+    sample1Button.position(sampButX, sampButY);
+    sample1Button.size(sampButWd, sampButHt);
+    sample1Button.mousePressed(triggerSample1);
+
+    sample2Button = createButton('SAMPLE 2');
+    sample2Button.position(sampButX, 2.5 * sampButY);
+    sample2Button.size(sampButWd, sampButHt);
+    sample2Button.mousePressed(triggerSample2);
+
+    linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
+    linkBackward.position(0.05 * w, 0.05 * h);
+
+    //clip = new Tone.Loop(playclip, 0.3);    //  this is the loop to time granulation
+
+    Tone.Transport.start();     //  start Tone.js timing architecture
 }
-
-function draw() {
-    background(0, 150, 80);
-
-    noStroke();
-    textAlign(CENTER);  //  set up page title
-    textSize(40);
-    fill(0);       
-    text('Playing In The Waves:\nGranulation', 0.5 * w, 0.05 * h); //  page title
-
-    if (samplerButton.state == 'recording') {     //  if button is recording
-        fill(255, 0, 0);    //  red for record light
-        circle((recButX + (1.25 * recButWd)), (recButY + (0.5 * recButHt)), 0.4 * recButHt);
-    }
-
-    if (samplerButton.state == 'play' || samplerButton.state == 'stop') {
-        //  failsafe
-        if (samplerButton.playLength == 0) {
-            samplerButton.playLength = samplerButton.player.buffer.length / samplerButton.player.buffer.sampleRate;
-        }
-        
+ 
+ function draw() {
+     background(0, 150, 80);
+ 
+     noStroke();
+     textAlign(CENTER);  //  set up page title
+     textSize(40);
+     fill(0);       
+     text('Playing In The Waves:\nGranulation', 0.5 * w, 0.05 * h); //  page title
+ 
+     if (state == 1) {     //  if button is recording
+         fill(255, 0, 0);    //  red for record light
+         circle((recButX + (1.25 * recButWd)), (recButY + (0.5 * recButHt)), 0.4 * recButHt);
+     }
+ 
+     if (slicer.slice.state == 'started') {
+         fill(0);
+         textSize(20);
+         noStroke();
+         text('LOOP 1', 0.06 * w, soundVizY - (0.4 * soundVizHt));
+ 
+         fill(255, 153, 0);
+         circle(0.06 * w, soundVizY - (0.48 * soundVizHt), 0.4 * recButHt);
+     }
+     
+ 
+    if (state > 1) {
         fill(0);    //  black
         rectMode(CENTER);   //  align rectangle to center
         rect(soundVizX, soundVizY, soundVizWd, soundVizHt);  //  create backdrop for waveform drawing
         
-
         stroke(255);
         strokeWeight(1);
 
         beginShape();
-        for (let i = 0; i < samplerButton.player.buffer.toArray(0).length; i += 300) {
+        for (let i = 0; i < slicer.player.buffer.toArray(0).length; i += 300) {
 
-            let x = map(i, 0, samplerButton.player.buffer.toArray(0).length, leftSide, rightSide);
-            let y = map(samplerButton.player.buffer.toArray(0)[i], -1, 1, bottomSide, topSide);
+            let x = map(i, 0, slicer.player.buffer.toArray(0).length, leftSide, rightSide);
+            let y = map(slicer.player.buffer.toArray(0)[i], -1, 1, bottomSide, topSide);
 
             vertex(x, y);
         }
-        endShape();
-
-        stroke(255, 0, 0);
-        line(startLine, topSide, startLine, bottomSide); //  start line
-        line(endLine, topSide, endLine, bottomSide);   //  end line
-
+        endShape();  
+ 
         textSize(30);
         stroke(0);
-
-        if (samplerButton.player.state == 'started') {
+        if (playActive && slicerFreeze) {
             text('Click anywhere on black box to STOP playback.', 0.5 * w, 0.85 * topSide);
         }
-        else {
+        else if (playActive && !slicerFreeze) {
+            text('Click anywhere on black box to FREEZE Slicer 1 playback.\nTrigger Slice 2 if You Want', 0.5 * w, 0.83 * topSide);
+        }
+        else if (!playActive && !slicerFreeze) {
             text('Click anywhere on black box to START playback.', 0.5 * w, 0.85 * topSide);
         }
-    }
+     }
+ 
+     // if there is an audio buffer to mess with and mouse is inside visualizer
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1 && playActive) {    
+        if (!slicerFreeze) {
+            slicer.process();     
+            slicer.drawLines();
+        }
 
-
-    // if there is an audio buffer to mess with and mouse is inside visualizer
-    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide) { 
-        if (samplerButton.player.state == 'started') {    
-            let mousePos = map(mouseX, leftSide, rightSide, 0, 1);  //  percentage x-axis in rectangle
-
-            //  total length in seconds of audio file
-            let bufferTimeInSeconds = samplerButton.player.buffer.length / samplerButton.player.buffer.sampleRate;   
-
-            maxOffset = 0.4;
-            if (maxOffset >= bufferTimeInSeconds) {
-                maxOffset = bufferTimeInSeconds;
-            }
-            offset = map(mouseY, topSide, bottomSide, 0.03, maxOffset);     //  dynamically set offset to y-axis
-
-            start = (mousePos * bufferTimeInSeconds);   //  percentage of x-axis in rect multiplied by total buffer length or percentage of buffer
-
-            end = start + offset;  //  loop length of 0.2 sec
-
-            if (start > (bufferTimeInSeconds - offset)) {   //  range control
-                start = bufferTimeInSeconds - offset;
-            }
-
-            if (end > bufferTimeInSeconds) {    //  range control
-                end = bufferTimeInSeconds;
-            }
-
-            samplerButton.setStartPoint(start);
-            samplerButton.setLoopLength(offset);
-            
-            //samplerButton.player.setLoopPoints(start, end);   //  set loop to start point + offset
-
-            offsetPercent = offset / bufferTimeInSeconds;   //  percent of buffer time (in seconds) the offset is
-            offsetPercentInPixels = soundVizWd * offsetPercent;     //  percent of visualization window
-
-            startLine = mouseX;
-            endLine = mouseX + (soundVizWd * offsetPercent);
-
-            if (endLine > rightSide) {  //  range control
-                endLine = rightSide;
-            }
-            if (startLine < leftSide) { //  range control
-                startLine = leftSide;
-            }
-            if (startLine > (rightSide - offsetPercentInPixels)) {  //  range control
-                startLine = rightSide - offsetPercentInPixels;
-            }   
+        else if (slicerFreeze && changeSlice2) {
+            slicer2.process();
+            slicer2.drawLines();
         }
     }
-}
 
+    if (slicerFreeze) {
+        slicer.drawLines();
+    }
+ }
+ 
+ async function recordIn() {
+     if (state == 0 || state == 3) {       //  begin recording
+         if (slicer.slice.state == 'started') {
+             slicer.slice.stop();
+             slicer.player.stop();
+         }
+ 
+         setTimeout(function() {recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
+ 
+         recordButton.html('STOP RECORDING');        //  change button text
+         state = 1;      //  move record state through
+     }
+ 
+     else if (state == 1) {      //  stop recording
+         data = await recorder.stop();   //  end recording and return a javascript promise with the result in it
+         blob = URL.createObjectURL(data);   //  save the result of the recoder object into a blob and assign it a url object
+         //player = new Tone.Player(blob).connect(limiter);  //  connect recording to Tone player and route player to master output
+         slicer.player.load(blob), () => {console.log('SLICER 1 LOADED')};
+         slicer2.player.load(blob, () => {console.log('SLICER 2 LOADED')});
+         slicer.player.fadeIn = 0.02;
+         slicer.player.fadeOut = 0.02;
+         slicer2.player.fadeIn = 0.02;
+         slicer2.player.fadeOut = 0.02;
+         
+         showControls();
+ 
+         recordButton.html('PLAY RECORDING');    //  change button text
+         state = 2;
+     }
+ }
+ 
+ function showControls() {
+     recordButton.hide();
+ 
+     clearBut = createButton('START\nOVER');
+     clearBut.position(recButX - (recButWd * 0.6), recButY);
+     clearBut.size(0.5 * recButWd, recButHt);
+     clearBut.mousePressed(function() {
+         recordButton.show();
+         
+         recordButton.html('RECORD');
+         clip.stop();
+         player.stop();
+         state = 0;
+         clearBut.remove();
+     });
+ }
+ 
 function mouseClicked() {
-    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide) {
-        if (samplerButton.state == 'play' || samplerButton.state == 'stop') {
-            if (samplerButton.loop.state == 'stopped') {
-                samplerButton.loop.start();
-            }
-            else {
-                samplerButton.loop.stop();
-            }
+    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
+        if (!playActive && !slicerFreeze) {
+            slicer.slice.start();
+            playActive = true;
+        }
+
+        else if (playActive && !slicerFreeze) {
+            slicerFreeze = true;
+        }
+
+        else if (playActive && slicerFreeze) {
+            slicer.slice.stop();
+            slicer.player.stop();
+            playActive = false;
+            slicerFreeze = false;
         }
     }
 }
 
+function triggerSlicer2() {
+    if (!changeSlice2) {
+        changeSlice1 = false;
+        changeSlice2 = true;
 
+        slicer2.slice.start();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-async function recordIn() {
-    if (state == 0) {       //  begin recording
-        setTimeout(function() {recorder.start()}, 120);     //  wait 120 ms to avoid mouse click then begin recording
-
-        recordButton.html('STOP RECORDING');        //  change button text
-        state = 1;      //  move record state through
-    }
-
-    else if (state == 1) {      //  stop recording
-        data = await recorder.stop();   //  end recording and return a javascript promise with the result in it
-        blob = URL.createObjectURL(data);   //  save the result of the recoder object into a blob and assign it a url object
-        audioBuffer = new Tone.ToneAudioBuffer({    //  create a new audio buffer and assign it to the url object. Finally the recording is in an audio buffer
-            url: blob,
-        });    
-        
-        player = new Tone.Player(audioBuffer).connect(volNode);  //  connect recording to Tone player and route player to master output
-        player.loop = true;
-        player.fadeIn = 0.1;
-        player.fadeOut = 0.5;
-
-        showControls();
-
-        recordButton.html('PLAY RECORDING');    //  change button text
-        state = 2;
-    }
-    
-    else if (state == 2) {      //  play recording
-        player.loop = true; //  set player to loop output
-        player.start();   //  play back recording
-
-        recordButton.html('STOP PLAYBACK');     //  change button text
-        state = 3;  //  more record state
-    }
-
-    else if (state == 3) {      //  stop playback
-        player.stop();    //    stop playing
-
-        recordButton.html('PLAY RECORDING');
-        state = 2;
     }
 }
 
 
-function showControls() {
-    recordButton.hide();
-
-    clearBut = createButton('START\nOVER');
-    clearBut.position(soundVizX - (soundVizWd * 0.5 ), 0.06 * h);
-    clearBut.size(0.5 * recButWd, 0.5 * recButHt);
-    clearBut.mousePressed(function() {
-        recordButton.show();
-        
-        recordButton.html('RECORD');
-        player.stop();
-        state = 0;
-        clearBut.remove();
-    });
-}
-*/
-/*
-function mousePressed() {
-    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
-        player.loop = true;
-        player.start();
-    }
+ 
+function triggerSample1() {
+    state = 3;
+    player = new Tone.Player(sample1).connect(limiter);  //  connect recording to Tone player and route player to master output
+    player.fadeIn = 0.02;
+    player.fadeOut = 0.02;
 }
 
-function mouseReleased() {
-    if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
-        player.stop();
-    }
+function triggerSample2() {
+    state = 3;
+    player = new Tone.Player(sample2).connect(limiter);  //  connect recording to Tone player and route player to master output
+    player.fadeIn = 0.02;
+    player.fadeOut = 0.02;
 }
-*/
-
-//function mouseDragged() {
