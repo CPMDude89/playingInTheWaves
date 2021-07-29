@@ -23,9 +23,10 @@ let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=
 let playActive=false;
 let env;
 let linkBackward;
-let loopStartPoint, loopLength, clip, changeLoop1=true, changeLoop2=false, alternateLoopButton;
+let loopStartPoint, loopLength, clip;
 let limiter;
 let newBuffer, newFileButton;
+let sample1Active=false, sample2Active=false;
 
 function preload() {
     volNode = new Tone.Volume().toDestination();
@@ -47,22 +48,6 @@ function setup() {
     recordButton.position(recButX, recButY);
     recordButton.size(recButWd, recButHt);
     recordButton.mousePressed(recordIn);    
-
-    /*
-    alternateLoopButton = createButton('SWITCH');
-    alternateLoopButton.position(0.04 * w, soundVizY + (0.38 * soundVizHt));
-    alternateLoopButton.size(sampButWd, sampButHt);
-    alternateLoopButton.mousePressed(() => {
-        if (changeLoop1) {
-            changeLoop1 = false;
-            changeLoop2 = true;
-        }
-        else if (changeLoop2) {
-            changeLoop1 = true;
-            changeLoop2 = false;
-        }
-    })
-    */
 
     sample1Button = createButton('SAMPLE 1');
     sample1Button.position(sampButX, sampButY);
@@ -96,10 +81,14 @@ function draw() {
         circle((recButX + (1.25 * recButWd)), (recButY + (0.5 * recButHt)), 0.4 * recButHt);
     }
 
-    if (clip.state == 'started') {
+    if (sample1Active) {
+        fill(0, 0, 255);
+        circle(sampButX + (0.5 * sampButWd), sampButY - (0.4 * sampButHt), 0.4 * recButHt);
+    }
 
-        fill(255, 153, 0);
-        circle(0.06 * w, soundVizY - (0.48 * soundVizHt), 0.4 * recButHt);
+    if (sample2Active) {
+        fill(0, 0, 255);
+        circle(sampButX + (0.5 * sampButWd), 2.5 * sampButY - (0.4 * sampButHt), 0.4 * recButHt);
     }
     
 
@@ -120,8 +109,6 @@ function draw() {
             vertex(x, y);
         }
         endShape();
-
-        
 
         textSize(30);
         stroke(0);
@@ -202,6 +189,9 @@ async function recordIn() {
 
         recordButton.html('PLAY RECORDING');    //  change button text
         state = 2;
+
+        sample1Active = false;
+        sample2Active = false;
     }
 }
 
@@ -251,6 +241,8 @@ function triggerSample1() {
     player = new Tone.Player(sample1).connect(limiter);  //  connect recording to Tone player and route player to master output
     player.fadeIn = 0.02;
     player.fadeOut = 0.02;
+    sample1Active = true;
+    sample2Active = false;
 }
 
 function triggerSample2() {
@@ -258,4 +250,6 @@ function triggerSample2() {
     player = new Tone.Player(sample2).connect(limiter);  //  connect recording to Tone player and route player to master output
     player.fadeIn = 0.02;
     player.fadeOut = 0.02;
+    sample1Active = false;
+    sample2Active = true;
 }
