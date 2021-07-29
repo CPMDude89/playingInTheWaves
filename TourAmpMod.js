@@ -14,7 +14,7 @@ let mic;
 let recButX=(0.11 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.08 * h);
 let samp1ButX=(0.3 * w), samp2ButX=(0.49 * w);
 let soundVizX=0.5 * w, soundVizY=0.68 * h, soundVizWd=0.55 * w, soundVizHt=0.57 * h;
-let lfoVizRectX=(0.86 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.72 * h);
+let lfoVizRectX=(0.88 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.72 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
 let testToneButton, testTone, testToneActive=false;
 let ampModButton, ampModLFO, ampModActive = false, ampModHighFreq=false;
@@ -22,6 +22,7 @@ let volNode;
 let sample1, sample1Active=false, sample2, sample2Active=false;
 let loop, transport;
 let linkForward, linkBackward;
+let scopeTypeButton;
 
 function preload() {
     limiter = new Tone.Limiter(0).toDestination();
@@ -75,11 +76,19 @@ function setup() {
     lfoFreqSlider.position(0.2 * w, 0.36 * h);
     lfoFreqSlider.hide();
 
-    scope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048, false);    //  initialize oscilloscope 
+    scope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048, 1024, false);    //  initialize oscilloscope 
     volNode.connect(scope.wave); //  connect volume node out to oscilloscope
+    volNode.connect(scope.fft); //  connect to FFT object
 
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);    //  initialize lfo visualizer
     ampModLFO.connect(lfoViz.wave);     //  connect amp mod lfo to visualizer
+
+    fftButton = createButton('CHANGE SCOPE TYPE');
+    fftButton.position(0.79 * w, soundVizY + (0.5 * soundVizHt) - recButHt);
+    fftButton.size(0.5 * recButWd, recButHt);
+    fftButton.mousePressed(() => {
+        scope.fftActive = scope.fftActive ? scope.fftActive = false : scope.fftActive = true;
+    })
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
@@ -130,6 +139,17 @@ function draw() {
         strokeWeight(2);
         textSize(30);
         text('WARNING:\n Different wave types are\nnaturally different volumes.\nStart with a low volume when\nchanging wave types!', 0.11 * w, 1.15 * soundVizY)
+    }
+
+    if (scope.fftActive) {
+        textSize(26);
+        fill(0);
+        text('FFT', 0.81 * w, soundVizY + (0.45 * soundVizHt) - recButHt);
+    }
+    else {
+        textSize(26);
+        fill(0);
+        text('WAVEFORM', 0.82 * w, soundVizY + (0.45 * soundVizHt) - recButHt);
     }
 
     if (ampModActive) {     //  if amplitude modulation is engaged, enable changing modulating frequency and show lfo viz

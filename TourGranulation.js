@@ -97,10 +97,6 @@ function draw() {
     }
 
     if (clip.state == 'started') {
-        fill(0);
-        textSize(20);
-        noStroke();
-        text('LOOP 1', 0.06 * w, soundVizY - (0.4 * soundVizHt));
 
         fill(255, 153, 0);
         circle(0.06 * w, soundVizY - (0.48 * soundVizHt), 0.4 * recButHt);

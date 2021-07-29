@@ -281,20 +281,28 @@ class OscScope {
         Ypos,   //  y-axis coordinate
         scopeWd,    //  visualizer width
         scopeHt,    //  visualizer height
-        binsAmt,    //  number of bins for waveform analysis, needs to be a power of 2 
+        oscilloBinsAmt,    //  number of bins for waveform analysis, needs to be a power of 2 
+        fftBinsAmt,     //  number of frequency bins for fft analysis, needs to be a power of 2
         squareWindow      //  boolean to determine if window is a rectangle or square (square primarily for playback rate program)
     ) {
         this.Xpos = Xpos;
         this.Ypos = Ypos;
         this.scopeWd = scopeWd;
         this.scopeHt = scopeHt;
-        this.binsAmt = binsAmt;
+        this.oscilloBinsAmt = oscilloBinsAmt;
+        this.fftBinsAmt = fftBinsAmt;
         this.squareWindow = squareWindow;
 
         this.wave = new Tone.Waveform();    //  set up new Tone Waveform object to do the analysis
-        this.wave.size = this.binsAmt;      //  amount of definition in the wave
+        this.wave.size = this.oscilloBinsAmt;      //  amount of definition in the wave
 
+        this.fft = new Tone.FFT();
+        this.fft.size = this.fftBinsAmt;
+        this.fftActive = false;
+    }
 
+    switchToFFT() {
+        this.fftActive = this.fftActive ? this.fftActive = false : this.fftActive = true;
     }
 
     process() {     //  draw oscilloscope
@@ -310,25 +318,59 @@ class OscScope {
         stroke(255);        //  set up wave visualizer
         strokeWeight(3);
         noFill();
-        let buffer = this.wave.getValue();  //  assign variable for array to analyze
 
-        let start = 0;      //  find the starting point to stabalize wave
-        for (let i = 1; i < buffer.length; i++) {
-            if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
-                start = i;                              //  by finding the two places in the buffer that go from negative to positive 
-                break;      //  break out of loop
+        if (!this.fftActive) {
+            let buffer = this.wave.getValue();  //  assign variable for array to analyze
+
+            let start = 0;      //  find the starting point to stabalize wave
+            for (let i = 1; i < buffer.length; i++) {
+                if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
+                    start = i;                              //  by finding the two places in the buffer that go from negative to positive 
+                    break;      //  break out of loop
+                }
             }
-        }
-        let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
+            let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
 
-        beginShape()    //  begin custom vertex shape
-        for (let i = start; i < end; i++) {   //  iterate over returned array    
-            let x = map(i, start, end, (this.Xpos - (0.5 * this.scopeWd)), (this.Xpos + (0.5 * this.scopeWd)));   
-            let y = map(buffer[i], -1, 1, (this.Ypos - (0.5 * this.scopeHt)), (this.Ypos + (0.5 * this.scopeHt)));
+            beginShape()    //  begin custom vertex shape
+            for (let i = start; i < end; i++) {   //  iterate over returned array    
+                let x = map(i, start, end, (this.Xpos - (0.5 * this.scopeWd)), (this.Xpos + (0.5 * this.scopeWd)));   
+                let y = map(buffer[i], -1, 1, (this.Ypos - (0.5 * this.scopeHt)), (this.Ypos + (0.5 * this.scopeHt)));
 
-            vertex(x,y);    //  assign to point in custom vertex shape
+                vertex(x,y);    //  assign to point in custom vertex shape
+            }
+            endShape();     //  finish custom vertex shape
         }
-        endShape();     //  finish custom vertex shape
+
+        else {
+            let buffer = this.fft.getValue();
+
+            let start = 0;      //  find the starting point to stabalize wave
+            for (let i = 1; i < buffer.length; i++) {
+                if (buffer[i-1] < 0 && buffer[i] >= 0) {    //  find the point in the wave that equals 0
+                    start = i;                              //  by finding the two places in the buffer that go from negative to positive 
+                    break;      //  break out of loop
+                }
+            }
+            let end = start + (0.5 * buffer.length);    //  set end point, and always fixed amount
+
+            beginShape()    //  begin custom vertex shape
+            for (let i = start; i < end; i++) {   //  iterate over returned array    
+                let x = map(i, start, end, (this.Xpos - (0.5 * this.scopeWd)), (this.Xpos + (0.5 * this.scopeWd)));   
+
+                if (buffer[i] < -155) {
+                    buffer[i] = -155;
+                }
+
+                let y = map(buffer[i], -155, 0, (this.Ypos + (0.5 * this.scopeHt)), (this.Ypos - (0.5 * this.scopeHt)));
+
+                if (y < this.Ypos - (0.5 * this.scopeHt)) {
+                    y = this.Ypos - (0.5 * this.scopeHt);
+                }
+
+                vertex(x,y);    //  assign to point in custom vertex shape
+            }
+            endShape();     //  finish custom vertex shape
+        }
     }
 }
 //===================================================================================================================================================//
