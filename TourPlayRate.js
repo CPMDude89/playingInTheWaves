@@ -50,7 +50,7 @@ function setup() {
 
     mic.connect(samplerButton.recorder);      //  connect microphone output to Tone recorder object
     
-    scope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048, true);
+    scope = new OscScope(soundVizX, soundVizY, soundVizWd, soundVizHt, 2048, 1024, true);
     volNode.connect(scope.wave);
 
     shifter = new Tone.PitchShift().connect(volNode);

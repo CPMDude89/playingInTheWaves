@@ -95,10 +95,10 @@ function setup() {
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);
     delayTimeLFO.connect(lfoViz.wave);
 
-    fundScope = new OscScope(soundVizX_fund, soundVizY, soundVizWd, soundVizHt, 2048, false);
+    fundScope = new OscScope(soundVizX_fund, soundVizY, soundVizWd, soundVizHt, 2048, 1024, false);
     volNode.connect(fundScope.wave);
 
-    delayScope = new OscScope(soundVizX_delay, soundVizY, soundVizWd, soundVizHt, 2048, false);
+    delayScope = new OscScope(soundVizX_delay, soundVizY, soundVizWd, soundVizHt, 2048, 1024, false);
     delayVolNode.connect(delayScope.wave);
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'PREVIOUS TOUR STOP');

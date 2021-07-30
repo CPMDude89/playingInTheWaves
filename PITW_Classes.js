@@ -36,8 +36,8 @@ class SamplerButton {
 
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
-            fadeIn: 0.15,
-            fadeOut: 0.15
+            fadeIn: 0.2,
+            fadeOut: 0.2
         }); //  Tone player object to handle playback
         
         this.state = 'ready';   //  string to keep track of recording process and playback
@@ -60,10 +60,13 @@ class SamplerButton {
             let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
             let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
             this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
+
             setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.player.start();
-            }, (this.player.buffer.length / this.player.buffer.sampleRate)),
-            200);
+                this.player.start(0);
+            }, 
+            //(this.player.buffer.length / this.player.buffer.sampleRate)),
+            (toSeconds(this.player.buffer.length)),
+            200));
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
