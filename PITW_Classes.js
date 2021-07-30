@@ -37,7 +37,8 @@ class SamplerButton {
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
             fadeIn: 0.2,
-            fadeOut: 0.2
+            fadeOut: 0.2,
+
         }); //  Tone player object to handle playback
         
         this.state = 'ready';   //  string to keep track of recording process and playback
@@ -47,6 +48,8 @@ class SamplerButton {
         this.button.position(Xpos, Ypos);   //  button placement on canvas
         this.button.size(butWd, butHt);     //  button size
         this.button.mousePressed(() => this.process()); //  what happens when button is clicked
+
+        this.loop = new Tone.Loop((time) => this.playLoop(), 0.5 );
     }
 
     async process() {
@@ -60,13 +63,17 @@ class SamplerButton {
             let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
             let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
             this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
-
+            
+            /*
             setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.player.start(0);
+                this.player.start();
             }, 
-            //(this.player.buffer.length / this.player.buffer.sampleRate)),
-            (toSeconds(this.player.buffer.length)),
-            200));
+            (this.player.buffer.length / this.player.buffer.sampleRate)),
+            //this.player.buffer.duration,
+            200);
+            */
+
+            setTimeout(() => {this.loop.interval = this.player.buffer.duration}, 200);
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
@@ -100,6 +107,13 @@ class SamplerButton {
             this.state = 'ready';
             this.clearButton.remove();
         })
+    }
+
+    playLoop(time) {
+        this.player.start();
+
+        //this.player.onstop(() => {console.log('asd;lfkj')});
+        this.loop.interval = 1.001 * this.player.buffer.duration;
     }
 }
 //===================================================================================================================================================//
