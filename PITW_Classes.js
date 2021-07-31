@@ -63,7 +63,12 @@ class SamplerButton {
             let data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
             let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
             this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
+
+            //setTimeout(() => {console.log(this.player.buffer.numberOfChannels);}, 200);
             
+
+           
+
             /*
             setTimeout(() => this.loop = new Tone.Loop((time) => {
                 this.player.start();
@@ -72,6 +77,8 @@ class SamplerButton {
             //this.player.buffer.duration,
             200);
             */
+
+
 
             setTimeout(() => {this.loop.interval = this.player.buffer.duration}, 200);
 
@@ -447,5 +454,83 @@ class LFOVisualizer {
         
         //  map values to p5.js 'circle' object
         circle((0.5 * this.rectWd) + this.Xpos, map(y, 0, 1, (this.Ypos + this.rectHt), this.Ypos), 1.75 * this.rectWd);
+    }
+}
+
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+
+class PlaygroundControls {
+    constructor (
+        parentXpos,     //  parent button x-axis position
+        parentYpos,     //  parent button y-axis position
+        parentButWd,    //  parent button width
+        parentButHt,     //  parent button height 
+        player,     //  parent player object
+        output      //   volume node out
+    ) {
+        this.parentXpos = parentXpos;
+        this.parentYpos = parentYpos;
+        this.parentButWd = parentButWd;
+        this.parentButHt = parentButHt;
+        this.player = player;
+        this.output = output;
+
+        this.delayActive = false;
+        this.delayButton = createButton('DELAY');
+        this.delayButton.position(0.9 * parentXpos, parentYpos);
+        this.delayButton.size(0.5 * parentButWd, parentButHt);
+        this.delayButton.mousePressed(() => {this.triggerDelay()});
+
+        this.delay = new Tone.PingPongDelay({
+            delayTime: 0.5,
+            feedback: 0.65,
+            wet: 0
+        }).connect(this.output);
+
+        this.ampModActive = false;
+        this.ampModButton = createButton('AMP MOD');
+        this.ampModButton.position(0.8 * parentXpos, parentYpos);
+        this.ampModButton.size(0.5 * parentButWd, parentButHt);
+        this.ampModButton.mousePressed(() => {this.triggerAmpMod()});
+
+        this.ampModLFO = new Tone.LFO(5, 0, 1).connect(this.player.volume);
+        this.ampModLFO.amplitude.value = 0;
+        this.ampModLFO.phase = 90;
+
+    }
+    
+    init(_player) {
+        //this.player = _player;
+    }
+    
+    triggerDelay() {
+        //  flip delay on/off
+        this.delayActive = this.delayActive ? this.delayActive = false : this.delayActive = true;
+        
+        if (this.delayActive) {
+            this.player.connect(this.delay);
+            this.delay.wet.rampTo(1, 0.1);
+        }
+
+        else {
+            this.delay.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.delay);
+        }
+    }
+
+    triggerAmpMod() {
+        // flip amp mod on/off
+        this.ampModActive = this.ampModActive ? this.ampModActive = false : this.ampModActive = true;
+
+        if (this.ampModActive) {
+            this.ampModLFO.amplitude.rampTo(1, 0.1);
+            this.ampModLFO.start("+0.1");
+        }
+
+        else {
+            this.ampModLFO.amplitude.rampTo(0, 0.1);
+            this.ampModLFO.stop("+0.1");
+        }
     }
 }
