@@ -1,5 +1,5 @@
 /**
- * Draws a red or a green circle if an effect is active or not
+ * Draws a blue or red circle if an effect is active or not
  */
 
 class SignalCircle {
@@ -14,7 +14,7 @@ class SignalCircle {
     }
 
     drawActiveCircle() {    //  if the effect is active
-        fill(0, 255, 0);    //  green
+        fill(0, 0, 255);    //  green
 
         circle(this.x_coordinate, this.y_coordinate, this.radius);  //  draw circle
     }

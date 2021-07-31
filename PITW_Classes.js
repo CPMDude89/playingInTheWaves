@@ -117,10 +117,10 @@ class SamplerButton {
     }
 
     playLoop(time) {
-        this.player.start();
+        this.player.start(0);
 
-        //this.player.onstop(() => {console.log('asd;lfkj')});
-        this.loop.interval = 1.001 * this.player.buffer.duration;
+        this.player.stop("+this.player.duration");
+        //this.loop.interval = 1.01 * this.player.buffer.duration;
     }
 }
 //===================================================================================================================================================//
@@ -466,42 +466,98 @@ class PlaygroundControls {
         parentYpos,     //  parent button y-axis position
         parentButWd,    //  parent button width
         parentButHt,     //  parent button height 
-        player,     //  parent player object
-        output      //   volume node out
+        player     //  parent player object
     ) {
         this.parentXpos = parentXpos;
         this.parentYpos = parentYpos;
         this.parentButWd = parentButWd;
         this.parentButHt = parentButHt;
         this.player = player;
-        this.output = output;
 
         this.delayActive = false;
         this.delayButton = createButton('DELAY');
         this.delayButton.position(0.9 * parentXpos, parentYpos);
         this.delayButton.size(0.5 * parentButWd, parentButHt);
         this.delayButton.mousePressed(() => {this.triggerDelay()});
+        this.delaySignal = new SignalCircle((0.9 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.delay = new Tone.PingPongDelay({
             delayTime: 0.5,
             feedback: 0.65,
             wet: 0
-        }).connect(this.output);
+        });
 
         this.ampModActive = false;
         this.ampModButton = createButton('AMP MOD');
         this.ampModButton.position(0.8 * parentXpos, parentYpos);
         this.ampModButton.size(0.5 * parentButWd, parentButHt);
         this.ampModButton.mousePressed(() => {this.triggerAmpMod()});
+        this.ampModSignal = new SignalCircle((0.8 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
-        this.ampModLFO = new Tone.LFO(5, 0, 1).connect(this.player.volume);
-        this.ampModLFO.amplitude.value = 0;
-        this.ampModLFO.phase = 90;
+        this.ampModLFO = new Tone.LFO(15, -100, 1).connect(this.player.volume);
+        this.ampModLFO.set({
+            amplitude: 0,
+            phase: 90
+        });
 
+        this.filterSweepActive = false;
+        this.filterSweepButton = createButton('FILTER SWEEP');
+        this.filterSweepButton.position(0.7 * parentXpos, parentYpos);
+        this.filterSweepButton.size(0.5 * parentButWd, parentButHt);
+        this.filterSweepButton.mousePressed(() => {this.triggerFilterSweep()});
+        this.filterSweepSignal = new SignalCircle((0.7 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
+
+        this.filterSweep = new Tone.AutoFilter({
+            frequency: 1.2,
+            baseFrequency: 100,
+            depth: 1.0,
+            octaves: 3.2 
+        });
+        this.filterSweep.filter.Q.value = 10;
+
+        this.freqShifterActive = false;
+        this.freqShifterButton = createButton('FREQ SHIFT');
+        this.freqShifterButton.position(0.6 * parentXpos, parentYpos);
+        this.freqShifterButton.size(0.5 * parentButWd, parentButHt);
+        this.freqShifterButton.mousePressed(() => {this.triggerFreqShifter()});
+        this.freqShifterSignal = new SignalCircle((0.6 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
+
+        this.freqShifter = new Tone.FrequencyShifter({
+            frequency: 50
+        });
+        this.freqShifterLFO = new Tone.LFO(0.1, -100, 300).connect(this.freqShifter.frequency);
+        this.freqShifterLFO.set({
+            phase: 90,
+            wet: 0
+        });
+
+        this.reverbActive = false;
+        this.reverbButton = createButton('REVERB');
+        this.reverbButton.position(0.5 * parentXpos, parentYpos);
+        this.reverbButton.size(0.5 * parentButWd, parentButHt);
+        this.reverbButton.mousePressed(() => {this.triggerReverb()});
+        this.reverbSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
+
+        this.reverb = new Tone.Reverb();
+        this.reverb.set({
+            decay: 3.0,
+            wet: 0
+        });
     }
-    
-    init(_player) {
-        //this.player = _player;
+
+    connectToBus(_output) {
+        this.delay.connect(_output);
+        this.filterSweep.connect(_output);
+        this.freqShifter.connect(_output);
+        this.reverb.connect(_output);
+    }
+
+    checkForActivity() {
+        if (this.delayActive) {this.delaySignal.drawActiveCircle();}
+        if (this.ampModActive) {this.ampModSignal.drawActiveCircle();}
+        if (this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
+        if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
+        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
     }
     
     triggerDelay() {
@@ -524,13 +580,92 @@ class PlaygroundControls {
         this.ampModActive = this.ampModActive ? this.ampModActive = false : this.ampModActive = true;
 
         if (this.ampModActive) {
+            this.player.volume.rampTo(-100, 0.1);
             this.ampModLFO.amplitude.rampTo(1, 0.1);
             this.ampModLFO.start("+0.1");
         }
 
         else {
             this.ampModLFO.amplitude.rampTo(0, 0.1);
+            this.player.volume.rampTo(0, 0.1);
             this.ampModLFO.stop("+0.1");
         }
+    }
+
+    triggerFilterSweep() {
+        this.filterSweepActive = this.filterSweepActive ? this.filterSweepActive = false : this.filterSweepActive = true;
+
+        if (this.filterSweepActive) {
+            this.player.connect(this.filterSweep);
+            this.filterSweep.start();
+        }
+
+        else {
+            this.player.disconnect(this.filterSweep);
+            this.filterSweep.stop();
+        }
+    }
+
+    triggerFreqShifter() {
+        this.freqShifterActive = this.freqShifterActive ? this.freqShifterActive = false : this.freqShifterActive = true;
+
+        if (this.freqShifterActive) {
+            this.player.connect(this.freqShifter);
+            this.freqShifter.wet.rampTo(1, 0.1);
+            this.freqShifterLFO.start();
+        }
+
+        else {
+            this.freqShifter.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.freqShifter);
+        }
+    }
+
+    triggerReverb() {
+        this.reverbActive = this.reverbActive ? this.reverbActive = false : this.reverbActive = true;
+
+        if (this.reverbActive) {
+            this.player.connect(this.reverb);
+            this.reverb.wet.rampTo(1, 0.1);
+
+        }
+
+        else {
+            this.reverb.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.reverb);
+        }
+    }
+}
+
+
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+
+
+/**
+ * Draws a blue or red circle if an effect is active or not
+ */
+
+ class SignalCircle {
+    constructor(
+        x_coordinate,
+        y_coordinate,
+        radius
+    ) {
+        this.x_coordinate = x_coordinate;
+        this.y_coordinate = y_coordinate;
+        this.radius = radius;
+    }
+
+    drawActiveCircle() {    //  if the effect is active
+        fill(0, 0, 255);    //  green
+
+        circle(this.x_coordinate, this.y_coordinate, this.radius);  //  draw circle
+    }
+
+    drawInactiveCircle() {    //  if the effect is active
+        fill(255, 0, 0);    //  green
+
+        circle(this.x_coordinate, this.y_coordinate, this.radius);  //  draw circle
     }
 }

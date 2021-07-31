@@ -2,12 +2,14 @@ let w=window.innerWidth, h=window.innerHeight;
 let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * h;
 let mic;
 let sampler1, sampler2, sampler3;
-let limiter, volNode;
+let limiter, volNode1, volNode2, volNode3;
+//let lfoViz;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
-    //volNode = new Tone.Volume().connect(limiter);
-    volNode = new Tone.Volume().toDestination();
+    volNode1 = new Tone.Volume().connect(limiter);
+    volNode2 = new Tone.Volume().connect(limiter);
+    volNode3 = new Tone.Volume().connect(limiter);
     effectBus = new Tone.Volume().connect(limiter);
 }
 
@@ -21,19 +23,26 @@ function setup() {
     sampler2 = new SamplerButton(recButX, 2.25 * recButY, recButWd, recButHt);    
     sampler3 = new SamplerButton(recButX, 3.5 * recButY, recButWd, recButHt);
 
-    sampler1.player.connect(volNode);
+    sampler1.player.connect(volNode1);
     mic.connect(sampler1.recorder);
-
-    sampler2.player.connect(volNode);
+    
+    sampler2.player.connect(volNode2);
     mic.connect(sampler2.recorder);
 
-    sampler3.player.connect(volNode);
+    sampler3.player.connect(volNode3);
     mic.connect(sampler3.recorder);
-
+    
     controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player, effectBus);
-    controls1.delay.connect(effectBus);
-    //controls1.ampModLFO.connect(volNode.volume);
+    controls1.connectToBus(effectBus);
 
+    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler1.player, effectBus);
+    controls2.connectToBus(effectBus);
+
+    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler1.player, effectBus);
+    controls3.connectToBus(effectBus);
+    
+    //lfoViz = new LFOVisualizer(0.1 * w, 0.1 * h, 0.1 * w, 0.7 * h, 0, 200, 200);
+    //controls1.ampModLFO.connect(lfoViz.wave);
 
     Tone.Transport.start();
 }
@@ -57,5 +66,24 @@ function draw() {
         fill(255, 0, 0);
         circle(recButX + (0.5 * recButWd), recButY - (0.5 * recButHt), 0.4 * recButHt);
     }
+
+    //lfoViz.process();
+
+    controls1.checkForActivity();
+    controls2.checkForActivity();
+    controls3.checkForActivity();
+
+    
+    if (controls1.freqShifterActive) {
+        volNode1.volume.rampTo(-100, 0.1);
+    }
+
+    else {
+        volNode1.volume.rampTo(0, 0.1);
+    }
+    
+    
+    
+
 }
 
