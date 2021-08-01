@@ -467,13 +467,15 @@ class PlaygroundControls {
         parentYpos,     //  parent button y-axis position
         parentButWd,    //  parent button width
         parentButHt,     //  parent button height 
-        player     //  parent player object
+        player,     //  parent player object
+        verb        //  main script's reverb
     ) {
         this.parentXpos = parentXpos;
         this.parentYpos = parentYpos;
         this.parentButWd = parentButWd;
         this.parentButHt = parentButHt;
         this.player = player;
+        this.verb = verb;
 
         this.delayActive = false;
         this.delayButton = createButton('DELAY');
@@ -533,19 +535,14 @@ class PlaygroundControls {
             phase: 90,
             wet: 0
         });
-
+        
+        
         this.reverbActive = false;
         this.reverbButton = createButton('REVERB');
         this.reverbButton.position(0.5 * parentXpos, parentYpos);
         this.reverbButton.size(0.5 * parentButWd, parentButHt);
         this.reverbButton.mousePressed(() => {this.triggerReverb()});
         this.reverbSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
-
-        this.reverb = new Tone.Reverb();
-        this.reverb.set({
-            decay: 3.0,
-            wet: 0
-        });
 
         this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
@@ -564,15 +561,10 @@ class PlaygroundControls {
         this.reverseSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
     }
 
-    connectToBus(_output, _reverbOut) {
+    connectToBus(_output) {
         this.delay.connect(_output);
         this.filterSweep.connect(_output);
         this.freqShifter.connect(_output);
-        this.reverb.connect(_reverbOut);
-    }
-
-    setParameters() {
-
     }
 
     checkForActivity() {
@@ -650,14 +642,14 @@ class PlaygroundControls {
         this.reverbActive = this.reverbActive ? this.reverbActive = false : this.reverbActive = true;
 
         if (this.reverbActive) {
-            this.player.connect(this.reverb);
-            this.reverb.wet.rampTo(1, 0.1);
+            this.player.connect(this.verb);
+            //this.reverb.wet.rampTo(1, 0.1);
 
         }
 
         else {
-            this.reverb.wet.rampTo(0, 10);
-            this.player.disconnect(this.reverb);
+            //this.reverb.wet.rampTo(0, 10);
+            this.player.disconnect(this.verb);
         }
     }
 
