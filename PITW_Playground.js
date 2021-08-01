@@ -2,24 +2,14 @@ let w=window.innerWidth, h=window.innerHeight;
 let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * h;
 let mic;
 let sampler1, sampler2, sampler3;
-let limiter, volNode1, volNode2, volNode3;
+let limiter, volNode, effectBus;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
 
     volNode1 = new Tone.Volume(-6).connect(limiter);
-    //volNode2 = new Tone.Volume(-6).connect(limiter);
-    //volNode3 = new Tone.Volume(-6).connect(limiter);
 
-    reverbBus = new Tone.Volume(-1).connect(limiter);
-    reverb = new Tone.Reverb({
-        decay: 5,
-        wet: 1
-    }).connect(reverbBus);
-
-    effectBus1 = new Tone.Volume(-4).connect(limiter);
-    //effectBus2 = new Tone.Volume(-4).connect(limiter);
-    //effectBus3 = new Tone.Volume(-4).connect(limiter);
+    effectBus = new Tone.Volume(-4).connect(limiter);
 }
 
 function setup() {
@@ -41,11 +31,11 @@ function setup() {
     sampler3.player.connect(volNode1);
     mic.connect(sampler3.recorder);
     
-    controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player, reverb);
-    controls1.connectToBus(effectBus1, reverbBus);
+    controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player);
+    controls1.connectToBus(effectBus);
 
-    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler2.player, reverb);
-    controls2.connectToBus(effectBus1, reverbBus);
+    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler2.player);
+    controls2.connectToBus(effectBus);
     controls2.delay.delayTime.value = 0.5;
     controls2.delayTimeLFO.frequency.value = 0.08;
     controls2.delayTimeLFO.min = 0.05;
@@ -60,9 +50,8 @@ function setup() {
     controls2.freqShifterLFO.min = -500;
     controls2.freqShifterLFO.max = 400;
 
-    
-    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler3.player, reverb);
-    controls3.connectToBus(effectBus1, reverbBus);
+    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler3.player);
+    controls3.connectToBus(effectBus);
     controls3.delay.delayTime.value = 0.5;
     controls3.delay.feedback.value = 0.5;
     controls3.delayTimeLFO.frequency.value = 0.03;
@@ -101,6 +90,16 @@ function draw() {
     if (sampler1.state == 'recording') {
         fill(255, 0, 0);
         circle(recButX + (0.5 * recButWd), recButY - (0.5 * recButHt), 0.4 * recButHt);
+    }
+
+    if (sampler2.state == 'recording') {
+        fill(255, 0, 0);
+        circle(recButX + (0.5 * recButWd), 2.25 * recButY - (0.5 * recButHt), 0.4 * recButHt);
+    }
+
+    if (sampler3.state == 'recording') {
+        fill(255, 0, 0);
+        circle(recButX + (0.5 * recButWd), 3.5 * recButY - (0.5 * recButHt), 0.4 * recButHt);
     }
 
     controls1.checkForActivity();

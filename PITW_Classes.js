@@ -468,14 +468,12 @@ class PlaygroundControls {
         parentButWd,    //  parent button width
         parentButHt,     //  parent button height 
         player,     //  parent player object
-        verb        //  main script's reverb
     ) {
         this.parentXpos = parentXpos;
         this.parentYpos = parentYpos;
         this.parentButWd = parentButWd;
         this.parentButHt = parentButHt;
         this.player = player;
-        this.verb = verb;
 
         this.delayActive = false;
         this.delayButton = createButton('DELAY');
@@ -535,27 +533,19 @@ class PlaygroundControls {
             phase: 90,
             wet: 0
         });
-        
-        
-        this.reverbActive = false;
-        this.reverbButton = createButton('REVERB');
-        this.reverbButton.position(0.5 * parentXpos, parentYpos);
-        this.reverbButton.size(0.5 * parentButWd, parentButHt);
-        this.reverbButton.mousePressed(() => {this.triggerReverb()});
-        this.reverbSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
         this.playbackRateGoingDown = true;
         this.playbackRateButton = createButton('PLAYBACK RATE');
-        this.playbackRateButton.position(0.4 * parentXpos, parentYpos);
+        this.playbackRateButton.position(0.5 * parentXpos, parentYpos);
         this.playbackRateButton.size(0.5 * parentButWd, parentButHt);
         this.playbackRateButton.mousePressed(() => {this.triggerPlaybackRateLoop();});
         this.playbackRateSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
-        this.reverseButton.position(0.3 * parentXpos, parentYpos);
+        this.reverseButton.position(0.4 * parentXpos, parentYpos);
         this.reverseButton.size(0.5 * parentButWd, parentButHt);
         this.reverseButton.mousePressed(() => {this.triggerReverse();});
         this.reverseSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
@@ -572,7 +562,6 @@ class PlaygroundControls {
         if (this.ampModActive) {this.ampModSignal.drawActiveCircle();}
         if (this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
         if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
-        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
         if (this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
         if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
     }
@@ -635,21 +624,6 @@ class PlaygroundControls {
         else {
             this.freqShifter.wet.rampTo(0, 0.1);
             this.player.disconnect(this.freqShifter);
-        }
-    }
-
-    triggerReverb() {
-        this.reverbActive = this.reverbActive ? this.reverbActive = false : this.reverbActive = true;
-
-        if (this.reverbActive) {
-            this.player.connect(this.verb);
-            //this.reverb.wet.rampTo(1, 0.1);
-
-        }
-
-        else {
-            //this.reverb.wet.rampTo(0, 10);
-            this.player.disconnect(this.verb);
         }
     }
 
