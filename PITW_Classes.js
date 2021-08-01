@@ -36,6 +36,7 @@ class SamplerButton {
 
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
+            volume: -3,
             fadeIn: 0.2,
             fadeOut: 0.2,
 
@@ -481,11 +482,12 @@ class PlaygroundControls {
         this.delayButton.mousePressed(() => {this.triggerDelay()});
         this.delaySignal = new SignalCircle((0.9 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
-        this.delay = new Tone.PingPongDelay({
-            delayTime: 0.5,
-            feedback: 0.65,
+        this.delay = new Tone.FeedbackDelay({
+            delayTime: 0.2,
+            feedback: 0.7,
             wet: 0
         });
+        this.delayTimeLFO = new Tone.LFO(0.02, 0.05, 0.3).start().connect(this.delay.delayTime);
 
         this.ampModActive = false;
         this.ampModButton = createButton('AMP MOD');
@@ -494,11 +496,12 @@ class PlaygroundControls {
         this.ampModButton.mousePressed(() => {this.triggerAmpMod()});
         this.ampModSignal = new SignalCircle((0.8 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
-        this.ampModLFO = new Tone.LFO(15, -100, 1).connect(this.player.volume);
+        this.ampModLFO = new Tone.LFO(15, -100, 0).connect(this.player.volume);
         this.ampModLFO.set({
             amplitude: 0,
             phase: 90
         });
+        this.ampModLFOModulator = new Tone.LFO(0.1, 0.4, 40).start().connect(this.ampModLFO.frequency);
 
         this.filterSweepActive = false;
         this.filterSweepButton = createButton('FILTER SWEEP');
@@ -508,10 +511,10 @@ class PlaygroundControls {
         this.filterSweepSignal = new SignalCircle((0.7 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.filterSweep = new Tone.AutoFilter({
-            frequency: 1.2,
+            frequency: 2,
             baseFrequency: 100,
             depth: 1.0,
-            octaves: 3.2 
+            octaves: 4
         });
         this.filterSweep.filter.Q.value = 10;
 
@@ -523,9 +526,9 @@ class PlaygroundControls {
         this.freqShifterSignal = new SignalCircle((0.6 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.freqShifter = new Tone.FrequencyShifter({
-            frequency: 50
+            frequency: 0
         });
-        this.freqShifterLFO = new Tone.LFO(0.1, -100, 300).connect(this.freqShifter.frequency);
+        this.freqShifterLFO = new Tone.LFO(0.5, -300, 200).connect(this.freqShifter.frequency);
         this.freqShifterLFO.set({
             phase: 90,
             wet: 0
@@ -543,13 +546,33 @@ class PlaygroundControls {
             decay: 3.0,
             wet: 0
         });
+
+        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
+        this.playbackRateActive = false;
+        this.playbackRateGoingDown = true;
+        this.playbackRateButton = createButton('PLAYBACK RATE');
+        this.playbackRateButton.position(0.4 * parentXpos, parentYpos);
+        this.playbackRateButton.size(0.5 * parentButWd, parentButHt);
+        this.playbackRateButton.mousePressed(() => {this.triggerPlaybackRateLoop();});
+        this.playbackRateSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
+
+        this.reverseActive = false;
+        this.reverseButton = createButton('REVERSE');
+        this.reverseButton.position(0.3 * parentXpos, parentYpos);
+        this.reverseButton.size(0.5 * parentButWd, parentButHt);
+        this.reverseButton.mousePressed(() => {this.triggerReverse();});
+        this.reverseSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
     }
 
-    connectToBus(_output) {
+    connectToBus(_output, _reverbOut) {
         this.delay.connect(_output);
         this.filterSweep.connect(_output);
         this.freqShifter.connect(_output);
-        this.reverb.connect(_output);
+        this.reverb.connect(_reverbOut);
+    }
+
+    setParameters() {
+
     }
 
     checkForActivity() {
@@ -558,6 +581,8 @@ class PlaygroundControls {
         if (this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
         if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
         if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
+        if (this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
+        if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
     }
     
     triggerDelay() {
@@ -631,8 +656,97 @@ class PlaygroundControls {
         }
 
         else {
-            this.reverb.wet.rampTo(0, 0.1);
+            this.reverb.wet.rampTo(0, 10);
             this.player.disconnect(this.reverb);
+        }
+    }
+
+    triggerPlaybackRateLoop() {
+        this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
+
+        if (this.playbackRateActive) {
+            this.playbackRateLoop.start();
+        }
+        else {
+            this.playbackRateLoop.stop();
+            this.playbackRateToNormal = new Tone.Loop(((time) => {
+                if (this.player.playbackRate < 1) {
+                    this.player.playbackRate += 0.01
+                }
+                else if (this.player.playbackRate > 1) {
+                    this.player.playbackRate -= 0.01
+                }
+                if (this.player.playbackRate == 1) {
+                    this.playbackRateToNormal.stop();
+                }
+            }), 0.02).start();
+
+        }
+    }
+
+    playbackRateLFO() {
+        let curRate = this.player.playbackRate;
+        
+        if (this.playbackRateGoingDown) {
+            this.player.playbackRate -= 0.01;
+        }
+        else {
+            this.player.playbackRate += 0.01;
+        }
+
+        if (curRate < 0.05) {
+            this.playbackRateGoingDown = false;
+        }        
+        else if (curRate > 2) {
+            this.playbackRateGoingDown = true;
+        }
+    }
+
+    triggerReverse() {
+        this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
+
+        if (this.reverseActive) {
+            this.reverseLoop = new Tone.Loop((time) => {
+                if (this.player.playbackRate > 0.02 && !this.player.reverse) {
+                    this.player.playbackRate -= 0.01
+                }
+
+                if (this.player.playbackRate <= 0.02 && !this.player.reverse) {
+                    this.player.volume.rampTo(-100, 0.05);
+                    setTimeout(this.player.reverse = true, 100);
+                    this.player.volume.rampTo(0, 0.5);
+                }
+
+                if (this.player.playbackRate < 1 && this.player.reverse) {
+                    this.player.playbackRate += 0.01;
+                }
+
+                if (this.player.playbackRate == 1 && this.player.reverse) {
+                    this.reverseLoop.stop();
+                }
+            }, 0.01).start();
+        }
+
+        else {
+            this.reverseLoop = new Tone.Loop((time) => {
+                if (this.player.playbackRate > 0.02 && this.player.reverse) {
+                    this.player.playbackRate -= 0.01
+                }
+
+                if (this.player.playbackRate <= 0.02 && this.player.reverse) {
+                    this.player.volume.rampTo(-100, 0.05);
+                    setTimeout(this.player.reverse = false, 100);
+                    this.player.volume.rampTo(0, 0.5);
+                }
+
+                if (this.player.playbackRate < 1 && !this.player.reverse) {
+                    this.player.playbackRate += 0.01;
+                }
+
+                if (this.player.playbackRate == 1 && !this.player.reverse) {
+                    this.reverseLoop.stop();
+                }
+            }, 0.01).start();
         }
     }
 }

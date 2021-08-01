@@ -7,10 +7,14 @@ let limiter, volNode1, volNode2, volNode3;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
-    volNode1 = new Tone.Volume().connect(limiter);
-    volNode2 = new Tone.Volume().connect(limiter);
-    volNode3 = new Tone.Volume().connect(limiter);
-    effectBus = new Tone.Volume().connect(limiter);
+    volNode1 = new Tone.Volume(-6).connect(limiter);
+    volNode2 = new Tone.Volume(-6).connect(limiter);
+    volNode3 = new Tone.Volume(-6).connect(limiter);
+    reverbBus = new Tone.Volume(-1).connect(limiter);
+    effectBus1 = new Tone.Volume(-4).connect(limiter);
+    effectBus2 = new Tone.Volume(-4).connect(limiter);
+    effectBus3 = new Tone.Volume(-4).connect(limiter);
+    
 }
 
 function setup() {
@@ -32,14 +36,14 @@ function setup() {
     sampler3.player.connect(volNode3);
     mic.connect(sampler3.recorder);
     
-    controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player, effectBus);
-    controls1.connectToBus(effectBus);
+    controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player);
+    controls1.connectToBus(effectBus1, reverbBus);
 
-    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler1.player, effectBus);
-    controls2.connectToBus(effectBus);
+    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler2.player);
+    controls2.connectToBus(effectBus2, reverbBus);
 
-    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler1.player, effectBus);
-    controls3.connectToBus(effectBus);
+    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler3.player);
+    controls3.connectToBus(effectBus3, reverbBus);
     
     //lfoViz = new LFOVisualizer(0.1 * w, 0.1 * h, 0.1 * w, 0.7 * h, 0, 200, 200);
     //controls1.ampModLFO.connect(lfoViz.wave);
