@@ -84,8 +84,8 @@ function draw() {
     textAlign(LEFT);
     textSize(25)
     text('--SHORT LOOP--\n2 SECONDS OR LESS', 0.82 * w, recButY + (0.5 * recButHt));
-    text('--MEDIUM LOOP--\n7 SECONDS OR LESS', 0.82 * w, 2.25 * recButY + (0.5 * recButHt));
-    text('--LONG LOOP--\n15 SECONDS OR LESS', 0.82 * w, 3.5 * recButY + (0.5 * recButHt));
+    text('--MEDIUM LOOP--\n5 SECONDS OR LESS', 0.82 * w, 2.25 * recButY + (0.5 * recButHt));
+    text('--LONG LOOP--\n10 SECONDS OR LESS', 0.82 * w, 3.5 * recButY + (0.5 * recButHt));
 
     if (sampler1.state == 'recording') {
         fill(255, 0, 0);

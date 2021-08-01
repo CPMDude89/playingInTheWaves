@@ -120,8 +120,8 @@ class SamplerButton {
     playLoop(time) {
         this.player.start(0);
 
-        this.player.stop("+this.player.duration");
-        //this.loop.interval = 1.01 * this.player.buffer.duration;
+        //this.player.stop("+this.player.duration");
+        this.loop.interval = 1.01 * this.player.buffer.duration;
     }
 }
 //===================================================================================================================================================//
@@ -534,21 +534,21 @@ class PlaygroundControls {
             wet: 0
         });
 
-        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
+        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.1);
         this.playbackRateActive = false;
         this.playbackRateGoingDown = true;
         this.playbackRateButton = createButton('PLAYBACK RATE');
         this.playbackRateButton.position(0.5 * parentXpos, parentYpos);
         this.playbackRateButton.size(0.5 * parentButWd, parentButHt);
         this.playbackRateButton.mousePressed(() => {this.triggerPlaybackRateLoop();});
-        this.playbackRateSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
+        this.playbackRateSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
         this.reverseButton.position(0.4 * parentXpos, parentYpos);
         this.reverseButton.size(0.5 * parentButWd, parentButHt);
         this.reverseButton.mousePressed(() => {this.triggerReverse();});
-        this.reverseSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
+        this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
     }
 
     connectToBus(_output) {
@@ -637,12 +637,12 @@ class PlaygroundControls {
             this.playbackRateLoop.stop();
             this.playbackRateToNormal = new Tone.Loop(((time) => {
                 if (this.player.playbackRate < 1) {
-                    this.player.playbackRate += 0.01
+                    this.player.playbackRate += 0.02
                 }
                 else if (this.player.playbackRate > 1) {
-                    this.player.playbackRate -= 0.01
+                    this.player.playbackRate -= 0.02
                 }
-                if (this.player.playbackRate == 1) {
+                if (this.player.playbackRate < 1.01 && this.player.playbackRate > 99.01) {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
@@ -660,12 +660,14 @@ class PlaygroundControls {
             this.player.playbackRate += 0.01;
         }
 
-        if (curRate < 0.05) {
+        if (curRate < 0.1) {
             this.playbackRateGoingDown = false;
         }        
         else if (curRate > 2) {
             this.playbackRateGoingDown = true;
         }
+
+        this.player.loop.interval = this.player.buffer.duration * curRate;
     }
 
     triggerReverse() {
