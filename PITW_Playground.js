@@ -3,7 +3,6 @@ let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * 
 let mic;
 let sampler1, sampler2, sampler3;
 let limiter, volNode1, volNode2, volNode3;
-//let lfoViz;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
@@ -44,9 +43,6 @@ function setup() {
 
     controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler3.player);
     controls3.connectToBus(effectBus3, reverbBus);
-    
-    //lfoViz = new LFOVisualizer(0.1 * w, 0.1 * h, 0.1 * w, 0.7 * h, 0, 200, 200);
-    //controls1.ampModLFO.connect(lfoViz.wave);
 
     Tone.Transport.start();
 }
@@ -64,14 +60,12 @@ function draw() {
     textSize(25)
     text('--SHORT LOOP--\n2 SECONDS OR LESS', 0.82 * w, recButY + (0.5 * recButHt));
     text('--MEDIUM LOOP--\n7 SECONDS OR LESS', 0.82 * w, 2.25 * recButY + (0.5 * recButHt));
-    text('--LONG LOOP--\n10 SECONDS OR MORE', 0.82 * w, 3.5 * recButY + (0.5 * recButHt));
+    text('--LONG LOOP--\n15 SECONDS OR LESS', 0.82 * w, 3.5 * recButY + (0.5 * recButHt));
 
     if (sampler1.state == 'recording') {
         fill(255, 0, 0);
         circle(recButX + (0.5 * recButWd), recButY - (0.5 * recButHt), 0.4 * recButHt);
     }
-
-    //lfoViz.process();
 
     controls1.checkForActivity();
     controls2.checkForActivity();
