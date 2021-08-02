@@ -37,9 +37,8 @@ class SamplerButton {
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
             volume: -3,
-            fadeIn: 0.2,
-            fadeOut: 0.2,
-
+            fadeOut: 0.1,
+            loop: true
         }); //  Tone player object to handle playback
         
         this.state = 'ready';   //  string to keep track of recording process and playback
@@ -50,7 +49,8 @@ class SamplerButton {
         this.button.size(butWd, butHt);     //  button size
         this.button.mousePressed(() => this.process()); //  what happens when button is clicked
 
-        this.loop = new Tone.Loop((time) => this.playLoop(), 0.5 );
+        //this.loop = new Tone.Loop((time) => this.playLoop(), 0.1);
+        
     }
 
     async process() {
@@ -65,23 +65,22 @@ class SamplerButton {
             let blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
             this.player.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
 
-            //setTimeout(() => {console.log(this.player.buffer.numberOfChannels);}, 200);
-            
+            setTimeout(() => {
+                let array = this.player.buffer.getChannelData(0);
+                let max = 10000;
+                
+                for (let i = 0; i < max; i++) {
+                    array[i] = array[i] * (i/max);
+                    this.player.buffer.getChannelData(0)[this.player.buffer.getChannelData(0).length - (1 + i)] = this.player.buffer.getChannelData(0)[this.player.buffer.getChannelData(0).length - (1 + i)] * (i / max);
+                }
 
-           
+                array = this.player.buffer.getChannelData(1);
 
-            /*
-            setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.player.start();
-            }, 
-            (this.player.buffer.length / this.player.buffer.sampleRate)),
-            //this.player.buffer.duration,
-            200);
-            */
-
-
-
-            setTimeout(() => {this.loop.interval = this.player.buffer.duration}, 200);
+                for (let i = 0; i < max; i++) {
+                    array[i] = array[i] * (i/max);
+                    this.player.buffer.getChannelData(1)[this.player.buffer.getChannelData(1).length - (1 + i)] = this.player.buffer.getChannelData(1)[this.player.buffer.getChannelData(1).length - (1 + i)] * (i / max);
+                }
+            }, 300);
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
@@ -91,8 +90,8 @@ class SamplerButton {
         else if (this.state == 'play') {    //  play recorded audio buffer
             this.button.html('STOP PLAYBACK');  //  change button text
             this.state = 'stop';    //  change string to keep track of process
-            
-            this.loop.start();     //   start event loop 
+
+            this.player.start();
         }
 
         else if (this.state = 'stop') {
@@ -100,29 +99,44 @@ class SamplerButton {
             this.state = 'play';    //  change string to keep track of process
 
             this.player.stop();     //  stop player
-            this.loop.stop();       //  stop event loop
         }
     }
 
     showControls() {
+        this.button.size(this.butWd * 0.65, this.butHt);
+        this.button.position(this.Xpos + (0.35 * this.butWd), this.Ypos);
         this.clearButton = createButton('START OVER');  //  create button to restart process
-        this.clearButton.position(this.Xpos - (0.6 * this.butWd), this.Ypos);   
-        this.clearButton.size(0.5 * this.butWd, this.butHt);
+        this.clearButton.position(this.Xpos, this.Ypos);   
+        this.clearButton.size(0.35 * this.butWd, this.butHt);
         this.clearButton.mousePressed(() => {
+            this.button.size(this.butWd, this.butHt);
+            this.button.position(this.Xpos, this.Ypos);
             this.button.html('RECORD');
             this.player.stop();
-            this.loop.stop();
             this.state = 'ready';
             this.clearButton.remove();
         })
     }
-
+    
+    /*
     playLoop(time) {
-        this.player.start(0);
+        
+        if (this.player.state == "stopped" && this.player.playbackRate == 1) {
+            this.player.start();
+        }
 
-        //this.player.stop("+this.player.duration");
-        this.loop.interval = 1.01 * this.player.buffer.duration;
+        else if (this.player.state == "stopped" && this.player.playbackRate != 1) {
+            //this.loop.interval = this.player.buffer.duration * (1 + (1 - this.player.playbackRate));
+            this.player.start(0, 0);
+            this.loop.interval = this.timeStretchedInterval;
+        }
+
+       console.log("interval: " + this.loop.interval + " duration: " + this.player.buffer.duration + " playrate: " + this.player.playbackRate);
+
+        //this.loop.interval = this.player.buffer.duration * (1 + (1 - this.player.playbackRate));
     }
+    */
+    
 }
 //===================================================================================================================================================//
 //===================================================================================================================================================//
@@ -147,17 +161,19 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
 
         this.playerForward = new Tone.Player({  //  create forwards running player
-            fadeIn: 0.1,
-            fadeOut: 0.1,
+            fadeIn: 0.2,
+            fadeOut: 0.2,
             reverse: false,
             volume: 0
         });
         this.playerBackward = new Tone.Player({ //  create backwards running player
-            fadeIn: 0.1,
-            fadeOut: 0.1,
+            fadeIn: 0.2,
+            fadeOut: 0.2,
             reverse: true,
             volume: -100
         });
+
+        this.loop = new Tone.Loop((time) => this.playLoop(), 0.1);
     }
 
     async process() {
@@ -173,11 +189,13 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
             this.playerForward.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
             this.playerBackward.load(blob);     //  same but load it to a reversed player
 
+            /*
             setTimeout(() => this.loop = new Tone.Loop((time) => {
                 this.playerForward.start();
                 this.playerBackward.start();
             }, (this.playerForward.buffer.length / this.playerForward.buffer.sampleRate)),
             200);
+            */
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
@@ -200,6 +218,23 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
             this.playerBackward.stop();     //  stop player
             this.loop.stop();       //  stop event loop
         }
+    }
+
+    playLoop(time) {
+        
+        if (this.playerForward.state == "stopped") {
+            this.playerForward.start();
+        }
+        /*
+        if (this.playerBackward.state == "stopped") {
+            this.playerBackward.start();
+        }
+        */
+        
+
+        //this.player.start();
+
+        //this.loop.interval = 1.001 * this.player.buffer.duration;
     }
 }
 //===================================================================================================================================================//
@@ -468,12 +503,16 @@ class PlaygroundControls {
         parentButWd,    //  parent button width
         parentButHt,     //  parent button height 
         player,     //  parent player object
+        verb   //  parent script reverb node
     ) {
         this.parentXpos = parentXpos;
         this.parentYpos = parentYpos;
         this.parentButWd = parentButWd;
         this.parentButHt = parentButHt;
         this.player = player;
+        this.verb = verb;
+
+        this.playerSignal = new SignalCircle(this.parentXpos + 0.65 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.delayActive = false;
         this.delayButton = createButton('DELAY');
@@ -534,7 +573,7 @@ class PlaygroundControls {
             wet: 0
         });
 
-        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.1);
+        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
         this.playbackRateGoingDown = true;
         this.playbackRateButton = createButton('PLAYBACK RATE');
@@ -549,6 +588,13 @@ class PlaygroundControls {
         this.reverseButton.size(0.5 * parentButWd, parentButHt);
         this.reverseButton.mousePressed(() => {this.triggerReverse();});
         this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
+
+        this.reverbActive = false;
+        this.reverbButton = createButton('REVERB');
+        this.reverbButton.position(0.3 * parentXpos, parentYpos);
+        this.reverbButton.size(0.5 * parentButWd, parentButHt);
+        this.reverbButton.mousePressed(() => this.triggerReverb());
+        this.reverbSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
     }
 
     connectToBus(_output) {
@@ -558,12 +604,14 @@ class PlaygroundControls {
     }
 
     checkForActivity() {
+        if (this.player.state == 'started') {this.playerSignal.drawActiveCircle();}
         if (this.delayActive) {this.delaySignal.drawActiveCircle();}
         if (this.ampModActive) {this.ampModSignal.drawActiveCircle();}
         if (this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
         if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
         if (this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
         if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
+        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
     }
     
     triggerDelay() {
@@ -631,6 +679,8 @@ class PlaygroundControls {
         this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
 
         if (this.playbackRateActive) {
+            //this.player.fadeIn = 1;
+            //this.player.fadeOut = 1;
             this.playbackRateLoop.start();
         }
         else {
@@ -642,11 +692,13 @@ class PlaygroundControls {
                 else if (this.player.playbackRate > 1) {
                     this.player.playbackRate -= 0.02
                 }
-                if (this.player.playbackRate < 1.01 && this.player.playbackRate > 99.01) {
+                if (this.player.playbackRate < 1.001 && this.player.playbackRate > 99.99) {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
 
+            //this.player.fadeIn = 0.2;
+            //this.player.fadeOut = 0.2;
         }
     }
 
@@ -654,20 +706,18 @@ class PlaygroundControls {
         let curRate = this.player.playbackRate;
         
         if (this.playbackRateGoingDown) {
-            this.player.playbackRate -= 0.01;
+            this.player.playbackRate -= 0.02;
         }
         else {
-            this.player.playbackRate += 0.01;
+            this.player.playbackRate += 0.02;
         }
 
-        if (curRate < 0.1) {
+        if (curRate < 0.2) {
             this.playbackRateGoingDown = false;
         }        
         else if (curRate > 2) {
             this.playbackRateGoingDown = true;
         }
-
-        this.player.loop.interval = this.player.buffer.duration * curRate;
     }
 
     triggerReverse() {
@@ -716,6 +766,19 @@ class PlaygroundControls {
                 }
             }, 0.01).start();
         }
+    }
+
+    triggerReverb() {
+        this.reverbActive = this.reverbActive ? this.reverbActive = false : this.reverbActive = true;
+
+        if (this.reverbActive) {
+            this.player.connect(this.verb);
+        }
+
+        else {
+            this.player.disconnect(this.verb);
+        }
+        
     }
 }
 

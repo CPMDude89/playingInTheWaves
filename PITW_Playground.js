@@ -2,12 +2,18 @@ let w=window.innerWidth, h=window.innerHeight;
 let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * h;
 let mic;
 let sampler1, sampler2, sampler3;
-let limiter, volNode, effectBus;
+let limiter, volNode1, volNode2, volNode3, effectBus;
+let volSlider1, volSlider2, volSlider3;
+let reverb
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
 
+    reverb = new Tone.Reverb(4).toDestination();
+
     volNode1 = new Tone.Volume(-6).connect(limiter);
+    volNode2 = new Tone.Volume(-6).connect(limiter);
+    volNode3 = new Tone.Volume(-6).connect(limiter);
 
     effectBus = new Tone.Volume(-4).connect(limiter);
 }
@@ -31,11 +37,12 @@ function setup() {
     sampler3.player.connect(volNode1);
     mic.connect(sampler3.recorder);
     
-    controls1 = new PlaygroundControls(recButX - (0.5 * recButWd), recButY, recButWd, recButHt, sampler1.player);
+    controls1 = new PlaygroundControls(recButX, recButY, recButWd, recButHt, sampler1.player, reverb);
     controls1.connectToBus(effectBus);
 
-    controls2 = new PlaygroundControls(recButX - (0.5 * recButWd), 2.25 * recButY, recButWd, recButHt, sampler2.player);
+    controls2 = new PlaygroundControls(recButX, 2.25 * recButY, recButWd, recButHt, sampler2.player, reverb);
     controls2.connectToBus(effectBus);
+
     controls2.delay.delayTime.value = 0.5;
     controls2.delayTimeLFO.frequency.value = 0.08;
     controls2.delayTimeLFO.min = 0.05;
@@ -50,8 +57,9 @@ function setup() {
     controls2.freqShifterLFO.min = -500;
     controls2.freqShifterLFO.max = 400;
 
-    controls3 = new PlaygroundControls(recButX - (0.5 * recButWd), 3.5 * recButY, recButWd, recButHt, sampler3.player);
+    controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, reverb);
     controls3.connectToBus(effectBus);
+
     controls3.delay.delayTime.value = 0.5;
     controls3.delay.feedback.value = 0.5;
     controls3.delayTimeLFO.frequency.value = 0.03;
@@ -67,7 +75,15 @@ function setup() {
     controls3.freqShifterLFO.frequency.value = 0.03;
     controls3.freqShifterLFO.min = -500;
     controls3.freqShifterLFO.max = 600;
-    
+
+    testButton = createButton('TEST');
+    testButton.position(0.1 * w, h);
+    testButton.size(recButWd, recButHt);
+    testButton.mousePressed(() => {
+        volNode1.connect(reverb);
+        volNode2.connect(reverb);
+        volNode3.connect(reverb);
+    });
 
     Tone.Transport.start();
 }
@@ -105,8 +121,6 @@ function draw() {
     controls1.checkForActivity();
     controls2.checkForActivity();
     controls3.checkForActivity();
-    
-    
 
 }
 
