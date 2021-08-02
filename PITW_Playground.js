@@ -4,7 +4,8 @@ let mic;
 let sampler1, sampler2, sampler3;
 let limiter, volNode1, volNode2, volNode3, effectBus;
 let volSlider1, volSlider2, volSlider3;
-let reverb
+let reverb;
+let YDepth, XFreq;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
@@ -37,10 +38,10 @@ function setup() {
     sampler3.player.connect(volNode1);
     mic.connect(sampler3.recorder);
     
-    controls1 = new PlaygroundControls(recButX, recButY, recButWd, recButHt, sampler1.player, reverb);
+    controls1 = new PlaygroundControls(recButX, recButY, recButWd, recButHt, sampler1.player, volNode1, reverb);
     controls1.connectToBus(effectBus);
 
-    controls2 = new PlaygroundControls(recButX, 2.25 * recButY, recButWd, recButHt, sampler2.player, reverb);
+    controls2 = new PlaygroundControls(recButX, 2.25 * recButY, recButWd, recButHt, sampler2.player, volNode2, reverb);
     controls2.connectToBus(effectBus);
 
     controls2.delay.delayTime.value = 0.5;
@@ -57,7 +58,7 @@ function setup() {
     controls2.freqShifterLFO.min = -500;
     controls2.freqShifterLFO.max = 400;
 
-    controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, reverb);
+    controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, volNode3, reverb);
     controls3.connectToBus(effectBus);
 
     controls3.delay.delayTime.value = 0.5;
@@ -122,5 +123,10 @@ function draw() {
     controls2.checkForActivity();
     controls3.checkForActivity();
 
+    
+    
+
 }
+
+
 

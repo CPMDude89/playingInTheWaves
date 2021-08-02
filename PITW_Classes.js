@@ -48,9 +48,6 @@ class SamplerButton {
         this.button.position(Xpos, Ypos);   //  button placement on canvas
         this.button.size(butWd, butHt);     //  button size
         this.button.mousePressed(() => this.process()); //  what happens when button is clicked
-
-        //this.loop = new Tone.Loop((time) => this.playLoop(), 0.1);
-        
     }
 
     async process() {
@@ -503,6 +500,7 @@ class PlaygroundControls {
         parentButWd,    //  parent button width
         parentButHt,     //  parent button height 
         player,     //  parent player object
+        volOut,     //  parent player volume node
         verb   //  parent script reverb node
     ) {
         this.parentXpos = parentXpos;
@@ -510,6 +508,7 @@ class PlaygroundControls {
         this.parentButWd = parentButWd;
         this.parentButHt = parentButHt;
         this.player = player;
+        this.volOut = volOut;
         this.verb = verb;
 
         this.playerSignal = new SignalCircle(this.parentXpos + 0.65 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
@@ -518,7 +517,7 @@ class PlaygroundControls {
         this.delayButton = createButton('DELAY');
         this.delayButton.position(0.9 * parentXpos, parentYpos);
         this.delayButton.size(0.5 * parentButWd, parentButHt);
-        this.delayButton.mousePressed(() => {this.triggerDelay()});
+        this.delayButton.mousePressed(() => this.triggerDelay());
         this.delaySignal = new SignalCircle((0.9 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.delay = new Tone.FeedbackDelay({
@@ -532,7 +531,7 @@ class PlaygroundControls {
         this.ampModButton = createButton('AMP MOD');
         this.ampModButton.position(0.8 * parentXpos, parentYpos);
         this.ampModButton.size(0.5 * parentButWd, parentButHt);
-        this.ampModButton.mousePressed(() => {this.triggerAmpMod()});
+        this.ampModButton.mousePressed(() => this.triggerAmpMod());
         this.ampModSignal = new SignalCircle((0.8 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.ampModLFO = new Tone.LFO(15, -100, 0).connect(this.player.volume);
@@ -546,7 +545,7 @@ class PlaygroundControls {
         this.filterSweepButton = createButton('FILTER SWEEP');
         this.filterSweepButton.position(0.7 * parentXpos, parentYpos);
         this.filterSweepButton.size(0.5 * parentButWd, parentButHt);
-        this.filterSweepButton.mousePressed(() => {this.triggerFilterSweep()});
+        this.filterSweepButton.mousePressed(() => this.triggerFilterSweep());
         this.filterSweepSignal = new SignalCircle((0.7 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.filterSweep = new Tone.AutoFilter({
@@ -561,7 +560,7 @@ class PlaygroundControls {
         this.freqShifterButton = createButton('FREQ SHIFT');
         this.freqShifterButton.position(0.6 * parentXpos, parentYpos);
         this.freqShifterButton.size(0.5 * parentButWd, parentButHt);
-        this.freqShifterButton.mousePressed(() => {this.triggerFreqShifter()});
+        this.freqShifterButton.mousePressed(() => this.triggerFreqShifter());
         this.freqShifterSignal = new SignalCircle((0.6 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.freqShifter = new Tone.FrequencyShifter({
@@ -579,26 +578,39 @@ class PlaygroundControls {
         this.playbackRateButton = createButton('PLAYBACK RATE');
         this.playbackRateButton.position(0.5 * parentXpos, parentYpos);
         this.playbackRateButton.size(0.5 * parentButWd, parentButHt);
-        this.playbackRateButton.mousePressed(() => {this.triggerPlaybackRateLoop();});
+        this.playbackRateButton.mousePressed(() => this.triggerPlaybackRateLoop());
         this.playbackRateSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
         this.reverseButton.position(0.4 * parentXpos, parentYpos);
         this.reverseButton.size(0.5 * parentButWd, parentButHt);
-        this.reverseButton.mousePressed(() => {this.triggerReverse();});
+        this.reverseButton.mousePressed(() => this.triggerReverse());
         this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
+
+        this.pannerActive = false;
+        this.pannerButton = createButton('PANNER');
+        this.pannerButton.position(0.3 * parentXpos, parentYpos);
+        this.pannerButton.size(0.5 * parentButWd, parentButHt);
+        this.pannerButton.mousePressed(() => this.triggerPanner());
+        this.pannerSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
+
+        this.panner = new Tone.AutoPanner({
+            frequency: 3,
+            depth: 0.7
+        });
 
         this.reverbActive = false;
         this.reverbButton = createButton('REVERB');
-        this.reverbButton.position(0.3 * parentXpos, parentYpos);
+        this.reverbButton.position(0.2 * parentXpos, parentYpos);
         this.reverbButton.size(0.5 * parentButWd, parentButHt);
         this.reverbButton.mousePressed(() => this.triggerReverb());
-        this.reverbSignal = new SignalCircle((0.3 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
+        this.reverbSignal = new SignalCircle((0.2 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
     }
 
     connectToBus(_output) {
         this.delay.connect(_output);
+        this.panner.connect(_output);
         this.filterSweep.connect(_output);
         this.freqShifter.connect(_output);
     }
@@ -611,6 +623,7 @@ class PlaygroundControls {
         if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
         if (this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
         if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
+        if (this.pannerActive) {this.pannerSignal.drawActiveCircle();}
         if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
     }
     
@@ -765,6 +778,20 @@ class PlaygroundControls {
                     this.reverseLoop.stop();
                 }
             }, 0.01).start();
+        }
+    }
+
+    triggerPanner() {
+        this.pannerActive = this.pannerActive ? this.pannerActive = false : this.pannerActive = true;
+
+        if (this.pannerActive) {
+            this.panner.start();
+            this.player.connect(this.panner);
+            //this.player.disconnect(this.volOut)
+        }
+
+        else {
+            this.player.disconnect(this.panner);
         }
     }
 
