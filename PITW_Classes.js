@@ -42,6 +42,7 @@ class SamplerButton {
         }); //  Tone player object to handle playback
         
         this.state = 'ready';   //  string to keep track of recording process and playback
+        this.sampleLoaded = false;
 
         //  set up button
         this.button = createButton('RECORD');    //  p5 createButton()
@@ -81,6 +82,7 @@ class SamplerButton {
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
+            this.sampleLoaded = false;
             this.state = 'play';    //  change string to keep track of process
         }
 
@@ -92,7 +94,13 @@ class SamplerButton {
         }
 
         else if (this.state = 'stop') {
-            this.button.html('PLAY RECORDING');     //  change button text
+            if (this.sampleLoaded) {
+                this.button.html('PLAY SAMPLE');
+            }
+            else {
+                this.button.html('PLAY RECORDING');     //  change button text
+            }
+            
             this.state = 'play';    //  change string to keep track of process
 
             this.player.stop();     //  stop player
@@ -719,10 +727,10 @@ class PlaygroundControls {
         let curRate = this.player.playbackRate;
         
         if (this.playbackRateGoingDown) {
-            this.player.playbackRate -= 0.02;
+            this.player.playbackRate -= 0.01;
         }
         else {
-            this.player.playbackRate += 0.02;
+            this.player.playbackRate += 0.01;
         }
 
         if (curRate < 0.2) {
@@ -735,6 +743,9 @@ class PlaygroundControls {
 
     triggerReverse() {
         this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
+        if (this.playbackRateActive) {
+            this.playbackRateActive = false;
+        }
 
         if (this.reverseActive) {
             this.reverseLoop = new Tone.Loop((time) => {

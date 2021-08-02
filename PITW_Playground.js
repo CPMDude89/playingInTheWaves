@@ -3,6 +3,7 @@ let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * 
 let mic;
 let sampler1, sampler2, sampler3;
 let limiter, volNode1, volNode2, volNode3, effectBus;
+let longSample1
 let volSlider1, volSlider2, volSlider3;
 let reverb;
 let YDepth, XFreq;
@@ -20,6 +21,8 @@ function preload() {
 }
 
 function setup() {
+    frameRate(30);
+
     canv = createCanvas(w, h);
 
     mic = new Tone.UserMedia();
@@ -77,14 +80,39 @@ function setup() {
     controls3.freqShifterLFO.min = -500;
     controls3.freqShifterLFO.max = 600;
 
-    testButton = createButton('TEST');
-    testButton.position(0.1 * w, h);
-    testButton.size(recButWd, recButHt);
-    testButton.mousePressed(() => {
-        volNode1.connect(reverb);
-        volNode2.connect(reverb);
-        volNode3.connect(reverb);
-    });
+    shortSample1Button = createButton('SHORT SAMPLE 1');
+    shortSample1Button.position(recButX, (recButY) + 1.7 * recButHt);
+    shortSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
+    shortSample1Button.mousePressed(() => {
+        sampler1.player.load("./sounds/martina_3.wav");
+        sampler1.button.html('PLAY SAMPLE 1');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+
+    mediumSample1Button = createButton('MED SAMPLE 1');
+    mediumSample1Button.position(recButX, (2.25 * recButY) + 1.7 * recButHt);
+    mediumSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
+    mediumSample1Button.mousePressed(() => {
+        sampler2.player.load("./sounds/martina_2.wav");
+        sampler2.button.html('PLAY SAMPLE 1');
+        sampler2.sampleLoaded = true;
+        sampler2.showControls();
+        sampler2.state = 'play';
+    })
+
+    longSample1Button = createButton('LONG SAMPLE 1');
+    longSample1Button.position(recButX, (3.5 * recButY) + 1.7 * recButHt);
+    longSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
+    longSample1Button.mousePressed(() => {
+        sampler3.player.load("./sounds/martina_1.wav");
+        sampler3.button.html('PLAY SAMPLE 1');
+        sampler3.sampleLoaded = true;
+        sampler3.showControls();
+        sampler3.state = 'play';
+    })
+
 
     Tone.Transport.start();
 }
