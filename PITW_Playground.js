@@ -60,6 +60,9 @@ function setup() {
     controls2.freqShifterLFO.frequency.value = 0.05;
     controls2.freqShifterLFO.min = -500;
     controls2.freqShifterLFO.max = 400;
+    controls2.pannerFreqLFO.frequency.value = 0.1;
+    controls2.pannerFreqLFO.min = 0.5;
+    controls2.pannerFreqLFO.max = 3;
 
     controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, volNode3, reverb);
     controls3.connectToBus(effectBus);
@@ -79,6 +82,10 @@ function setup() {
     controls3.freqShifterLFO.frequency.value = 0.03;
     controls3.freqShifterLFO.min = -500;
     controls3.freqShifterLFO.max = 600;
+    controls3.pannerFreqLFO.frequency.value = 0.07;
+    controls3.pannerFreqLFO.min = 0.08;
+    controls3.pannerFreqLFO.max = 1;
+    controls3.panner.depth.value = 1;
 
     shortSample1Button = createButton('SHORT SAMPLE 1');
     shortSample1Button.position(recButX, (recButY) + 1.7 * recButHt);

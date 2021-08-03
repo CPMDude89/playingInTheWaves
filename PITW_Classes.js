@@ -557,12 +557,12 @@ class PlaygroundControls {
         this.filterSweepSignal = new SignalCircle((0.7 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.filterSweep = new Tone.AutoFilter({
-            frequency: 2,
+            frequency: 1.2,
             baseFrequency: 100,
-            depth: 1.0,
+            depth: 0.8,
             octaves: 4
         });
-        this.filterSweep.filter.Q.value = 10;
+        this.filterSweep.filter.Q.value = 6;
 
         this.freqShifterActive = false;
         this.freqShifterButton = createButton('FREQ SHIFT');
@@ -607,6 +607,8 @@ class PlaygroundControls {
             frequency: 3,
             depth: 0.7
         });
+
+        this.pannerFreqLFO = new Tone.LFO(0.3, 1, 8).connect(this.panner.frequency);
 
         this.reverbActive = false;
         this.reverbButton = createButton('REVERB');
@@ -796,12 +798,14 @@ class PlaygroundControls {
         this.pannerActive = this.pannerActive ? this.pannerActive = false : this.pannerActive = true;
 
         if (this.pannerActive) {
+            this.pannerFreqLFO.start();
             this.panner.start();
             this.player.connect(this.panner);
             //this.player.disconnect(this.volOut)
         }
 
         else {
+            this.pannerFreqLFO.stop();
             this.player.disconnect(this.panner);
         }
     }
