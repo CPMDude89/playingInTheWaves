@@ -155,7 +155,7 @@ function draw() {
         text('Delay time is: ' + lfoViz.getLFOPhase() + ' seconds long', 0.5 * w, 0.38 * h);
     }
 
-    if (samplerButton.loop.state == 'started' || sample1Active || sample2Active) {
+    if (samplerButton.player.state == 'started' || sample1Active || sample2Active) {
         fundScope.process();
     }
 }

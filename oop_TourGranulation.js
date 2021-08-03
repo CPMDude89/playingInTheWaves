@@ -37,6 +37,8 @@
 function setup() {
     canv = createCanvas(w, h);
 
+    frameRate(30);
+
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input
 
@@ -137,13 +139,17 @@ function setup() {
      // if there is an audio buffer to mess with and mouse is inside visualizer
     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1 && playActive) {    
         if (!slicerFreeze) {
-            slicer.process();     
-            slicer.drawLines();
+            slicer2.process();     
+            slicer2.drawLines();
+            //console.log("slicer 1: " + slicer.player.state);
+            //console.log("slicer 1 slice loop interval: " + slicer.slice.interval);
         }
 
         else if (slicerFreeze && changeSlice2) {
-            slicer2.process();
-            slicer2.drawLines();
+            slicer.process();
+            slicer.drawLines();
+            //console.log("slicer 2: " + slicer2.player.state);
+            console.log("slicer 2 slice loop interval: " + slicer.slice.interval);
         }
     }
 
@@ -204,6 +210,7 @@ function mouseClicked() {
     if (mouseX >= leftSide && mouseX <= rightSide && mouseY >= topSide && mouseY <= bottomSide && state > 1) {
         if (!playActive && !slicerFreeze) {
             slicer.slice.start();
+            //slicer.player.start();
             playActive = true;
         }
 

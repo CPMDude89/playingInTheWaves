@@ -268,7 +268,9 @@ class GranulationSlicer {
        this.vizWidth = vizWidth;
        this.lineColor = color(lineColorR, lineColorG, lineColorB);
 
-       this.player = new Tone.Player();
+       this.player = new Tone.Player({
+           loop: true
+       });
        this.slice = new Tone.Loop(() => this.playSlice(), 0.3);
 
        this.minOffset = 0.01;
@@ -310,6 +312,8 @@ class GranulationSlicer {
         if (this.startLine > (this.right - this.offsetPercentInPixels)) {  //  range control
             this.startLine = this.right - this.offsetPercentInPixels;
         }   
+
+        console.log(this.loopStartPoint);
     }
         //  draw slice lines on visualizer
         drawLines() {
