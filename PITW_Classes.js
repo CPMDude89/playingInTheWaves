@@ -37,6 +37,7 @@ class SamplerButton {
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
         this.player = new Tone.Player({
             volume: -3,
+            fadeIn: 0.1,
             fadeOut: 0.1,
             loop: true
         }); //  Tone player object to handle playback
@@ -166,19 +167,19 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
         this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
 
         this.playerForward = new Tone.Player({  //  create forwards running player
-            fadeIn: 0.2,
-            fadeOut: 0.2,
+            fadeIn: 0.1,
+            fadeOut: 0.1,
             reverse: false,
+            loop: true,
             volume: 0
         });
         this.playerBackward = new Tone.Player({ //  create backwards running player
             fadeIn: 0.2,
             fadeOut: 0.2,
             reverse: true,
+            loop: true,
             volume: -100
         });
-
-        this.loop = new Tone.Loop((time) => this.playLoop(), 0.1);
     }
 
     async process() {
@@ -194,13 +195,28 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
             this.playerForward.load(blob);      //  send audio blob to player, which will decode it to a ToneAudioBuffer https://tonejs.github.io/docs/14.7.77/Player#load
             this.playerBackward.load(blob);     //  same but load it to a reversed player
 
-            /*
-            setTimeout(() => this.loop = new Tone.Loop((time) => {
-                this.playerForward.start();
-                this.playerBackward.start();
-            }, (this.playerForward.buffer.length / this.playerForward.buffer.sampleRate)),
-            200);
-            */
+            setTimeout(() => {
+                let arrayForward = this.playerForward.buffer.getChannelData(0);
+                let arrayBackward = this.playerBackward.buffer.getChannelData(0);
+                let max = 8000;
+                
+                for (let i = 0; i < max; i++) {
+                    arrayForward[i] = arrayForward[i] * (i/max);
+                    arrayBackward[i] = arrayBackward[i] * (i/max);
+                    this.playerForward.buffer.getChannelData(0)[this.playerForward.buffer.getChannelData(0).length - (1 + i)] = this.playerForward.buffer.getChannelData(0)[this.playerForward.buffer.getChannelData(0).length - (1 + i)] * (i / max);
+                    this.playerBackward.buffer.getChannelData(0)[this.playerBackward.buffer.getChannelData(0).length - (1 + i)] = this.playerBackward.buffer.getChannelData(0)[this.playerBackward.buffer.getChannelData(0).length - (1 + i)] * (i / max);
+                }
+
+                arrayForward = this.playerForward.buffer.getChannelData(1);
+                arrayBackward = this.playerBackward.buffer.getChannelData(1);
+
+                for (let i = 0; i < max; i++) {
+                    arrayForward[i] = arrayForward[i] * (i/max);
+                    arrayBackward[i] = arrayBackward[i] * (i/max);
+                    this.playerForward.buffer.getChannelData(1)[this.playerForward.buffer.getChannelData(1).length - (1 + i)] = this.playerForward.buffer.getChannelData(1)[this.playerForward.buffer.getChannelData(1).length - (1 + i)] * (i / max);
+                    this.playerBackward.buffer.getChannelData(1)[this.playerBackward.buffer.getChannelData(1).length - (1 + i)] = this.playerBackward.buffer.getChannelData(1)[this.playerBackward.buffer.getChannelData(1).length - (1 + i)] * (i / max);
+                }
+            }, 300);
 
             this.button.html('PLAY RECORDING');     //  change button text
             this.showControls();    //  send to function to show start over button
@@ -211,35 +227,18 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
             this.button.html('STOP PLAYBACK');  //  change button text
             this.state = 'stop';    //  change string to keep track of process
             
-            this.loop.start();     //   start event loop 
+            this.playerForward.start();     //  stop player
+            this.playerBackward.start();     //  stop player
+
         }
 
         else if (this.state = 'stop') {
-            this.player.stop();     //  stop playback
             this.button.html('PLAY RECORDING');     //  change button text
             this.state = 'play';    //  change string to keep track of process
 
             this.playerForward.stop();     //  stop player
             this.playerBackward.stop();     //  stop player
-            this.loop.stop();       //  stop event loop
         }
-    }
-
-    playLoop(time) {
-        
-        if (this.playerForward.state == "stopped") {
-            this.playerForward.start();
-        }
-        /*
-        if (this.playerBackward.state == "stopped") {
-            this.playerBackward.start();
-        }
-        */
-        
-
-        //this.player.start();
-
-        //this.loop.interval = 1.001 * this.player.buffer.duration;
     }
 }
 //===================================================================================================================================================//
