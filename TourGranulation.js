@@ -22,7 +22,7 @@ let bottomSide = soundVizY + (0.5 * soundVizHt);
 let start, end, offset=0.2, startLine=0, endLine=0, lineOffset=0, offsetPercent=0, offsetPercentInPixels=0, maxOffset, minOffset=0.01;
 let playActive=false;
 let env;
-let linkBackward;
+let linkForward, linkBackward;
 let loopStartPoint, loopLength, clip;
 let limiter;
 let newBuffer, newFileButton;
@@ -58,6 +58,9 @@ function setup() {
     sample2Button.position(sampButX, 2.5 * sampButY);
     sample2Button.size(sampButWd, sampButHt);
     sample2Button.mousePressed(triggerSample2);
+
+    linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/PITW_Playground.html', 'ON TO THE PLAYGROUND!');
+    linkForward.position(0.8 * w, 0.05 * h);
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);

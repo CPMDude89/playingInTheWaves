@@ -7,6 +7,7 @@ let longSample1
 let volSlider1, volSlider2, volSlider3;
 let reverb;
 let YDepth, XFreq;
+let tourLink;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
@@ -120,6 +121,8 @@ function setup() {
         sampler3.state = 'play';
     })
 
+    tourLink = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'TAKE THE TOUR');
+    tourLink.position(0.05 * w, 0.05 * h);
 
     Tone.Transport.start();
 }
