@@ -171,28 +171,44 @@ function draw() {
 function mousePressed() {
     //  check if clicked on Track 1 Delay Signal Circle
     if ((dist(mouseX, mouseY, controls1.delaySignal.x_coordinate, controls1.delaySignal.y_coordinate) < 
-    (0.5 * controls1.delaySignal.diameter) && controls1.delayActive)) {
-        controls1.delayParamTrackActive = controls1.delayParamTrackActive ? controls1.delayParamTrackActive = false : controls1.delayParamTrackActive = true;
-        
-        if (controls1.delayParamTrackActive) {controls1.delayTimeLFO.stop();}
-        else {controls1.delayTimeLFO.start();}
-
+    (0.5 * controls1.delaySignal.diameter) && controls1.delayActive)) {        
+        if (!controls1.delayParamTrackActive) {
+            controls1.delayParamTrackActive = true;
+            controls1.delayTimeLFO.stop();
+        }
+        else if (controls1.delayParamTrackActive && !controls1.delayParamTrackActive_Y) {
+            controls1.delayParamTrackActive_Y = true;
+            
+        }
+        else if (controls1.delayParamTrackActive && controls1.delayParamTrackActive_Y) {
+            controls1.delayParamTrackActive = false;
+            controls1.delayParamTrackActive_Y = false;
+            controls1.delayTimeLFO.start();
+        }
         //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Amp Mod Signal Circle
     if ((dist(mouseX, mouseY, controls1.ampModSignal.x_coordinate, controls1.ampModSignal.y_coordinate) < 
     (0.5 * controls1.ampModSignal.diameter) && controls1.ampModActive)) {
-        controls1.ampModParamTrackActive = controls1.ampModParamTrackActive ? controls1.ampModParamTrackActive = false : controls1.ampModParamTrackActive = true;
+        //controls1.ampModParamTrackActive = controls1.ampModParamTrackActive ? controls1.ampModParamTrackActive = false : controls1.ampModParamTrackActive = true;
 
-        if (controls1.ampModParamTrackActive) {
+        if (!controls1.ampModParamTrackActive) {
+            controls1.ampModParamTrackActive = true;
+
             controls1.ampModLFO.stop();
             controls1.ampModLFO.phase = 90;
 
             controls1.ampModLFOParamTrack.start();
             controls1.ampModLFOParamTrack.amplitude.rampTo(1, 0.1);
         }
-        else {
+        else if (controls1.ampModParamTrackActive && !controls1.ampModParamTrackActive_Y) {
+            controls1.ampModParamTrackActive_Y = true;
+        }
+        else if (controls1.ampModParamTrackActive && controls1.ampModParamTrackActive_Y) {
+            controls1.ampModParamTrackActive = false;
+            controls1.ampModParamTrackActive_Y = false;
+            
             controls1.ampModLFOParamTrack.stop();
             controls1.ampModLFOParamTrack.phase = 90;
 

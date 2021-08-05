@@ -530,6 +530,7 @@ class PlaygroundControls {
 
         this.delayActive = false;
         this.delayParamTrackActive = false;
+        this.delayParamTrackActive_Y = false;
         this.delayButton = createButton('DELAY');
         this.delayButton.position(0.9 * parentXpos, parentYpos);
         this.delayButton.size(0.5 * parentButWd, parentButHt);
@@ -541,10 +542,11 @@ class PlaygroundControls {
             feedback: 0.7,
             wet: 0
         });
-        this.delayTimeLFO = new Tone.LFO(0.02, 0.05, 0.3).start().connect(this.delay.delayTime);
+        this.delayTimeLFO = new Tone.LFO(0.03, 0.05, 0.3).start().connect(this.delay.delayTime);
 
         this.ampModActive = false;
         this.ampModParamTrackActive = false;
+        this.ampModParamTrackActive_Y = false;
         this.ampModButton = createButton('AMP MOD');
         this.ampModButton.position(0.8 * parentXpos, parentYpos);
         this.ampModButton.size(0.5 * parentButWd, parentButHt);
@@ -566,6 +568,7 @@ class PlaygroundControls {
 
         this.filterSweepActive = false;
         this.filterSweepParamTrackActive = false;
+        this.filterSweepParamTrackActive_Y = false;
         this.filterSweepButton = createButton('FILTER SWEEP');
         this.filterSweepButton.position(0.7 * parentXpos, parentYpos);
         this.filterSweepButton.size(0.5 * parentButWd, parentButHt);
@@ -582,6 +585,7 @@ class PlaygroundControls {
 
         this.freqShifterActive = false;
         this.freqShifterParamTrackActive = false;
+        this.freqShifterParamTrackActive_Y = false;
         this.freqShifterButton = createButton('FREQ SHIFT');
         this.freqShifterButton.position(0.6 * parentXpos, parentYpos);
         this.freqShifterButton.size(0.5 * parentButWd, parentButHt);
@@ -608,6 +612,7 @@ class PlaygroundControls {
         this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
         this.playbackRateParamTrackActive = false;
+        this.playbackRateParamTrackActive_Y = false;
         this.playbackRateGoingDown = true;
         this.playbackRateButton = createButton('PLAYBACK RATE');
         this.playbackRateButton.position(0.5 * parentXpos, parentYpos);
@@ -624,6 +629,7 @@ class PlaygroundControls {
 
         this.pannerActive = false;
         this.pannerParamTrackActive = false;
+        this.pannerParamTrackActive_Y = false;
         this.pannerButton = createButton('PANNER');
         this.pannerButton.position(0.3 * parentXpos, parentYpos);
         this.pannerButton.size(0.5 * parentButWd, parentButHt);
@@ -661,44 +667,66 @@ class PlaygroundControls {
 
     checkForActivity() {
         if (this.player.state == 'started') {this.playerSignal.drawActiveCircle();}
-        if (this.delayActive) {this.delaySignal.drawActiveCircle();}
-        if (this.ampModActive) {this.ampModSignal.drawActiveCircle();}
-        if (this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
-        if (this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
-        if (this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
-        if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
-        if (this.pannerActive) {this.pannerSignal.drawActiveCircle();}
-        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
 
         if (this.delayParamTrackActive) {
-            var dt = map(mouseX, 0, w, 1, 0.005);
-            this.delay.delayTime.rampTo(dt, 0.3);
+            if (!this.delayParamTrackActive_Y) {
+                var dt = map(mouseX, 0, w, 1, 0.005);
+                this.delay.delayTime.rampTo(dt, 0.3);
+                this.delaySignal.drawLavenderCircle();
+            }
+            else {
+                var dt = map(mouseY, h, 0, 1, 0.005);
+                this.delay.delayTime.rampTo(dt, 0.3);
+                this.delaySignal.drawGoldCircle();
+            }
         }
+        else if (!this.delayParamTrackActive && this.delayActive) {this.delaySignal.drawActiveCircle();}
 
         if (this.ampModParamTrackActive) {
-            var am = map(mouseX, 0, w, 1, 200);
-            this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
+            if (!this.ampModParamTrackActive_Y) {
+                var am = map(mouseX, 0, w, 1, 200);
+                this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
+                this.ampModSignal.drawLavenderCircle();
+            }
+            else {
+                var am = map(mouseY, h, 0, 1, 200);
+                this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
+                this.ampModSignal.drawGoldCircle();
+            }
+            
         }
+        else if (!this.ampModParamTrackActive && this.ampModActive) {this.ampModSignal.drawActiveCircle();}
 
         if (this.filterSweepParamTrackActive) {
             var fs = map(mouseX, 0, w, 0.5, 30);
             this.filterSweep.frequency.rampTo(fs, 0.1);
+            this.filterSweepSignal.drawLavenderCircle();
         }
+        else if (!this.filterSweepParamTrackActive && this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
 
         if (this.freqShifterParamTrackActive) {
             var frs = map(mouseX, 0, w, 0, 500);
             this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
+            this.freqShifterSignal.drawLavenderCircle();
         }
+        else if (!this.freqShifterParamTrackActive && this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
 
         if (this.playbackRateParamTrackActive) {
             var pr = map(mouseX, 0, w, 0.0005, 0.08);
             this.playbackRateIncrement = pr;
+            this.playbackRateSignal.drawLavenderCircle();
         }
+        else if (!this.playbackRateParamTrackActive && this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
 
         if (this.pannerParamTrackActive) {
             var ap = map(mouseX, 0, w, 1, 40);
             this.pannerParamTrack.frequency.rampTo(ap, 0.2);
+            this.pannerSignal.drawLavenderCircle();
         }
+        else if (!this.pannerParamTrackActive && this.pannerActive) {this.pannerSignal.drawActiveCircle();}
+        
+        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
+        if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
     }
 
     checkParamTracks() {
@@ -727,7 +755,7 @@ class PlaygroundControls {
             this.player.disconnect(this.delay);
             if (this.delayParamTrack) {
                 this.delayTimeLFO.start();
-                this.delayParamTrack = false;
+                this.delayParamTrackActive = false;
             }
         }
     }
@@ -748,7 +776,7 @@ class PlaygroundControls {
             this.ampModLFO.stop("+0.1");
             this.ampModLFOParamTrack.stop();
             this.ampModLFOParamTrack.phase = 90;
-            this.ampModParamTrack = false;
+            this.ampModParamTrackActive = false;
 
         }
     }
@@ -807,6 +835,8 @@ class PlaygroundControls {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
+
+            this.playbackRateParamTrackActive = false;
         }
     }
 
@@ -900,6 +930,7 @@ class PlaygroundControls {
             this.pannerParamTrack.wet.rampTo(0, 0.1);
             this.pannerParamTrack.stop();
             //this.player.disconnect(this.pannerParamTrack);
+            this.pannerParamTrackActive = false;
         }
     }
 
@@ -942,8 +973,26 @@ class PlaygroundControls {
         circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
     }
 
-    drawInactiveCircle() {    //  if the effect is active
-        fill(255, 0, 0);    //  green
+    drawInactiveCircle() {    //  if the effect is inactive
+        fill(200, 0, 0);    //  red
+
+        circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
+    }    
+
+    drawRecordingCircle() {    //  if recording
+        fill(255, 0, 0);    //  red
+
+        circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
+    }
+
+    drawLavenderCircle() {    //  if the effect is active
+        fill(189, 127, 220);    //  lavender
+
+        circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
+    }
+
+    drawGoldCircle() {    //  if the effect is active
+        fill(214, 214, 31);    //  gold
 
         circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
     }
