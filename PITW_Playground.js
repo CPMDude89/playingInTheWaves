@@ -191,8 +191,6 @@ function mousePressed() {
     //  check if clicked on Track 1 Amp Mod Signal Circle
     if ((dist(mouseX, mouseY, controls1.ampModSignal.x_coordinate, controls1.ampModSignal.y_coordinate) < 
     (0.5 * controls1.ampModSignal.diameter) && controls1.ampModActive)) {
-        //controls1.ampModParamTrackActive = controls1.ampModParamTrackActive ? controls1.ampModParamTrackActive = false : controls1.ampModParamTrackActive = true;
-
         if (!controls1.ampModParamTrackActive) {
             controls1.ampModParamTrackActive = true;
 
@@ -221,41 +219,57 @@ function mousePressed() {
     //  check if clicked on Track 1 Filter Sweep Signal Circle
     if ((dist(mouseX, mouseY, controls1.filterSweepSignal.x_coordinate, controls1.filterSweepSignal.y_coordinate) < 
     (0.5 * controls1.filterSweepSignal.diameter) && controls1.filterSweepActive)) {
-        controls1.filterSweepParamTrackActive = controls1.filterSweepParamTrackActive ? controls1.filterSweepParamTrackActive = false : controls1.filterSweepParamTrackActive = true;
-        
-        if (!controls1.delayParamTrackActive) {
+        if (!controls1.filterSweepParamTrackActive) {
+            controls1.filterSweepParamTrackActive = true;
+        }
+        else if (controls1.filterSweepParamTrackActive && !controls1.filterSweepParamTrackActive_Y) {
+            controls1.filterSweepParamTrackActive_Y = true;
+        }
+        else if (controls1.filterSweepParamTrackActive && controls1.filterSweepParamTrackActive_Y) {
+            controls1.filterSweepParamTrackActive = false;
+            controls1.filterSweepParamTrackActive_Y = false;
+
             controls1.filterSweep.frequency.value = 1.2;
         }
-        //else {controls1.delayTimeLFO.start();}
-
+        
         //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Frequency Shifter Signal Circle
     if ((dist(mouseX, mouseY, controls1.freqShifterSignal.x_coordinate, controls1.freqShifterSignal.y_coordinate) < 
     (0.5 * controls1.freqShifterSignal.diameter) && controls1.freqShifterActive)) {
-        controls1.freqShifterParamTrackActive = controls1.freqShifterParamTrackActive ? controls1.freqShifterParamTrackActive = false : controls1.freqShifterParamTrackActive = true;
-        
-        if (controls1.freqShifterParamTrackActive) {
+        if (!controls1.freqShifterParamTrackActive) {
+            controls1.freqShifterParamTrackActive = true;
             controls1.freqShifter.wet.rampTo(0, 0.1);
             controls1.freqShifterParamTrack.wet.rampTo(1, 0.1);
-            
+        }
+        else if (controls1.freqShifterParamTrackActive && !controls1.freqShifterParamTrackActive_Y) {
+            controls1.freqShifterParamTrackActive_Y = true;
         }
 
-        else {
+        else if (controls1.freqShifterParamTrackActive && controls1.freqShifterParamTrackActive_Y) {
+            controls1.freqShifterParamTrackActive = false;
+            controls1.freqShifterParamTrackActive_Y = false;
+
             controls1.freqShifter.wet.rampTo(1, 0.1);
             controls1.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
-
         //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Playback Rate Signal Circle
     if ((dist(mouseX, mouseY, controls1.playbackRateSignal.x_coordinate, controls1.playbackRateSignal.y_coordinate) < 
-    (0.5 * controls1.playbackRateSignal.diameter) && controls1.playbackRateActive)) {
-        controls1.playbackRateParamTrackActive = controls1.playbackRateParamTrackActive ? controls1.playbackRateParamTrackActive = false : controls1.playbackRateParamTrackActive = true;
-        
+    (0.5 * controls1.playbackRateSignal.diameter) && controls1.playbackRateActive)) {        
         if (!controls1.playbackRateParamTrackActive) {
+            controls1.playbackRateParamTrackActive = true;
+        }
+        else if (controls1.playbackRateParamTrackActive && !controls1.playbackRateParamTrackActive_Y) {
+            controls1.playbackRateParamTrackActive_Y = true;
+        }
+        else if (controls1.playbackRateParamTrackActive && controls1.playbackRateParamTrackActive_Y) {
+            controls1.playbackRateParamTrackActive = false;
+            controls1.playbackRateParamTrackActive_Y = false;
+
             controls1.playbackRateIncrement = 0.01;
         }
 
@@ -265,9 +279,11 @@ function mousePressed() {
     //  check if clicked on Track 1 Auto Panner Signal Circle
     if ((dist(mouseX, mouseY, controls1.pannerSignal.x_coordinate, controls1.pannerSignal.y_coordinate) < 
     (0.5 * controls1.pannerSignal.diameter) && controls1.pannerActive)) {
-        controls1.pannerParamTrackActive = controls1.pannerParamTrackActive ? controls1.pannerParamTrackActive = false : controls1.pannerParamTrackActive = true;
+        //controls1.pannerParamTrackActive = controls1.pannerParamTrackActive ? controls1.pannerParamTrackActive = false : controls1.pannerParamTrackActive = true;
         
-        if (controls1.pannerParamTrackActive) {
+        if (!controls1.pannerParamTrackActive) {
+            controls1.pannerParamTrackActive = true;
+
             controls1.panner.wet.rampTo(0, 0.1);
             controls1.pannerFreqLFO.stop();
             controls1.panner.stop();
@@ -277,7 +293,13 @@ function mousePressed() {
             controls1.pannerParamTrack.start();
             controls1.pannerParamTrack.wet.rampTo(1, 0.1);
         }
-        else {
+        else if (controls1.pannerParamTrackActive && !controls1.pannerParamTrackActive_Y) {
+            controls1.pannerParamTrackActive_Y = true;
+        }
+        else if (controls1.pannerParamTrackActive && controls1.pannerParamTrackActive_Y) {
+            controls1.pannerParamTrackActive = false;
+            controls1.pannerParamTrackActive_Y = false;
+
             controls1.pannerParamTrack.wet.rampTo(0, 0.1);
             controls1.pannerParamTrack.stop();
             controls1.player.disconnect(controls1.pannerParamTrack);

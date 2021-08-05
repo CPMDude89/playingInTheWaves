@@ -693,35 +693,62 @@ class PlaygroundControls {
                 this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
                 this.ampModSignal.drawGoldCircle();
             }
-            
         }
         else if (!this.ampModParamTrackActive && this.ampModActive) {this.ampModSignal.drawActiveCircle();}
 
         if (this.filterSweepParamTrackActive) {
-            var fs = map(mouseX, 0, w, 0.5, 30);
-            this.filterSweep.frequency.rampTo(fs, 0.1);
-            this.filterSweepSignal.drawLavenderCircle();
+            if (!this.filterSweepParamTrackActive_Y) {
+                var fs = map(mouseX, 0, w, 0.5, 30);
+                this.filterSweep.frequency.rampTo(fs, 0.1);
+                this.filterSweepSignal.drawLavenderCircle();
+            }
+            else {
+                var fs = map(mouseY, h, 0, 0.5, 30);
+                this.filterSweep.frequency.rampTo(fs, 0.1);
+                this.filterSweepSignal.drawGoldCircle();
+            }
         }
         else if (!this.filterSweepParamTrackActive && this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
 
         if (this.freqShifterParamTrackActive) {
-            var frs = map(mouseX, 0, w, 0, 500);
-            this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
-            this.freqShifterSignal.drawLavenderCircle();
+            if (!this.freqShifterParamTrackActive_Y) {
+                var frs = map(mouseX, 0, w, 0, 500);
+                this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
+                this.freqShifterSignal.drawLavenderCircle();
+            }
+            else {
+                var frs = map(mouseY, h, 0, 0, 500);
+                this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
+                this.freqShifterSignal.drawGoldCircle();
+            }
         }
         else if (!this.freqShifterParamTrackActive && this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
 
         if (this.playbackRateParamTrackActive) {
-            var pr = map(mouseX, 0, w, 0.0005, 0.08);
-            this.playbackRateIncrement = pr;
-            this.playbackRateSignal.drawLavenderCircle();
+            if (!this.playbackRateParamTrackActive_Y) {
+                var pr = map(mouseX, 0, w, 0.0005, 0.08);
+                this.playbackRateIncrement = pr;
+                this.playbackRateSignal.drawLavenderCircle();
+            }
+            else {
+                var pr = map(mouseY, h, 0, 0.0005, 0.08);
+                this.playbackRateIncrement = pr;
+                this.playbackRateSignal.drawGoldCircle();
+            }
         }
         else if (!this.playbackRateParamTrackActive && this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
 
         if (this.pannerParamTrackActive) {
-            var ap = map(mouseX, 0, w, 1, 40);
-            this.pannerParamTrack.frequency.rampTo(ap, 0.2);
-            this.pannerSignal.drawLavenderCircle();
+            if (!this.pannerParamTrackActive_Y) {
+                var ap = map(mouseX, 0, w, 1, 40);
+                this.pannerParamTrack.frequency.rampTo(ap, 0.2);
+                this.pannerSignal.drawLavenderCircle();
+            }
+            else {
+                var ap = map(mouseY, h, 0, 1, 40);
+                this.pannerParamTrack.frequency.rampTo(ap, 0.2);
+                this.pannerSignal.drawGoldCircle();
+            }
         }
         else if (!this.pannerParamTrackActive && this.pannerActive) {this.pannerSignal.drawActiveCircle();}
         
@@ -756,6 +783,7 @@ class PlaygroundControls {
             if (this.delayParamTrack) {
                 this.delayTimeLFO.start();
                 this.delayParamTrackActive = false;
+                this.delayParamTrackActive_Y = false;
             }
         }
     }
@@ -777,7 +805,7 @@ class PlaygroundControls {
             this.ampModLFOParamTrack.stop();
             this.ampModLFOParamTrack.phase = 90;
             this.ampModParamTrackActive = false;
-
+            this.ampModParamTrackActive_Y = false;
         }
     }
 
@@ -793,6 +821,7 @@ class PlaygroundControls {
             this.player.disconnect(this.filterSweep);
 
             this.filterSweepParamTrackActive = false;
+            this.filterSweepParamTrackActive_Y = false;
             this.filterSweep.frequency.value = this.filterSweepFreq;
 
             this.filterSweep.stop();
@@ -813,6 +842,7 @@ class PlaygroundControls {
             this.player.disconnect(this.freqShifter);
             this.freqShifterParamTrack.wet.rampTo(0, 0.1);
             this.freqShifterParamTrackActive = false;
+            this.freqShifterParamTrackActive_Y = false;
         }
     }
 
@@ -826,17 +856,18 @@ class PlaygroundControls {
             this.playbackRateLoop.stop();
             this.playbackRateToNormal = new Tone.Loop(((time) => {
                 if (this.player.playbackRate < 1) {
-                    this.player.playbackRate += 0.02
+                    this.player.playbackRate += 0.01
                 }
                 else if (this.player.playbackRate > 1) {
-                    this.player.playbackRate -= 0.02
+                    this.player.playbackRate -= 0.01
                 }
-                if (this.player.playbackRate < 1.001 && this.player.playbackRate > 99.99) {
+                if (this.player.playbackRate < 1.0001 && this.player.playbackRate > 99.999) {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
 
             this.playbackRateParamTrackActive = false;
+            this.playbackRateParamTrackActive_Y = false;
         }
     }
 
@@ -931,6 +962,7 @@ class PlaygroundControls {
             this.pannerParamTrack.stop();
             //this.player.disconnect(this.pannerParamTrack);
             this.pannerParamTrackActive = false;
+            this.pannerParamTrackActive_Y = false;
         }
     }
 
