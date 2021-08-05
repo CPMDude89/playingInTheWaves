@@ -512,7 +512,8 @@ class PlaygroundControls {
         parentButHt,     //  parent button height 
         player,     //  parent player object
         volOut,     //  parent player volume node
-        verb   //  parent script reverb node
+        verb,   //  parent script reverb node
+        filterSweepFreq     //  Auto Filter Frequency. This is needed for easy control when using Param Track
     ) {
         this.parentXpos = parentXpos;
         this.parentYpos = parentYpos;
@@ -521,10 +522,14 @@ class PlaygroundControls {
         this.player = player;
         this.volOut = volOut;
         this.verb = verb;
+        this.filterSweepFreq = filterSweepFreq;
 
         this.playerSignal = new SignalCircle(this.parentXpos + 0.65 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
+        this.paramTrackActive = false;
+
         this.delayActive = false;
+        this.delayParamTrackActive = false;
         this.delayButton = createButton('DELAY');
         this.delayButton.position(0.9 * parentXpos, parentYpos);
         this.delayButton.size(0.5 * parentButWd, parentButHt);
@@ -539,20 +544,28 @@ class PlaygroundControls {
         this.delayTimeLFO = new Tone.LFO(0.02, 0.05, 0.3).start().connect(this.delay.delayTime);
 
         this.ampModActive = false;
+        this.ampModParamTrackActive = false;
         this.ampModButton = createButton('AMP MOD');
         this.ampModButton.position(0.8 * parentXpos, parentYpos);
         this.ampModButton.size(0.5 * parentButWd, parentButHt);
         this.ampModButton.mousePressed(() => this.triggerAmpMod());
         this.ampModSignal = new SignalCircle((0.8 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
-        this.ampModLFO = new Tone.LFO(15, -100, 0).connect(this.player.volume);
+        this.ampModLFO = new Tone.LFO(1, -100, 0).connect(this.player.volume);
         this.ampModLFO.set({
             amplitude: 0,
             phase: 90
         });
         this.ampModLFOModulator = new Tone.LFO(0.1, 0.4, 40).start().connect(this.ampModLFO.frequency);
 
+        this.ampModLFOParamTrack = new Tone.LFO(1, -100, 0).connect(this.player.volume);
+        this.ampModLFOParamTrack.set({
+            amplitude: 0,
+            phase: 90
+        });
+
         this.filterSweepActive = false;
+        this.filterSweepParamTrackActive = false;
         this.filterSweepButton = createButton('FILTER SWEEP');
         this.filterSweepButton.position(0.7 * parentXpos, parentYpos);
         this.filterSweepButton.size(0.5 * parentButWd, parentButHt);
@@ -560,7 +573,7 @@ class PlaygroundControls {
         this.filterSweepSignal = new SignalCircle((0.7 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
         this.filterSweep = new Tone.AutoFilter({
-            frequency: 1.2,
+            frequency: this.filterSweepFreq,
             baseFrequency: 100,
             depth: 0.8,
             octaves: 4
@@ -568,6 +581,7 @@ class PlaygroundControls {
         this.filterSweep.filter.Q.value = 6;
 
         this.freqShifterActive = false;
+        this.freqShifterParamTrackActive = false;
         this.freqShifterButton = createButton('FREQ SHIFT');
         this.freqShifterButton.position(0.6 * parentXpos, parentYpos);
         this.freqShifterButton.size(0.5 * parentButWd, parentButHt);
@@ -577,14 +591,23 @@ class PlaygroundControls {
         this.freqShifter = new Tone.FrequencyShifter({
             frequency: 0
         });
+
         this.freqShifterLFO = new Tone.LFO(0.5, -300, 200).connect(this.freqShifter.frequency);
         this.freqShifterLFO.set({
             phase: 90,
             wet: 0
         });
 
+        this.freqShifterParamTrack = new Tone.FrequencyShifter({
+            frequency: 100,
+            wet: 0
+        });
+        this.player.connect(this.freqShifterParamTrack);
+
+        this.playbackRateIncrement = 0.01;
         this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
+        this.playbackRateParamTrackActive = false;
         this.playbackRateGoingDown = true;
         this.playbackRateButton = createButton('PLAYBACK RATE');
         this.playbackRateButton.position(0.5 * parentXpos, parentYpos);
@@ -600,6 +623,7 @@ class PlaygroundControls {
         this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
         this.pannerActive = false;
+        this.pannerParamTrackActive = false;
         this.pannerButton = createButton('PANNER');
         this.pannerButton.position(0.3 * parentXpos, parentYpos);
         this.pannerButton.size(0.5 * parentButWd, parentButHt);
@@ -613,6 +637,11 @@ class PlaygroundControls {
 
         this.pannerFreqLFO = new Tone.LFO(0.3, 1, 8).connect(this.panner.frequency);
 
+        this.pannerParamTrack = new Tone.AutoPanner({
+            frequency: 1,
+            depth: 1
+        });
+
         this.reverbActive = false;
         this.reverbButton = createButton('REVERB');
         this.reverbButton.position(0.2 * parentXpos, parentYpos);
@@ -623,9 +652,11 @@ class PlaygroundControls {
 
     connectToBus(_output) {
         this.delay.connect(_output);
-        this.panner.connect(_output);
         this.filterSweep.connect(_output);
         this.freqShifter.connect(_output);
+        this.freqShifterParamTrack.connect(_output);
+        this.panner.connect(_output);
+        this.pannerParamTrack.connect(_output);
     }
 
     checkForActivity() {
@@ -638,6 +669,48 @@ class PlaygroundControls {
         if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
         if (this.pannerActive) {this.pannerSignal.drawActiveCircle();}
         if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
+
+        if (this.delayParamTrackActive) {
+            var dt = map(mouseX, 0, w, 1, 0.005);
+            this.delay.delayTime.rampTo(dt, 0.3);
+        }
+
+        if (this.ampModParamTrackActive) {
+            var am = map(mouseX, 0, w, 1, 200);
+            this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
+        }
+
+        if (this.filterSweepParamTrackActive) {
+            var fs = map(mouseX, 0, w, 0.5, 30);
+            this.filterSweep.frequency.rampTo(fs, 0.1);
+        }
+
+        if (this.freqShifterParamTrackActive) {
+            var frs = map(mouseX, 0, w, 0, 500);
+            this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
+        }
+
+        if (this.playbackRateParamTrackActive) {
+            var pr = map(mouseX, 0, w, 0.0005, 0.08);
+            this.playbackRateIncrement = pr;
+        }
+
+        if (this.pannerParamTrackActive) {
+            var ap = map(mouseX, 0, w, 1, 40);
+            this.pannerParamTrack.frequency.rampTo(ap, 0.2);
+        }
+    }
+
+    checkParamTracks() {
+        var check = 0;
+
+        if (this.delayParamTrackActive) {check++;}
+        if (this.ampModParamTrackActive) {check++;}
+
+        if (check > 0) {this.paramTrackActive = true;}
+        else {this.paramTrackActive = false;}
+
+        //console.log(this.paramTrackActive);
     }
     
     triggerDelay() {
@@ -652,6 +725,10 @@ class PlaygroundControls {
         else {
             this.delay.wet.rampTo(0, 0.1);
             this.player.disconnect(this.delay);
+            if (this.delayParamTrack) {
+                this.delayTimeLFO.start();
+                this.delayParamTrack = false;
+            }
         }
     }
 
@@ -669,6 +746,10 @@ class PlaygroundControls {
             this.ampModLFO.amplitude.rampTo(0, 0.1);
             this.player.volume.rampTo(0, 0.1);
             this.ampModLFO.stop("+0.1");
+            this.ampModLFOParamTrack.stop();
+            this.ampModLFOParamTrack.phase = 90;
+            this.ampModParamTrack = false;
+
         }
     }
 
@@ -682,6 +763,10 @@ class PlaygroundControls {
 
         else {
             this.player.disconnect(this.filterSweep);
+
+            this.filterSweepParamTrackActive = false;
+            this.filterSweep.frequency.value = this.filterSweepFreq;
+
             this.filterSweep.stop();
         }
     }
@@ -698,6 +783,8 @@ class PlaygroundControls {
         else {
             this.freqShifter.wet.rampTo(0, 0.1);
             this.player.disconnect(this.freqShifter);
+            this.freqShifterParamTrack.wet.rampTo(0, 0.1);
+            this.freqShifterParamTrackActive = false;
         }
     }
 
@@ -705,8 +792,6 @@ class PlaygroundControls {
         this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
 
         if (this.playbackRateActive) {
-            //this.player.fadeIn = 1;
-            //this.player.fadeOut = 1;
             this.playbackRateLoop.start();
         }
         else {
@@ -722,9 +807,6 @@ class PlaygroundControls {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
-
-            //this.player.fadeIn = 0.2;
-            //this.player.fadeOut = 0.2;
         }
     }
 
@@ -732,16 +814,18 @@ class PlaygroundControls {
         let curRate = this.player.playbackRate;
         
         if (this.playbackRateGoingDown) {
-            this.player.playbackRate -= 0.01;
+            //this.player.playbackRate -= 0.01;
+            this.player.playbackRate -= this.playbackRateIncrement;
         }
         else {
-            this.player.playbackRate += 0.01;
+            //this.player.playbackRate += 0.01;
+            this.player.playbackRate += this.playbackRateIncrement;
         }
 
-        if (curRate < 0.2) {
+        if (curRate < 0.15) {
             this.playbackRateGoingDown = false;
         }        
-        else if (curRate > 2) {
+        else if (curRate > 1.6) {
             this.playbackRateGoingDown = true;
         }
     }
@@ -804,12 +888,18 @@ class PlaygroundControls {
             this.pannerFreqLFO.start();
             this.panner.start();
             this.player.connect(this.panner);
-            //this.player.disconnect(this.volOut)
         }
 
         else {
             this.pannerFreqLFO.stop();
-            this.player.disconnect(this.panner);
+            this.panner.wet.rampTo(1, 0.1);
+            //this.player.disconnect(this.panner);
+            this.panner.stop();
+            
+            this.pannerParamTrackActive = false;
+            this.pannerParamTrack.wet.rampTo(0, 0.1);
+            this.pannerParamTrack.stop();
+            //this.player.disconnect(this.pannerParamTrack);
         }
     }
 
@@ -823,7 +913,6 @@ class PlaygroundControls {
         else {
             this.player.disconnect(this.verb);
         }
-        
     }
 }
 
@@ -840,22 +929,24 @@ class PlaygroundControls {
     constructor(
         x_coordinate,
         y_coordinate,
-        radius
+        diameter
     ) {
         this.x_coordinate = x_coordinate;
         this.y_coordinate = y_coordinate;
-        this.radius = radius;
+        this.diameter = diameter;
     }
 
     drawActiveCircle() {    //  if the effect is active
         fill(0, 0, 255);    //  green
 
-        circle(this.x_coordinate, this.y_coordinate, this.radius);  //  draw circle
+        circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
     }
 
     drawInactiveCircle() {    //  if the effect is active
         fill(255, 0, 0);    //  green
 
-        circle(this.x_coordinate, this.y_coordinate, this.radius);  //  draw circle
+        circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
     }
+
+ 
 }
