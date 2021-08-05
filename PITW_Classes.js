@@ -609,7 +609,7 @@ class PlaygroundControls {
         this.player.connect(this.freqShifterParamTrack);
 
         this.playbackRateIncrement = 0.01;
-        this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
+        //this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
         this.playbackRateParamTrackActive = false;
         this.playbackRateParamTrackActive_Y = false;
@@ -726,12 +726,12 @@ class PlaygroundControls {
 
         if (this.playbackRateParamTrackActive) {
             if (!this.playbackRateParamTrackActive_Y) {
-                var pr = map(mouseX, 0, w, 0.0005, 0.08);
+                var pr = map(mouseX, 0, w, 0.0001, 0.05);
                 this.playbackRateIncrement = pr;
                 this.playbackRateSignal.drawLavenderCircle();
             }
             else {
-                var pr = map(mouseY, h, 0, 0.0005, 0.08);
+                var pr = map(mouseY, h, 0, 0.0001, 0.05);
                 this.playbackRateIncrement = pr;
                 this.playbackRateSignal.drawGoldCircle();
             }
@@ -780,11 +780,11 @@ class PlaygroundControls {
         else {
             this.delay.wet.rampTo(0, 0.1);
             this.player.disconnect(this.delay);
-            if (this.delayParamTrack) {
-                this.delayTimeLFO.start();
-                this.delayParamTrackActive = false;
-                this.delayParamTrackActive_Y = false;
-            }
+
+            this.delayTimeLFO.start();
+            this.delayParamTrackActive = false;
+            this.delayParamTrackActive_Y = false;
+
         }
     }
 
@@ -850,10 +850,12 @@ class PlaygroundControls {
         this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
 
         if (this.playbackRateActive) {
+            this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
             this.playbackRateLoop.start();
         }
         else {
             this.playbackRateLoop.stop();
+            /*
             this.playbackRateToNormal = new Tone.Loop(((time) => {
                 if (this.player.playbackRate < 1) {
                     this.player.playbackRate += 0.01
@@ -865,14 +867,22 @@ class PlaygroundControls {
                     this.playbackRateToNormal.stop();
                 }
             }), 0.02).start();
+            */
 
+            this.playbackRateLoop.stop();
             this.playbackRateParamTrackActive = false;
             this.playbackRateParamTrackActive_Y = false;
+            this.playbackRateGoingDown = true;
+
+            Tone.Transport.schedule((time) => {
+                //this.playbackRateToNormal.stop();
+                this.player.playbackRate = 1;
+            })
         }
     }
 
     playbackRateLFO() {
-        let curRate = this.player.playbackRate;
+        var curRate = this.player.playbackRate;
         
         if (this.playbackRateGoingDown) {
             //this.player.playbackRate -= 0.01;
@@ -883,7 +893,7 @@ class PlaygroundControls {
             this.player.playbackRate += this.playbackRateIncrement;
         }
 
-        if (curRate < 0.15) {
+        if (curRate < 0.18) {
             this.playbackRateGoingDown = false;
         }        
         else if (curRate > 1.6) {
