@@ -14,6 +14,7 @@ let shifter;
 let sample1Button, sample1Active=false, sample2Button, sample2Active=false;
 let seekLoop;
 let linkForward;
+let pageRecorder, pageRecButX = w * 0.9, pageRecButY = 0.85 * h, pageRecButWd=0.65 * recButWd;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
@@ -76,7 +77,9 @@ function setup() {
     linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
     
-
+    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
+    volNode.connect(pageRecorder.recorder);
+    pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 
     Tone.Transport.start();
 }
@@ -109,6 +112,10 @@ function draw() {
     if (sample2Forward.state == 'started') {
         fill(0, 0, 255);    //  blue
         circle((recButX + (0.5 * recButWd)), 4.7 * recButY, 0.4 * recButHt);
+    }
+
+    if (pageRecorder.state == 'recording') {
+        pageRecorderSignal.drawRecordingCircle();
     }
     
     scope.process();    //  draw oscilloscope

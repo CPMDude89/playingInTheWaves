@@ -23,6 +23,7 @@ let sample1, sample1Active=false, sample2, sample2Active=false;
 let loop, transport;
 let linkForward, linkBackward;
 let scopeTypeButton;
+let pageRecorder, pageRecButX = w * 0.93, pageRecButY = soundVizY + (0.5 * soundVizHt) - recButHt, pageRecButWd=0.5 * recButWd;
 
 function preload() {
     limiter = new Tone.Limiter(0).toDestination();
@@ -96,6 +97,10 @@ function setup() {
     linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
 
+    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
+    limiter.connect(pageRecorder.recorder);
+    pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
+
     Tone.Transport.start();     //  start Tone.Transport to set up events
 }
 
@@ -126,6 +131,10 @@ function draw() {
     if (sample2Active) {    //  signal light for stock sample 2
         fill(0, 0, 255);    //  blue
         circle(((samp2ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (pageRecorder.state == 'recording') {
+        pageRecorderSignal.drawRecordingCircle();
     }
 
     if (testToneActive) {   //  signal light for test tone

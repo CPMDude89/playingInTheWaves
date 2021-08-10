@@ -1,6 +1,6 @@
 let w=window.innerWidth, h=window.innerHeight;
 let recButX = w * 0.7, recButY = 0.2 * h, recButWd = 0.1 * w, recButHt = 0.08 * h;
-let pageRecButX = w * 0.86, pageRecButY = 0.08 * h;
+let pageRecButX = w * 0.86, pageRecButY = 0.08 * h, pageRecButWd=0.65 * recButWd;
 let mic;
 let sampler1, sampler2, sampler3;
 let controls1, controls2, controls3;
@@ -132,7 +132,7 @@ function setup() {
     tourLink = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'TAKE THE TOUR');
     tourLink.position(0.05 * w, 0.05 * h);
 
-    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, 0.65 * recButWd, recButHt);
+    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     limiter.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + 0.5*(0.65 * recButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 

@@ -22,6 +22,7 @@ let fundWave, delayWave;
 let limiter, sample1, sample1Active=false, sample2, sample2Active=false, sample1Button, sample2Button;
 let samplerButton;
 let linkForward, linkBackward;
+let pageRecorder, pageRecButX = w * 0.9, pageRecButY = 0.85 * h, pageRecButWd=0.65 * recButWd;
 
 
 function preload() {
@@ -107,6 +108,10 @@ function setup() {
     linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourGranulation.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
 
+    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
+    limiter.connect(pageRecorder.recorder);
+    pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
+
     Tone.Transport.start();
 }
 
@@ -143,6 +148,10 @@ function draw() {
     if (sample2Active) {
         fill(0, 0, 255);    //  blue
         circle(((0.32 * w) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    }
+
+    if (pageRecorder.state == 'recording') {
+        pageRecorderSignal.drawRecordingCircle();
     }
 
     if (delayTimeLFOActive) {

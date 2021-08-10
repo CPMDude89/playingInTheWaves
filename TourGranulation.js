@@ -27,6 +27,7 @@ let loopStartPoint, loopLength, clip;
 let limiter;
 let newBuffer, newFileButton;
 let sample1Active=false, sample2Active=false;
+let pageRecorder, pageRecButX = w * 0.9, pageRecButY = 0.85 * h, pageRecButWd=0.65 * recButWd;
 
 function preload() {
     volNode = new Tone.Volume().toDestination();
@@ -67,6 +68,10 @@ function setup() {
 
     clip = new Tone.Loop(playclip, 0.3);    //  this is the loop to time granulation
 
+    pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
+    volNode.connect(pageRecorder.recorder);
+    pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
+
     Tone.Transport.start();     //  start Tone.js timing architecture
 }
 
@@ -92,6 +97,10 @@ function draw() {
     if (sample2Active) {
         fill(0, 0, 255);
         circle(sampButX + (0.5 * sampButWd), 2.5 * sampButY - (0.4 * sampButHt), 0.4 * recButHt);
+    }
+
+    if (pageRecorder.state == 'recording') {
+        pageRecorderSignal.drawRecordingCircle();
     }
     
 
