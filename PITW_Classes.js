@@ -244,6 +244,57 @@ class ForwardsAndBackwardsSamplerButton extends SamplerButton {
 //===================================================================================================================================================//
 //===================================================================================================================================================//
 /**
+ * Designed to record the audio ouput from the page,
+ * so users can record their amazing sound designs
+ */
+class PageRecorder {
+    constructor(
+        Xpos,   //  x-axis coordinate
+        Ypos,   //  y-axis coordinate
+        butWd,  //  button width
+        butHt  //  button height
+    ) {
+        this.Xpos = Xpos;
+        this.Ypos = Ypos;
+        this.butWd = butWd;
+        this.butHt = butHt;
+
+        this.recorder = new Tone.Recorder();  //  Tone recorder object to handle user recording
+
+        this.state = 'ready';
+
+        this.button = createButton('RECORD PAGE OUTPUT');    //  p5 createButton()
+        this.button.position(Xpos, Ypos);   //  button placement on canvas
+        this.button.size(butWd, butHt);     //  button size
+        this.button.mousePressed(() => this.process()); //  what happens when button is clicked
+    }
+
+    async process() {
+        if (this.state == 'ready') {
+            this.recorder.start();
+            this.button.html('STOP RECORDING');     //  change button text
+            this.state = 'recording';   //  change string to keep track of process
+        }
+
+        else if (this.state == 'recording') {
+            var data = await this.recorder.stop();  //  receive audio data as a promise encoded as 'mimeType' https://tonejs.github.io/docs/14.7.77/Recorder#stop
+            var blob = URL.createObjectURL(data);   //  store audio data as a blob, which sends a package back to the server for use
+
+            var anchor = document.createElement("a");
+	        anchor.download = "recording.webm";
+	        anchor.href = blob;
+	        anchor.click();
+
+            this.button.html('RECORD PAGE OUTPUT');     //  change button text
+            this.state = 'ready';
+        }
+    }
+}
+
+
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+/**
  * GranulationSamplerButton will extend SamplerButton base class
  * 
  * Will get constant data in from p5.js draw() loop to adjust loop length.
