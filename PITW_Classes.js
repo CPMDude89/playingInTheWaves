@@ -580,6 +580,9 @@ class PlaygroundControls {
         this.paramTrackActive = false;
 
         this.delayActive = false;
+        this.delayFrozen = false;
+        this.delayFrozenX = 0;
+        this.delayFrozenY = 0;
         this.delayParamTrackActive = false;
         this.delayParamTrackActive_Y = false;
         this.delayButton = createButton('DELAY');
@@ -596,6 +599,9 @@ class PlaygroundControls {
         this.delayTimeLFO = new Tone.LFO(0.03, 0.05, 0.3).start().connect(this.delay.delayTime);
 
         this.ampModActive = false;
+        this.ampModFrozen = false;
+        this.ampModFrozenX = 0;
+        this.ampModFrozenY = 0;
         this.ampModParamTrackActive = false;
         this.ampModParamTrackActive_Y = false;
         this.ampModButton = createButton('AMP MOD');
@@ -618,6 +624,9 @@ class PlaygroundControls {
         });
 
         this.filterSweepActive = false;
+        this.filterSweepFrozen = false;
+        this.filterSweepFrozenX = 0;
+        this.filterSweepFrozenY = 0;
         this.filterSweepParamTrackActive = false;
         this.filterSweepParamTrackActive_Y = false;
         this.filterSweepButton = createButton('FILTER SWEEP');
@@ -635,6 +644,9 @@ class PlaygroundControls {
         this.filterSweep.filter.Q.value = 6;
 
         this.freqShifterActive = false;
+        this.freqShifterFrozen = false;
+        this.freqShifterFrozenX = 0;
+        this.freqShifterFrozenY = 0;
         this.freqShifterParamTrackActive = false;
         this.freqShifterParamTrackActive_Y = false;
         this.freqShifterButton = createButton('FREQ SHIFT');
@@ -660,8 +672,10 @@ class PlaygroundControls {
         this.player.connect(this.freqShifterParamTrack);
 
         this.playbackRateIncrement = 0.01;
-        //this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
         this.playbackRateActive = false;
+        this.playbackRateFrozen = false;
+        this.playbackRateFrozenX = 0;
+        this.playbackRateFrozenY = 0;
         this.playbackRateParamTrackActive = false;
         this.playbackRateParamTrackActive_Y = false;
         this.playbackRateGoingDown = true;
@@ -679,6 +693,9 @@ class PlaygroundControls {
         this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
         this.pannerActive = false;
+        this.pannerFrozen = false;
+        this.pannerFrozenX = 0;
+        this.pannerFrozenY = 0;
         this.pannerParamTrackActive = false;
         this.pannerParamTrackActive_Y = false;
         this.pannerButton = createButton('PANNER');
@@ -717,94 +734,380 @@ class PlaygroundControls {
     }
 
     checkForActivity() {
-        if (this.player.state == 'started') {this.playerSignal.drawActiveCircle();}
-
+        if (this.player.state == 'started') {
+            noStroke();
+            this.playerSignal.drawActiveCircle();
+        }
+        // -------- DELAY -------- //
         if (this.delayParamTrackActive) {
-            if (!this.delayParamTrackActive_Y) {
-                var dt = map(mouseX, 0, w, 1, 0.005);
-                this.delay.delayTime.rampTo(dt, 0.3);
-                this.delaySignal.drawLavenderCircle();
-            }
-            else {
-                var dt = map(mouseY, h, 0, 1, 0.005);
-                this.delay.delayTime.rampTo(dt, 0.3);
-                this.delaySignal.drawGoldCircle();
-            }
-        }
-        else if (!this.delayParamTrackActive && this.delayActive) {this.delaySignal.drawActiveCircle();}
+            if (!this.delayParamTrackActive_Y) {    //  X-axis control on
+                if (this.delayFrozen) {     //  if delay track HAS been frozen with X-axis control on
+                    noStroke();
+                    this.delaySignal.drawLavenderCircle();
 
-        if (this.ampModParamTrackActive) {
-            if (!this.ampModParamTrackActive_Y) {
-                var am = map(mouseX, 0, w, 1, 200);
-                this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
-                this.ampModSignal.drawLavenderCircle();
-            }
-            else {
-                var am = map(mouseY, h, 0, 1, 200);
-                this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);
-                this.ampModSignal.drawGoldCircle();
-            }
-        }
-        else if (!this.ampModParamTrackActive && this.ampModActive) {this.ampModSignal.drawActiveCircle();}
+                    stroke(189, 127, 220);      //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.delaySignal.x_coordinate, this.delaySignal.y_coordinate, this.delayFrozenX, this.delayFrozenY);
 
-        if (this.filterSweepParamTrackActive) {
-            if (!this.filterSweepParamTrackActive_Y) {
-                var fs = map(mouseX, 0, w, 0.5, 30);
-                this.filterSweep.frequency.rampTo(fs, 0.1);
-                this.filterSweepSignal.drawLavenderCircle();
-            }
-            else {
-                var fs = map(mouseY, h, 0, 0.5, 30);
-                this.filterSweep.frequency.rampTo(fs, 0.1);
-                this.filterSweepSignal.drawGoldCircle();
-            }
-        }
-        else if (!this.filterSweepParamTrackActive && this.filterSweepActive) {this.filterSweepSignal.drawActiveCircle();}
+                    fill(189, 127, 220);        //  draw circle to show where end of line is
+                    noStroke();
+                    circle(this.delayFrozenX, this.delayFrozenY, 0.3 * this.parentButHt);
+                }
 
-        if (this.freqShifterParamTrackActive) {
-            if (!this.freqShifterParamTrackActive_Y) {
-                var frs = map(mouseX, 0, w, 0, 500);
-                this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
-                this.freqShifterSignal.drawLavenderCircle();
-            }
-            else {
-                var frs = map(mouseY, h, 0, 0, 500);
-                this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);
-                this.freqShifterSignal.drawGoldCircle();
-            }
-        }
-        else if (!this.freqShifterParamTrackActive && this.freqShifterActive) {this.freqShifterSignal.drawActiveCircle();}
+                else {      //  if delay track has not been frozen, track mouse x-axis and apply effect param
+                    var dt = map(mouseX, 0, w, 1, 0.005);
+                    if (dt < 0.0001) {dt = 0.0001};     //  range control
+                    if (dt > 1) {dt = 1;}
+                    this.delay.delayTime.rampTo(dt, 0.3);
+                    noStroke();
+                    this.delaySignal.drawLavenderCircle();
 
-        if (this.playbackRateParamTrackActive) {
-            if (!this.playbackRateParamTrackActive_Y) {
-                var pr = map(mouseX, 0, w, 0.0001, 0.05);
-                this.playbackRateIncrement = pr;
-                this.playbackRateSignal.drawLavenderCircle();
+                    //  draw line to show degree of target param manipulation
+                    stroke(189, 127, 220);
+                    strokeWeight(5);
+                    line(this.delaySignal.x_coordinate, this.delaySignal.y_coordinate, mouseX, mouseY);
+                }
             }
-            else {
-                var pr = map(mouseY, h, 0, 0.0001, 0.05);
-                this.playbackRateIncrement = pr;
-                this.playbackRateSignal.drawGoldCircle();
-            }
-        }
-        else if (!this.playbackRateParamTrackActive && this.playbackRateActive) {this.playbackRateSignal.drawActiveCircle();}
+            else {      //  y-axis control on
+                if (this.delayFrozen) {      //  if delay track has been frozen with y-axis control on
+                    noStroke();
+                    this.delaySignal.drawGoldCircle();      //  keep drawing circle above button
 
-        if (this.pannerParamTrackActive) {
-            if (!this.pannerParamTrackActive_Y) {
-                var ap = map(mouseX, 0, w, 1, 40);
-                this.pannerParamTrack.frequency.rampTo(ap, 0.2);
-                this.pannerSignal.drawLavenderCircle();
-            }
-            else {
-                var ap = map(mouseY, h, 0, 1, 40);
-                this.pannerParamTrack.frequency.rampTo(ap, 0.2);
-                this.pannerSignal.drawGoldCircle();
+                    stroke(214, 214, 31);   //  draw line to show degree of effect param
+                    strokeWeight(5);    
+                    line(this.delaySignal.x_coordinate, this.delaySignal.y_coordinate, this.delayFrozenX, this.delayFrozenY);
+
+                    fill(214, 214, 31); //  draw circle to show where end of line is
+                    noStroke();     
+                    circle(this.delayFrozenX, this.delayFrozenY, 0.3 * this.parentButHt);
+                }
+                
+                else {      //  if delay track has not been frozen, track mouse y-axis and apply effect param
+                    var dt = map(mouseY, h, 0, 1, 0.0001);      //  map delay time to mouse y-axis on screen
+                    if (dt < 0.0001) {dt = 0.0001};     //  range control
+                    if (dt > 1) {dt = 1;}
+                    this.delay.delayTime.rampTo(dt, 0.3);       //  apply new delay time
+                    noStroke();
+                    this.delaySignal.drawGoldCircle();  //  draw signal circle
+
+                    //  draw line to show degree of target param manipulation
+                    stroke(214, 214, 31);
+                    strokeWeight(5);
+                    line(this.delaySignal.x_coordinate, this.delaySignal.y_coordinate, mouseX, mouseY);
+                }
             }
         }
-        else if (!this.pannerParamTrackActive && this.pannerActive) {this.pannerSignal.drawActiveCircle();}
+        //  if NO effect param tracking is active, then default effects will take over, and (default )blue signal circle
+        else if (!this.delayParamTrackActive && this.delayActive) {     
+            noStroke();
+            this.delaySignal.drawActiveCircle();
+        }
+
+        // -------- AMP MOD -------- //
+        if (this.ampModParamTrackActive) {      //  activate amp mod frequency tracking mouse on screen
+            if (!this.ampModParamTrackActive_Y) {   // ---- X-AXIS ---- //
+                if (this.ampModFrozen) {    //  if effect HAS been frozen in place on x-axis control
+                    noStroke();
+                    this.ampModSignal.drawLavenderCircle(); //  draw signal circle
+
+                    stroke(189, 127, 220);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.ampModSignal.x_coordinate, this.ampModSignal.y_coordinate, this.ampModFrozenX, this.ampModFrozenY);
+
+                    fill(189, 127, 220);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.ampModFrozenX, this.ampModFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {      //  if effect is NOT frozen, track mouse x-axis and apply effect param
+                    var am = map(mouseX, 0, w, 1, 200);     //  scale amp mod freq to mouse x-axis
+                    this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);     //  apply scaled amp mod freq
+                    noStroke();
+                    this.ampModSignal.drawLavenderCircle();     //  draw signal circle
+
+                    //  draw line to show degree of target param manipulation
+                    stroke(189, 127, 220);
+                    strokeWeight(5);
+                    line(this.ampModSignal.x_coordinate, this.ampModSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+            else {      // ---- Y-AXIS ---- //
+                if (this.ampModFrozen) {      //  if effect HAS been frozen in place on x-axis control
+                    noStroke();
+                    this.ampModSignal.drawGoldCircle(); //  draw signal circle
+
+                    stroke(214, 214, 31);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.ampModSignal.x_coordinate, this.ampModSignal.y_coordinate, this.ampModFrozenX, this.ampModFrozenY);
+
+                    fill(214, 214, 31);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.ampModFrozenX, this.ampModFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {      //  if effect is NOT frozen, track mouse y-axis and apply effect param
+                    var am = map(mouseY, h, 0, 1, 200);     //  scale amp mod freq to mouse y-axis
+                    this.ampModLFOParamTrack.frequency.rampTo(am, 0.1);     //  apply scaled amp mod freq
+                    noStroke();
+                    this.ampModSignal.drawGoldCircle();     // draw signal circle
+
+                    //  draw line to show degree of target param manipulation
+                    stroke(214, 214, 31);
+                    strokeWeight(5);
+                    line(this.ampModSignal.x_coordinate, this.ampModSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+        }
+        //  if NO effect param tracking is active, then default effects will take over, and (default )blue signal circle
+        else if (!this.ampModParamTrackActive && this.ampModActive) {
+            noStroke();
+            this.ampModSignal.drawActiveCircle();
+        }
+
+        // -------- FILTER SWEEP -------- //
+        if (this.filterSweepParamTrackActive) {     //  activate filter sweep frequency tracking mouse on screen
+            if (!this.filterSweepParamTrackActive_Y) {      // ---- X-AXIS ---- //
+                if (this.filterSweepFrozen) {       //  if effect HAS been frozen
+                    noStroke();
+                    this.filterSweepSignal.drawLavenderCircle();    //  draw signal circle
+
+                    stroke(189, 127, 220);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.filterSweepSignal.x_coordinate, this.filterSweepSignal.y_coordinate, this.filterSweepFrozenX, this.filterSweepFrozenY);
+
+                    fill(189, 127, 220);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.filterSweepFrozenX, this.filterSweepFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {      //  if effect has NOT been frozen
+                    var fs = map(mouseX, 0, w, 0.5, 30);    //  scale filter sweep freq to x-axis mouse on screen
+                    this.filterSweep.frequency.rampTo(fs, 0.1);     //  apply scaled value
+                    noStroke();
+                    this.filterSweepSignal.drawLavenderCircle();    //  draw signal circle
+
+                    stroke(189, 127, 220);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.filterSweepSignal.x_coordinate, this.filterSweepSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+            else {      // ---- Y-AXIS ---- //
+                if (this.filterSweepFrozen) {   //  if effect HAS been frozen
+                    noStroke();
+                    this.filterSweepSignal.drawGoldCircle();
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.filterSweepSignal.x_coordinate, this.filterSweepSignal.y_coordinate, this.filterSweepFrozenX, this.filterSweepFrozenY);
+
+                    fill(214, 214, 31);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.filterSweepFrozenX, this.filterSweepFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {  //  if effect has NOT been frozen
+                    var fs = map(mouseY, h, 0, 0.5, 30);    //  scale filter sweep freq to y-axis mouse on screen
+                    this.filterSweep.frequency.rampTo(fs, 0.1);     //  apply scaled value
+                    noStroke();
+                    this.filterSweepSignal.drawGoldCircle();    //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.filterSweepSignal.x_coordinate, this.filterSweepSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+        }
+        //  if NO effect param tracking is active, then default effects will take over, and (default )blue signal circle
+        else if (!this.filterSweepParamTrackActive && this.filterSweepActive) {
+            noStroke();
+            this.filterSweepSignal.drawActiveCircle();
+        }
+
+        // -------- FREQ SHIFTER -------- //
+        if (this.freqShifterParamTrackActive) {     //  activate frequency shifter base frequency tracking mouse on screen
+            if (!this.freqShifterParamTrackActive_Y) {  // ---- X-AXIS ---- //
+                if (this.freqShifterFrozen) {   //  if effect HAS been frozen
+                    noStroke();
+                    this.freqShifterSignal.drawLavenderCircle();    //  draw signal circle
+
+                    stroke(189, 127, 220);      //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.freqShifterSignal.x_coordinate, this.freqShifterSignal.y_coordinate, this.freqShifterFrozenX, this.freqShifterFrozenY);
+
+                    fill(189, 127, 220);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.freqShifterFrozenX, this.freqShifterFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {  //  if effect has NOT been frozen
+                    var frs = map(mouseX, 0, w, 0, 500);    //  scale x-axis value for freqshifter base freq
+                    this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);  //  apply scaled value
+                    noStroke();
+                    this.freqShifterSignal.drawLavenderCircle();    //  draw signal circle
+
+                    stroke(189, 127, 220);      //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.freqShifterSignal.x_coordinate, this.freqShifterSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+            else {      // ---- Y-AXIS ---- //
+                if (this.freqShifterFrozen) {   //  if effect HAS been frozen
+                    noStroke();
+                    this.freqShifterSignal.drawGoldCircle();    //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.freqShifterSignal.x_coordinate, this.freqShifterSignal.y_coordinate, this.freqShifterFrozenX, this.freqShifterFrozenY);
+
+                    fill(214, 214, 31);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.freqShifterFrozenX, this.freqShifterFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {  //  if effect has NOT been frozen
+                    var frs = map(mouseY, h, 0, 0, 500);    //  scale y-axis value for freqshifter base freq
+                    this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);   //  apply scaled value
+                    noStroke();
+                    this.freqShifterSignal.drawGoldCircle();    //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.freqShifterSignal.x_coordinate, this.freqShifterSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+        }
+        //  if NO effect param tracking is active, then default effects will take over, and (default) blue signal circle
+        else if (!this.freqShifterParamTrackActive && this.freqShifterActive) {
+            noStroke();
+            this.freqShifterSignal.drawActiveCircle();
+        }
+
+        // -------- PLAYBACK RATE -------- //
+        if (this.playbackRateParamTrackActive) {    //  activate play rate tracking mouse on screen
+            if (!this.playbackRateParamTrackActive_Y) {     // ---- X-AXIS ---- //
+                if (this.playbackRateFrozen) {      //  if effect HAS been frozen
+                    noStroke();
+                    this.playbackRateSignal.drawLavenderCircle();   //  draw signal circle
+
+                    stroke(189, 127, 220);      //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.playbackRateSignal.x_coordinate, this.playbackRateSignal.y_coordinate, this.playbackRateFrozenX, this.playbackRateFrozenY);
+
+                    fill(189, 127, 220);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.playbackRateFrozenX, this.playbackRateFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {      //  if effect has NOT been frozen
+                    var pr = map(mouseX, 0, w, 0.001, 2.0);     //  scale value of mouse x-axis on screen to playback rate
+                    this.player.playbackRate = pr;      //  apply scaled value
+                    noStroke();
+                    this.playbackRateSignal.drawLavenderCircle();   //  draw signal circle
+
+                    stroke(189, 127, 220);      //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.playbackRateSignal.x_coordinate, this.playbackRateSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+            else {      // ---- Y-AXIS ---- //
+                if (this.playbackRateFrozen) {      //  if effect HAS been frozen
+                    noStroke();
+                    this.playbackRateSignal.drawGoldCircle();   //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.playbackRateSignal.x_coordinate, this.playbackRateSignal.y_coordinate, this.playbackRateFrozenX, this.playbackRateFrozenY);
+
+                    fill(214, 214, 31);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.playbackRateFrozenX, this.playbackRateFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {  //  if effect has NOT been frozen
+                    var pr = map(mouseY, h, 0, 0.001, 2.0);     //  scale value of mouse y-axis on screen to playback rate
+                    this.player.playbackRate = pr;       //  apply scaled value
+                    noStroke();
+                    this.playbackRateSignal.drawGoldCircle();   //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.playbackRateSignal.x_coordinate, this.playbackRateSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+        }
+        //  if NO effect param tracking is active, then default effects will take over, and (default) blue signal circle
+        else if (!this.playbackRateParamTrackActive && this.playbackRateActive) {
+            noStroke();
+            this.playbackRateSignal.drawActiveCircle();
+        }
+
+        // -------- PANNER -------- //
+        if (this.pannerParamTrackActive) {  //  activate play rate tracking mouse on screen
+            if (!this.pannerParamTrackActive_Y) {   // ---- X-AXIS ---- //
+                if (this.pannerFrozen) {    //  if effect HAS been frozen
+                    noStroke();
+                    this.pannerSignal.drawLavenderCircle();     //  draw signal circle
+
+                    stroke(189, 127, 220);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.pannerSignal.x_coordinate, this.pannerSignal.y_coordinate, this.pannerFrozenX, this.pannerFrozenY);
+
+                    fill(189, 127, 220);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.pannerFrozenX, this.pannerFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {
+                    var ap = map(mouseX, 0, w, 1, 40);  //  scale value of mouse x-axis on screen to panner rate
+                    this.pannerParamTrack.frequency.rampTo(ap, 0.2);    //  apply scaled value
+                    noStroke();
+                    this.pannerSignal.drawLavenderCircle();     //  draw signal circle
+
+                    stroke(189, 127, 220);  //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.pannerSignal.x_coordinate, this.pannerSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+            else {      // ---- Y-AXIS ---- //
+                if (this.pannerFrozen) {    //  if effect HAS been frozen
+                    noStroke();
+                    this.pannerSignal.drawGoldCircle();     //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.pannerSignal.x_coordinate, this.pannerSignal.y_coordinate, this.pannerFrozenX, this.pannerFrozenY);
+
+                    fill(214, 214, 31);    // draw circle to show end of line
+                    noStroke();
+                    circle(this.pannerFrozenX, this.pannerFrozenY, 0.3 * this.parentButHt);
+                }
+
+                else {      //  if effect has NOT been frozen
+                    var ap = map(mouseY, h, 0, 1, 40);  //  scale value of mouse y-axis on screen to panner rate
+                    this.pannerParamTrack.frequency.rampTo(ap, 0.2);    //  apply scaled value
+                    noStroke();
+                    this.pannerSignal.drawGoldCircle();     //  draw signal circle
+
+                    stroke(214, 214, 31);   //  draw line to show degree of target param manipulation
+                    strokeWeight(5);
+                    line(this.pannerSignal.x_coordinate, this.pannerSignal.y_coordinate, mouseX, mouseY);
+                }
+            }
+        }
+        //  if NO effect param tracking is active, then default effects will take over, and (default) blue signal circle
+        else if (!this.pannerParamTrackActive && this.pannerActive) {
+            noStroke();
+            this.pannerSignal.drawActiveCircle();
+        }
         
-        if (this.reverbActive) {this.reverbSignal.drawActiveCircle();}
-        if (this.reverseActive) {this.reverseSignal.drawActiveCircle();}
+        if (this.reverbActive) {
+            noStroke();
+            this.reverbSignal.drawActiveCircle();
+        }
+        if (this.reverseActive) {
+            noStroke();
+            this.reverseSignal.drawActiveCircle();
+        }
     }
 
     checkParamTracks() {
@@ -906,29 +1209,11 @@ class PlaygroundControls {
         }
         else {
             this.playbackRateLoop.stop();
-            /*
-            this.playbackRateToNormal = new Tone.Loop(((time) => {
-                if (this.player.playbackRate < 1) {
-                    this.player.playbackRate += 0.01
-                }
-                else if (this.player.playbackRate > 1) {
-                    this.player.playbackRate -= 0.01
-                }
-                if (this.player.playbackRate < 1.0001 && this.player.playbackRate > 99.999) {
-                    this.playbackRateToNormal.stop();
-                }
-            }), 0.02).start();
-            */
-
-            this.playbackRateLoop.stop();
             this.playbackRateParamTrackActive = false;
             this.playbackRateParamTrackActive_Y = false;
             this.playbackRateGoingDown = true;
 
-            Tone.Transport.schedule((time) => {
-                //this.playbackRateToNormal.stop();
-                this.player.playbackRate = 1;
-            })
+            this.player.playbackRate = 1;
         }
     }
 
@@ -956,6 +1241,9 @@ class PlaygroundControls {
         this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
         if (this.playbackRateActive) {
             this.playbackRateActive = false;
+            this.playbackRateParamTrackActive = false;
+            this.playbackRateParamTrackActive_Y = false;
+            this.playbackRateFrozen = false;
         }
 
         if (this.reverseActive) {
@@ -1037,6 +1325,36 @@ class PlaygroundControls {
         else {
             this.player.disconnect(this.verb);
         }
+    }
+
+    freezeDelay(_x, _y) {
+        this.delayFrozenX = _x;
+        this.delayFrozenY = _y;
+    }
+
+    freezeAmpMod(_x, _y) {
+        this.ampModFrozenX = _x;
+        this.ampModFrozenY = _y;
+    }
+
+    freezeFilterSweep(_x, _y) {
+        this.filterSweepFrozenX = _x;
+        this.filterSweepFrozenY = _y;
+    }
+
+    freezeFreqShifter(_x, _y) {
+        this.freqShifterFrozenX = _x;
+        this.freqShifterFrozenY = _y;
+    }
+
+    freezePlaybackRate(_x, _y) {
+        this.playbackRateFrozenX = _x;
+        this.playbackRateFrozenY = _y;
+    }
+
+    freezePanner(_x, _y) {
+        this.pannerFrozenX = _x;
+        this.pannerFrozenY = _y;
     }
 }
 

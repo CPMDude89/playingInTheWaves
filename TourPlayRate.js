@@ -130,7 +130,7 @@ function draw() {
             fill(0);
             noStroke();
             text('X-axis: ' + mapMouseX.toFixed(2), 1.2 * rightSide, 1.1 * topSide);    //  coordinate text
-            text('Y-axis: ' + mapMouseY.toFixed(2), 1.2 * rightSide, 1.4 * topSide);
+            text('Y-axis: ' + -mapMouseY.toFixed(2), 1.2 * rightSide, 1.4 * topSide);
             
             fill(255)   //  white
             circle(mouseX, mouseY, 0.05 * soundVizWd);  //  circle to help see where mouse is on sound viz

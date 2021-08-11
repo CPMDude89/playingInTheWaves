@@ -177,7 +177,102 @@ function draw() {
     controls2.checkForActivity();
     controls3.checkForActivity();
 
+}
 
+//  if any key is pressed down
+function keyPressed() {
+    //  if spacebar is pressed
+    if (keyCode == 32) {
+        if (controls1.delayParamTrackActive && !controls1.delayFrozen) {
+            controls1.freezeDelay(mouseX, mouseY);
+            controls1.delayFrozen = true;
+        }
+
+        if (controls1.ampModParamTrackActive && !controls1.ampModFrozen) {
+            controls1.freezeAmpMod(mouseX, mouseY);
+            controls1.ampModFrozen = true;
+        }
+
+        if (controls1.filterSweepActive && !controls1.filterSweepFrozen) {
+            controls1.freezeFilterSweep(mouseX, mouseY);
+            controls1.filterSweepFrozen = true;
+        }
+
+        if (controls1.freqShifterParamTrackActive && !controls1.freqShifterFrozen) {
+            controls1.freezeFreqShifter(mouseX, mouseY);
+            controls1.freqShifterFrozen = true;
+        }
+
+        if (controls1.playbackRateParamTrackActive && !controls1.playbackRateFrozen) {
+            controls1.freezePlaybackRate(mouseX, mouseY);
+            controls1.playbackRateFrozen = true;
+        }
+
+        if (controls1.pannerParamTrack && !controls1.pannerFrozen) {
+            controls1.freezePanner(mouseX, mouseY);
+            controls1.pannerFrozen = true;
+        }
+
+        if (controls2.delayParamTrackActive && !controls2.delayFrozen) {
+            controls2.freezeDelay(mouseX, mouseY);
+            controls2.delayFrozen = true;
+        }
+
+        if (controls2.ampModParamTrackActive && !controls2.ampModFrozen) {
+            controls2.freezeAmpMod(mouseX, mouseY);
+            controls2.ampModFrozen = true;
+        }
+
+        if (controls2.filterSweepActive && !controls2.filterSweepFrozen) {
+            controls2.freezeFilterSweep(mouseX, mouseY);
+            controls2.filterSweepFrozen = true;
+        }
+
+        if (controls2.freqShifterParamTrackActive && !controls2.freqShifterFrozen) {
+            controls2.freezeFreqShifter(mouseX, mouseY);
+            controls2.freqShifterFrozen = true;
+        }
+
+        if (controls2.playbackRateParamTrackActive && !controls2.playbackRateFrozen) {
+            controls2.freezePlaybackRate(mouseX, mouseY);
+            controls2.playbackRateFrozen = true;
+        }
+
+        if (controls2.pannerParamTrack && !controls2.pannerFrozen) {
+            controls2.freezePanner(mouseX, mouseY);
+            controls2.pannerFrozen = true;
+        }
+
+        if (controls3.delayParamTrackActive && !controls3.delayFrozen) {
+            controls3.freezeDelay(mouseX, mouseY);
+            controls3.delayFrozen = true;
+        }
+
+        if (controls3.ampModParamTrackActive && !controls3.ampModFrozen) {
+            controls3.freezeAmpMod(mouseX, mouseY);
+            controls3.ampModFrozen = true;
+        }
+
+        if (controls3.filterSweepActive && !controls3.filterSweepFrozen) {
+            controls3.freezeFilterSweep(mouseX, mouseY);
+            controls3.filterSweepFrozen = true;
+        }
+
+        if (controls3.freqShifterParamTrackActive && !controls3.freqShifterFrozen) {
+            controls3.freezeFreqShifter(mouseX, mouseY);
+            controls3.freqShifterFrozen = true;
+        }
+
+        if (controls3.playbackRateParamTrackActive && !controls3.playbackRateFrozen) {
+            controls3.freezePlaybackRate(mouseX, mouseY);
+            controls3.playbackRateFrozen = true;
+        }
+
+        if (controls3.pannerParamTrack && !controls3.pannerFrozen) {
+            controls3.freezePanner(mouseX, mouseY);
+            controls3.pannerFrozen = true;
+        }
+    }
 }
 
 
@@ -189,7 +284,9 @@ function draw() {
 function mousePressed() {
     //  check if clicked on Track 1 Delay Signal Circle
     if ((dist(mouseX, mouseY, controls1.delaySignal.x_coordinate, controls1.delaySignal.y_coordinate) < 
-    (0.5 * controls1.delaySignal.diameter) && controls1.delayActive)) {        
+    (0.5 * controls1.delaySignal.diameter) && controls1.delayActive)) {   
+        controls1.delayFrozen = false;
+        
         if (!controls1.delayParamTrackActive) {
             controls1.delayParamTrackActive = true;
             controls1.delayTimeLFO.stop();
@@ -202,12 +299,13 @@ function mousePressed() {
             controls1.delayParamTrackActive_Y = false;
             controls1.delayTimeLFO.start();
         }
-        //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Amp Mod Signal Circle
     if ((dist(mouseX, mouseY, controls1.ampModSignal.x_coordinate, controls1.ampModSignal.y_coordinate) < 
     (0.5 * controls1.ampModSignal.diameter) && controls1.ampModActive)) {
+        controls1.ampModFrozen = false;
+
         if (!controls1.ampModParamTrackActive) {
             controls1.ampModParamTrackActive = true;
 
@@ -229,13 +327,13 @@ function mousePressed() {
 
             controls1.ampModLFO.start();
         }
-
-        //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Filter Sweep Signal Circle
     if ((dist(mouseX, mouseY, controls1.filterSweepSignal.x_coordinate, controls1.filterSweepSignal.y_coordinate) < 
     (0.5 * controls1.filterSweepSignal.diameter) && controls1.filterSweepActive)) {
+        controls1.filterSweepFrozen = false;
+
         if (!controls1.filterSweepParamTrackActive) {
             controls1.filterSweepParamTrackActive = true;
         }
@@ -248,13 +346,13 @@ function mousePressed() {
 
             controls1.filterSweep.frequency.value = 1.2;
         }
-        
-        //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Frequency Shifter Signal Circle
     if ((dist(mouseX, mouseY, controls1.freqShifterSignal.x_coordinate, controls1.freqShifterSignal.y_coordinate) < 
     (0.5 * controls1.freqShifterSignal.diameter) && controls1.freqShifterActive)) {
+        controls1.freqShifterFrozen = false;
+
         if (!controls1.freqShifterParamTrackActive) {
             controls1.freqShifterParamTrackActive = true;
             controls1.freqShifter.wet.rampTo(0, 0.1);
@@ -271,14 +369,16 @@ function mousePressed() {
             controls1.freqShifter.wet.rampTo(1, 0.1);
             controls1.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
-        //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 1 Playback Rate Signal Circle
     if ((dist(mouseX, mouseY, controls1.playbackRateSignal.x_coordinate, controls1.playbackRateSignal.y_coordinate) < 
     (0.5 * controls1.playbackRateSignal.diameter) && controls1.playbackRateActive)) {        
+        controls1.playbackRateFrozen = false;
+
         if (!controls1.playbackRateParamTrackActive) {
             controls1.playbackRateParamTrackActive = true;
+            controls1.playbackRateLoop.stop();
         }
         else if (controls1.playbackRateParamTrackActive && !controls1.playbackRateParamTrackActive_Y) {
             controls1.playbackRateParamTrackActive_Y = true;
@@ -287,16 +387,15 @@ function mousePressed() {
             controls1.playbackRateParamTrackActive = false;
             controls1.playbackRateParamTrackActive_Y = false;
 
+            controls1.playbackRateLoop.start();
             controls1.playbackRateIncrement = 0.01;
         }
-
-        //controls1.checkParamTracks();
     } 
 
     //  check if clicked on Track 1 Auto Panner Signal Circle
     if ((dist(mouseX, mouseY, controls1.pannerSignal.x_coordinate, controls1.pannerSignal.y_coordinate) < 
     (0.5 * controls1.pannerSignal.diameter) && controls1.pannerActive)) {
-        //controls1.pannerParamTrackActive = controls1.pannerParamTrackActive ? controls1.pannerParamTrackActive = false : controls1.pannerParamTrackActive = true;
+        controls1.pannerFrozen = false;
         
         if (!controls1.pannerParamTrackActive) {
             controls1.pannerParamTrackActive = true;
@@ -326,13 +425,13 @@ function mousePressed() {
             controls1.pannerFreqLFO.start();
             controls1.panner.wet.rampTo(1, 0.1);
         }
-
-        //controls1.checkParamTracks();
     }
 
     //  check if clicked on Track 2 Delay Signal Circle
     if ((dist(mouseX, mouseY, controls2.delaySignal.x_coordinate, controls2.delaySignal.y_coordinate) < 
-    (0.5 * controls2.delaySignal.diameter) && controls2.delayActive)) {        
+    (0.5 * controls2.delaySignal.diameter) && controls2.delayActive)) {    
+        controls2.delayFrozen = false;
+        
         if (!controls2.delayParamTrackActive) {
             controls2.delayParamTrackActive = true;
             controls2.delayTimeLFO.stop();
@@ -346,12 +445,13 @@ function mousePressed() {
             controls2.delayParamTrackActive_Y = false;
             controls2.delayTimeLFO.start();
         }
-        //controls2.checkParamTracks();
     }
 
     //  check if clicked on Track 2 Amp Mod Signal Circle
     if ((dist(mouseX, mouseY, controls2.ampModSignal.x_coordinate, controls2.ampModSignal.y_coordinate) < 
     (0.5 * controls2.ampModSignal.diameter) && controls2.ampModActive)) {
+        controls2.ampModFrozen = false;
+
         if (!controls2.ampModParamTrackActive) {
             controls2.ampModParamTrackActive = true;
 
@@ -373,13 +473,13 @@ function mousePressed() {
 
             controls2.ampModLFO.start();
         }
-
-        //controls2.checkParamTracks();
     }
 
     //  check if clicked on Track 2 Filter Sweep Signal Circle
     if ((dist(mouseX, mouseY, controls2.filterSweepSignal.x_coordinate, controls2.filterSweepSignal.y_coordinate) < 
     (0.5 * controls2.filterSweepSignal.diameter) && controls2.filterSweepActive)) {
+        controls2.filterSweepFrozen = false;
+
         if (!controls2.filterSweepParamTrackActive) {
             controls2.filterSweepParamTrackActive = true;
         }
@@ -392,13 +492,13 @@ function mousePressed() {
 
             controls2.filterSweep.frequency.value = 10;
         }
-        
-        //controls2.checkParamTracks();
     }
 
     //  check if clicked on Track 2 Frequency Shifter Signal Circle
     if ((dist(mouseX, mouseY, controls2.freqShifterSignal.x_coordinate, controls2.freqShifterSignal.y_coordinate) < 
     (0.5 * controls2.freqShifterSignal.diameter) && controls2.freqShifterActive)) {
+        controls2.freqShifterFrozen = false;
+
         if (!controls2.freqShifterParamTrackActive) {
             controls2.freqShifterParamTrackActive = true;
             controls2.freqShifter.wet.rampTo(0, 0.1);
@@ -415,12 +515,13 @@ function mousePressed() {
             controls2.freqShifter.wet.rampTo(1, 0.1);
             controls2.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
-        //controls2.checkParamTracks();
     }
 
     //  check if clicked on Track 2 Playback Rate Signal Circle
     if ((dist(mouseX, mouseY, controls2.playbackRateSignal.x_coordinate, controls2.playbackRateSignal.y_coordinate) < 
-    (0.5 * controls2.playbackRateSignal.diameter) && controls2.playbackRateActive)) {        
+    (0.5 * controls2.playbackRateSignal.diameter) && controls2.playbackRateActive)) {    
+        controls2.playbackRateFrozen = false;
+        
         if (!controls2.playbackRateParamTrackActive) {
             controls2.playbackRateParamTrackActive = true;
         }
@@ -433,14 +534,12 @@ function mousePressed() {
 
             controls2.playbackRateIncrement = 0.01;
         }
-
-        //controls2.checkParamTracks();
     } 
 
     //  check if clicked on Track 2 Auto Panner Signal Circle
     if ((dist(mouseX, mouseY, controls2.pannerSignal.x_coordinate, controls2.pannerSignal.y_coordinate) < 
     (0.5 * controls2.pannerSignal.diameter) && controls2.pannerActive)) {
-        //controls2.pannerParamTrackActive = controls2.pannerParamTrackActive ? controls2.pannerParamTrackActive = false : controls2.pannerParamTrackActive = true;
+        controls2.pannerFrozen = false;
         
         if (!controls2.pannerParamTrackActive) {
             controls2.pannerParamTrackActive = true;
@@ -470,13 +569,13 @@ function mousePressed() {
             controls2.pannerFreqLFO.start();
             controls2.panner.wet.rampTo(1, 0.1);
         }
-
-        //controls2.checkParamTracks();
     }
 
     //  check if clicked on Track 3 Delay Signal Circle
     if ((dist(mouseX, mouseY, controls3.delaySignal.x_coordinate, controls3.delaySignal.y_coordinate) < 
-    (0.5 * controls3.delaySignal.diameter) && controls3.delayActive)) {        
+    (0.5 * controls3.delaySignal.diameter) && controls3.delayActive)) {
+        controls3.delayFrozen = false;
+        
         if (!controls3.delayParamTrackActive) {
             controls3.delayParamTrackActive = true;
             controls3.delayTimeLFO.stop();
@@ -490,12 +589,13 @@ function mousePressed() {
             controls3.delayParamTrackActive_Y = false;
             controls3.delayTimeLFO.start();
         }
-        //controls3.checkParamTracks();
     }
 
     //  check if clicked on Track 3 Amp Mod Signal Circle
     if ((dist(mouseX, mouseY, controls3.ampModSignal.x_coordinate, controls3.ampModSignal.y_coordinate) < 
     (0.5 * controls3.ampModSignal.diameter) && controls3.ampModActive)) {
+        controls3.ampModFrozen = false;
+
         if (!controls3.ampModParamTrackActive) {
             controls3.ampModParamTrackActive = true;
 
@@ -517,13 +617,13 @@ function mousePressed() {
 
             controls3.ampModLFO.start();
         }
-
-        //controls3.checkParamTracks();
     }
 
     //  check if clicked on Track 3 Filter Sweep Signal Circle
     if ((dist(mouseX, mouseY, controls3.filterSweepSignal.x_coordinate, controls3.filterSweepSignal.y_coordinate) < 
     (0.5 * controls3.filterSweepSignal.diameter) && controls3.filterSweepActive)) {
+        controls3.filterSweepFrozen = false;
+
         if (!controls3.filterSweepParamTrackActive) {
             controls3.filterSweepParamTrackActive = true;
         }
@@ -536,13 +636,13 @@ function mousePressed() {
 
             controls3.filterSweep.frequency.value = 15;
         }
-        
-        //controls3.checkParamTracks();
     }
 
     //  check if clicked on Track 3 Frequency Shifter Signal Circle
     if ((dist(mouseX, mouseY, controls3.freqShifterSignal.x_coordinate, controls3.freqShifterSignal.y_coordinate) < 
     (0.5 * controls3.freqShifterSignal.diameter) && controls3.freqShifterActive)) {
+        controls3.freqShifterFrozen = false;
+
         if (!controls3.freqShifterParamTrackActive) {
             controls3.freqShifterParamTrackActive = true;
             controls3.freqShifter.wet.rampTo(0, 0.1);
@@ -559,12 +659,13 @@ function mousePressed() {
             controls3.freqShifter.wet.rampTo(1, 0.1);
             controls3.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
-        //controls3.checkParamTracks();
     }
 
     //  check if clicked on Track 3 Playback Rate Signal Circle
     if ((dist(mouseX, mouseY, controls3.playbackRateSignal.x_coordinate, controls3.playbackRateSignal.y_coordinate) < 
-    (0.5 * controls3.playbackRateSignal.diameter) && controls3.playbackRateActive)) {        
+    (0.5 * controls3.playbackRateSignal.diameter) && controls3.playbackRateActive)) {
+        controls3.playbackRateFrozen = false;
+        
         if (!controls3.playbackRateParamTrackActive) {
             controls3.playbackRateParamTrackActive = true;
         }
@@ -577,14 +678,12 @@ function mousePressed() {
 
             controls3.playbackRateIncrement = 0.01;
         }
-
-        //controls3.checkParamTracks();
     } 
 
     //  check if clicked on Track 3 Auto Panner Signal Circle
     if ((dist(mouseX, mouseY, controls3.pannerSignal.x_coordinate, controls3.pannerSignal.y_coordinate) < 
     (0.5 * controls3.pannerSignal.diameter) && controls3.pannerActive)) {
-        //controls3.pannerParamTrackActive = controls3.pannerParamTrackActive ? controls3.pannerParamTrackActive = false : controls3.pannerParamTrackActive = true;
+        controls3.pannerFrozen = false;
         
         if (!controls3.pannerParamTrackActive) {
             controls3.pannerParamTrackActive = true;
@@ -614,8 +713,6 @@ function mousePressed() {
             controls3.pannerFreqLFO.start();
             controls3.panner.wet.rampTo(1, 0.1);
         }
-
-        //controls3.checkParamTracks();
     }
 }
 
