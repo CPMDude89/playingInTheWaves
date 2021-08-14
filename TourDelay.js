@@ -105,7 +105,7 @@ function setup() {
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'PREVIOUS TOUR STOP');
     linkBackward.position(0.05 * w, 0.05 * h);
     
-    linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourGranulation.html', 'NEXT TOUR STOP');
+    linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAudioSlicer.html', 'NEXT TOUR STOP');
     linkForward.position(0.8 * w, 0.05 * h);
 
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);

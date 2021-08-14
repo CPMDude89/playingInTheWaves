@@ -76,7 +76,7 @@ function setup() {
 
     controls3.delay.delayTime.value = 0.5;
     controls3.delay.feedback.value = 0.5;
-    controls3.delayTimeLFO.frequency.value = 0.03;
+    controls3.delayTimeLFO.frequency.value = 0.01;
     controls3.delayTimeLFO.min = 0.04;
     controls3.delayTimeLFO.max = 1;
     controls3.ampModLFOModulator.frequency.value = 0.05;
