@@ -1,5 +1,5 @@
 /**
- * File containing all custom classes designed for the 'Playing In The Waves' project
+ * File containing all Tone.js-specific custom classes designed for the 'Playing In The Waves' project
  * 
  * All class objects designed by Chris Duvall, 2021
  * 

@@ -11,13 +11,13 @@ function setup() {
     canv = createCanvas(w, h);
     inMic = new p5.AudioIn();
 
-    looper1 = new Looper(bigButX, bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);  
-    buttons1 = new FunButtons(looper1.getEffButX(), looper1.getEffButY(), looper1.getEffButWidth(), looper1.getEffButHeight(), looper1);
+    looper1 = new Phone_Looper(bigButX, bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);  
+    buttons1 = new Phone_Buttons(looper1.getEffButX(), looper1.getEffButY(), looper1.getEffButWidth(), looper1.getEffButHeight(), looper1);
     looper1.init(buttons1);  //  initialize button and recorder
     buttons1.init();
 
-    looper2 = new Looper(bigButX, 3 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
-    buttons2 = new FunButtons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
+    looper2 = new Phone_Looper(bigButX, 3 * bigButY, bigButWidth, bigButHeight, effectButtonX, inMic);
+    buttons2 = new Phone_Buttons(looper2.getEffButX(), looper2.getEffButY(), looper2.getEffButWidth(), looper2.getEffButHeight(), looper2);
     looper2.init(buttons2);  //  initialize button and recorder
     buttons2.init();
 
