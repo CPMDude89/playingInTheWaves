@@ -12,7 +12,7 @@
 
 let w=window.innerWidth, h=window.innerHeight;
 let mic;
-let recButX=(0.1 * w), recButY=(0.1 * h), recButWd=(0.8 * w), recButHt=(0.3 * h);
+let recButX=(0.1 * w), recButY=(0.15 * h), recButWd=(0.8 * w), recButHt=(0.2 * h);
 let samplerButton1, samplerButton2;
 let volNode1, volNode2, limiter;
 let delay;
@@ -33,8 +33,9 @@ function setup() {
     //  new SamplerButton instances to record user input
     samplerButton1 = new SamplerButton(recButX, recButY, recButWd, recButHt);  
     samplerButton1.player.connect(volNode1);
+    buttonSignal1 = new SignalCircle(recButX + (0.5 * recButWd), recButY - (0.3 * recButHt), 0.3 * recButHt);
 
-    samplerButton2 = new SamplerButton(recButX, (recButY + (recButHt * 1.5)), recButWd, recButHt);
+    samplerButton2 = new SamplerButton(recButX, (recButY + (recButHt * 2.2)), recButWd, recButHt);
     samplerButton2.player.connect(volNode2);
 
     mic.connect(samplerButton1.recorder);      //  connect microphone output to Tone recorder object
@@ -46,7 +47,11 @@ function draw() {
 
     noStroke();     //  set up title text
     textAlign(CENTER);
-    textSize(40);
+    textSize(30);
     fill(0);
     text('Playing In The Waves', 0.5 * w, 0.05 * h);     //  title text
+
+    if (samplerButton1.state == 'recording') {
+        buttonSignal1.drawRecordingCircle();
+    }
 }

@@ -557,6 +557,27 @@ class LFOVisualizer {
 //===================================================================================================================================================//
 //===================================================================================================================================================//
 
+class phoneControls {
+    constructor (
+        parentXpos,     //  parent button x-axis position
+        parentYpos,     //  parent button y-axis position
+        parentButWd,    //  parent button width
+        parentButHt,     //  parent button height 
+        player,     //  parent player object
+        volOut,     //  parent player volume node
+    ) {
+        this.parentXpos = parentXpos;
+        this.parentYpos = parentYpos;
+        this.parentButWd = parentButWd;
+        this.parentButHt = parentButHt;
+        this.player = player;
+        this.volOut = volOut;
+    }
+}
+
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+
 class PlaygroundControls {
     constructor (
         parentXpos,     //  parent button x-axis position
