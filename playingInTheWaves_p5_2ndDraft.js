@@ -50,7 +50,7 @@ function draw() {
     fill(0);
     textAlign(CENTER);  //  page title
     textSize(45);
-    text('Playing In The Waves: A Play-Based Approach to Sound Design', w/2, h/11);
+    text('Playground 2nd Draft: p5.sound Version', w/2, h/11);
 
     textAlign(LEFT);    //  set up track names
     textSize(28);
