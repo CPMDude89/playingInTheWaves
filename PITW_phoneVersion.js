@@ -17,12 +17,19 @@ let samplerButton1, samplerButton2, controls1, controls2;
 let volNode1, volNode2, effectBus, limiter;
 let delay;
 let ampModLFO;
+//let stockSample1, stockSample1Button;
 
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
     volNode1 = new Tone.Volume().connect(limiter);
     volNode2 = new Tone.Volume().connect(limiter);
     effectBus = new Tone.Volume().connect(limiter);
+
+    stockSample1 = new Tone.Player("./sounds/snaps.wav").connect(volNode1);
+    stockSample1.set({
+        loop: true,
+        volume: -100
+    })
 }
 
 function setup() {
@@ -57,6 +64,12 @@ function setup() {
     controls1.connectToBus(effectBus);
     controls2.connectToBus(effectBus);
 
+    sample1Active = false;
+    stockSample1Button = createButton('SAMPLE 1');
+    stockSample1Button.position(recButX + (recButWd * 0.55), recButY + (1.05 * recButHt));
+    stockSample1Button.size(recButWd * 0.2, recButHt * 0.45);
+    stockSample1Button.mousePressed(triggerSample1);
+
     Tone.Transport.start();
 }
 
@@ -87,4 +100,17 @@ function draw() {
 
     controls1.checkForActivity();
     controls2.checkForActivity();
+}
+
+function triggerSample1() {
+    if (!sample1Active) {
+        stockSample1.start();
+        stockSample1.volume.rampTo(0, 0.05);
+        stockSample1Active = true;
+    }
+    else {
+        stockSample1.volume.rampTo(-100, 0.05);
+        stockSample1.stop("+0.05");
+        stockSample1Active = false;
+    }
 }
