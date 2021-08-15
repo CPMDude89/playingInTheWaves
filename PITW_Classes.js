@@ -391,8 +391,10 @@ class GranulationSlicer {
  * Needs to be included in html file with BOTH p5.js and Tone.js
  * Make sure to do all the connections in the script this is used in
  * 
- * Derived largely from this tutorial:
+ * Derived largely from these two tutorials:
  * https://www.youtube.com/watch?v=ddVrGY1dveY&t=1644s&ab_channel=DavidBouchard
+ * 
+ * https://www.youtube.com/watch?v=2O3nm0Nvbi4&t=609s&ab_channel=TheCodingTrain
  */
 class OscScope {
     constructor (
