@@ -557,7 +557,13 @@ class LFOVisualizer {
 //===================================================================================================================================================//
 //===================================================================================================================================================//
 
-class phoneControls {
+/**
+ * This class is the scaled-down, mobile-focused version of PlaygroundControls
+ * 
+ * PlaygroundControls is huge, so doesn't make sense to have this class inherit from it.
+ * Structured in a very similar way though
+ */
+class PhoneControls {
     constructor (
         parentXpos,     //  parent button x-axis position
         parentYpos,     //  parent button y-axis position
@@ -572,6 +578,61 @@ class phoneControls {
         this.parentButHt = parentButHt;
         this.player = player;
         this.volOut = volOut;
+
+        this.delayActive = false;
+        this.delayButton = createButton('DELAY');
+        this.delayButton.position(this.parentXpos, this.parentYpos + (1.05 * this.parentButHt));
+        this.delayButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
+        this.delayButton.mousePressed(() => this.triggerDelay());
+
+        this.delay = new Tone.FeedbackDelay(0.2, 0.7);
+        this.delayTimeLFO = new Tone.LFO(0.03, 0.03, 0.4).start().connect(this.delay.delayTime);
+
+        this.ampModActive = false;
+        this.ampModButton = createButton('AMP MOD');
+        this.ampModButton.position(this.parentXpos, this.parentYpos + (1.52 * this.parentButHt));
+        this.ampModButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
+        this.ampModButton.mousePressed(() => this.triggerAmpMod());
+
+        this.ampModLFO = new Tone.LFO(1, -100, 0).connect(this.player.volume);
+        this.ampModLFO.set({
+            amplitude: 0,
+            phase: 90
+        });
+        this.ampModLFOModulator = new Tone.LFO(0.1, 0.4, 40).start().connect(this.ampModLFO.frequency);
+
+        this.playbackRateActive = false;
+        this.playbackRateButton = createButton('PLAYBACK RATE');
+        this.playbackRateButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.05 * this.parentButHt));
+        this.playbackRateButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
+        this.playbackRateButton.mousePressed(() => this.triggerPlaybackRateLoop());
+        
+        this.reverseActive = false;
+        this.reverseButton = createButton('REVERSE');
+        this.reverseButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.52 * this.parentButHt));
+        this.reverseButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
+        this.reverseButton.mousePressed(() => this.triggerReverse());
+
+    }
+
+    connectToBus(_effBus) {
+        this.delay.connect(_effBus);
+    }
+
+    triggerDelay() {
+
+    }
+
+    triggerAmpMod() {
+
+    }
+
+    triggerPlaybackRate() {
+
+    }
+
+    triggerReverse() {
+
     }
 }
 

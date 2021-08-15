@@ -12,16 +12,17 @@
 
 let w=window.innerWidth, h=window.innerHeight;
 let mic;
-let recButX=(0.1 * w), recButY=(0.15 * h), recButWd=(0.8 * w), recButHt=(0.2 * h);
-let samplerButton1, samplerButton2;
-let volNode1, volNode2, limiter;
+let recButX=(0.1 * w), recButY=(0.13 * h), recButWd=(0.8 * w), recButHt=(0.2 * h);
+let samplerButton1, samplerButton2, controls1, controls2;
+let volNode1, volNode2, effectBus, limiter;
 let delay;
 let ampModLFO;
 
 function preload() {
-    limiter = new Tone.Limiter(-4).toDestination();
+    limiter = new Tone.Limiter(-1).toDestination();
     volNode1 = new Tone.Volume().connect(limiter);
     volNode2 = new Tone.Volume().connect(limiter);
+    effectBus = new Tone.Volume().connect(limiter);
 }
 
 function setup() {
@@ -33,13 +34,22 @@ function setup() {
     //  new SamplerButton instances to record user input
     samplerButton1 = new SamplerButton(recButX, recButY, recButWd, recButHt);  
     samplerButton1.player.connect(volNode1);
-    buttonSignal1 = new SignalCircle(recButX + (0.5 * recButWd), recButY - (0.3 * recButHt), 0.3 * recButHt);
+    buttonSignal1 = new SignalCircle(recButX + (0.5 * recButWd), recButY - (0.2 * recButHt), 0.3 * recButHt);
 
-    samplerButton2 = new SamplerButton(recButX, (recButY + (recButHt * 2.2)), recButWd, recButHt);
+    samplerButton2 = new SamplerButton(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt);
     samplerButton2.player.connect(volNode2);
+    buttonSignal2 = new SignalCircle(recButX + (0.5 * recButWd), (recButY + (recButHt * 2.2)) - (0.3 * recButHt), 0.3 * recButHt);
 
     mic.connect(samplerButton1.recorder);      //  connect microphone output to Tone recorder object
     mic.connect(samplerButton2.recorder);      
+
+    controls1 = new PhoneControls(recButX, recButY, recButWd, recButHt, samplerButton1.player, volNode1);
+    controls2 = new PhoneControls(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt, samplerButton2.player, volNode2);
+
+    controls1.connectToBus(effectBus);
+    controls2.connectToBus(effectBus);
+
+    Tone.Transport.start();
 }
 
 function draw() {
@@ -53,5 +63,9 @@ function draw() {
 
     if (samplerButton1.state == 'recording') {
         buttonSignal1.drawRecordingCircle();
+    }
+
+    if (samplerButton2.state == 'recording') {
+        buttonSignal2.drawRecordingCircle();
     }
 }
