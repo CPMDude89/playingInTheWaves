@@ -44,7 +44,15 @@ function setup() {
     mic.connect(samplerButton2.recorder);      
 
     controls1 = new PhoneControls(recButX, recButY, recButWd, recButHt, samplerButton1.player, volNode1);
+
     controls2 = new PhoneControls(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt, samplerButton2.player, volNode2);
+    controls2.delayTimeLFO.frequency.value = 0.08;
+    controls2.delayTimeLFO.min = 0.03;
+    controls2.delayTimeLFO.max = 1;
+    controls2.ampModLFOModulator.frequency.value = 0.15;
+    controls2.ampModLFOModulator.min = 1;
+    controls2.ampModLFOModulator.max = 400;
+    controls2.playbackRateIncrement = 0.02;
 
     controls1.connectToBus(effectBus);
     controls2.connectToBus(effectBus);
@@ -68,4 +76,15 @@ function draw() {
     if (samplerButton2.state == 'recording') {
         buttonSignal2.drawRecordingCircle();
     }
+
+    if (samplerButton1.player.state == 'started') {
+        buttonSignal1.drawActiveCircle();
+    }
+
+    if (samplerButton2.player.state == 'started') {
+        buttonSignal2.drawActiveCircle();
+    }
+
+    controls1.checkForActivity();
+    controls2.checkForActivity();
 }

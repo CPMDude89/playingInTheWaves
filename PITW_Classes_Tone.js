@@ -584,34 +584,39 @@ class PhoneControls {
         this.delayButton.position(this.parentXpos, this.parentYpos + (1.05 * this.parentButHt));
         this.delayButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.delayButton.mousePressed(() => this.triggerDelay());
+        this.delaySignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.05 * this.parentButHt), 0.3 * this.parentButHt);
 
         this.delay = new Tone.FeedbackDelay(0.2, 0.7);
-        this.delayTimeLFO = new Tone.LFO(0.03, 0.03, 0.4).start().connect(this.delay.delayTime);
+        this.delayTimeLFO = new Tone.LFO(0.03, 0.01, 0.4).start().connect(this.delay.delayTime);
 
         this.ampModActive = false;
         this.ampModButton = createButton('AMP MOD');
         this.ampModButton.position(this.parentXpos, this.parentYpos + (1.52 * this.parentButHt));
         this.ampModButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.ampModButton.mousePressed(() => this.triggerAmpMod());
+        this.ampModSignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
 
         this.ampModLFO = new Tone.LFO(1, -100, 0).connect(this.player.volume);
         this.ampModLFO.set({
             amplitude: 0,
             phase: 90
         });
-        this.ampModLFOModulator = new Tone.LFO(0.1, 0.4, 40).start().connect(this.ampModLFO.frequency);
+        this.ampModLFOModulator = new Tone.LFO(0.1, 0.3, 50).start().connect(this.ampModLFO.frequency);
 
         this.playbackRateActive = false;
-        this.playbackRateButton = createButton('PLAYBACK RATE');
+        this.playbackRateIncrement = 0.01;
+        this.playbackRateButton = createButton('PLAY RATE');
         this.playbackRateButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.05 * this.parentButHt));
         this.playbackRateButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
-        this.playbackRateButton.mousePressed(() => this.triggerPlaybackRateLoop());
+        this.playbackRateButton.mousePressed(() => this.triggerPlaybackRate());
+        this.playbackRateSignal = new SignalCircle(this.parentXpos + (this.parentButWd * 0.48), (this.parentButHt * 0.225) + this.parentYpos + (1.05 * this.parentButHt), 0.3 * this.parentButHt);
         
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
         this.reverseButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.52 * this.parentButHt));
         this.reverseButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.reverseButton.mousePressed(() => this.triggerReverse());
+        this.reverseSignal = new SignalCircle(this.parentXpos + (this.parentButWd * 0.48), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
 
     }
 
@@ -619,20 +624,146 @@ class PhoneControls {
         this.delay.connect(_effBus);
     }
 
-    triggerDelay() {
+    checkForActivity() {
+        //  in draw() loop, check if any effects are active, and if so, draw the active circle indicator
+        if (this.delayActive) {
+            this.delaySignal.drawActiveCircle();
+        }
 
+        if (this.ampModActive) {
+            this.ampModSignal.drawActiveCircle();
+        }
+
+        if (this.playbackRateActive) {
+            this.playbackRateSignal.drawActiveCircle();
+        }
+
+        if (this.reverseActive) {
+            this.reverseSignal.drawActiveCircle();
+        }
+    }
+
+    triggerDelay() {
+        //  flip delay on/off
+        this.delayActive = this.delayActive ? this.delayActive = false : this.delayActive = true;
+
+        if (this.delayActive) {
+            this.player.connect(this.delay);
+            this.delay.wet.rampTo(1, 0.1);
+        }
+
+        else {
+            this.delay.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.delay);
+
+            this.delayTimeLFO.start();
+        }
     }
 
     triggerAmpMod() {
+        // flip amp mod on/off
+        this.ampModActive = this.ampModActive ? this.ampModActive = false : this.ampModActive = true;
 
+        if (this.ampModActive) {
+            this.player.volume.rampTo(-100, 0.1);
+            this.ampModLFO.amplitude.rampTo(1, 0.1);
+            this.ampModLFO.start("+0.1");
+        }
+
+        else {
+            this.ampModLFO.amplitude.rampTo(0, 0.1);
+            this.ampModLFO.phase = 90;
+            this.player.volume.rampTo(0, 0.1);
+            this.ampModLFO.stop("+0.1");
+        }
     }
 
     triggerPlaybackRate() {
+        // flip playback rate modulation on/off
+        this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
 
+        if (this.playbackRateActive) {
+            this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
+            this.playbackRateLoop.start();
+        }
+        else {
+            this.playbackRateLoop.stop();
+            this.playbackRateGoingDown = true;
+
+            this.player.playbackRate = 1;
+        }
+    }
+
+    playbackRateLFO() {
+        var curRate = this.player.playbackRate;
+        
+        if (this.playbackRateGoingDown) {
+            this.player.playbackRate -= this.playbackRateIncrement;
+        }
+        else {
+            this.player.playbackRate += this.playbackRateIncrement;
+        }
+
+        if (curRate < 0.1) {
+            this.playbackRateGoingDown = false;
+        }        
+        else if (curRate > 1.6) {
+            this.playbackRateGoingDown = true;
+        }
     }
 
     triggerReverse() {
+        //  flip track reverse on/off
+        this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
 
+        if (this.playbackRateActive) {
+            this.playbackRateActive = false;
+            this.playbackRateFrozen = false;
+        }
+
+        if (this.reverseActive) {
+            this.reverseLoop = new Tone.Loop((time) => {
+                if (this.player.playbackRate > 0.02 && !this.player.reverse) {
+                    this.player.playbackRate -= 0.01
+                }
+
+                if (this.player.playbackRate <= 0.02 && !this.player.reverse) {
+                    this.player.volume.rampTo(-100, 0.05);
+                    setTimeout(this.player.reverse = true, 100);
+                    this.player.volume.rampTo(0, 0.5);
+                }
+
+                if (this.player.playbackRate < 1 && this.player.reverse) {
+                    this.player.playbackRate += 0.01;
+                }
+
+                if (this.player.playbackRate == 1 && this.player.reverse) {
+                    this.reverseLoop.stop();
+                }
+            }, 0.01).start();
+        }
+
+        else {
+            this.reverseLoop = new Tone.Loop((time) => {
+                if (this.player.playbackRate > 0.02 && this.player.reverse) {
+                    this.player.playbackRate -= 0.01
+                }
+
+                if (this.player.playbackRate <= 0.02 && this.player.reverse) {
+                    this.player.volume.rampTo(-100, 0.05);
+                    setTimeout(this.player.reverse = false, 100);
+                    this.player.volume.rampTo(0, 0.5);
+                }
+
+                if (this.player.playbackRate < 1 && !this.player.reverse) {
+                    this.player.playbackRate += 0.01;
+                }
+
+                if (this.player.playbackRate == 1 && !this.player.reverse) {
+                    this.reverseLoop.stop();
+                }
+            }, 0.01).start();
+        }
     }
 }
 
@@ -1285,6 +1416,7 @@ class PlaygroundControls {
     }
 
     triggerPlaybackRateLoop() {
+        // flip playback rate modulation on/off
         this.playbackRateActive = this.playbackRateActive ? this.playbackRateActive = false : this.playbackRateActive = true;
 
         if (this.playbackRateActive) {
@@ -1322,6 +1454,7 @@ class PlaygroundControls {
     }
 
     triggerReverse() {
+        //  flip track reverse on/off
         this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
         if (this.playbackRateActive) {
             this.playbackRateActive = false;
@@ -1400,6 +1533,7 @@ class PlaygroundControls {
     }
 
     triggerReverb() {
+        //  turn reverb on/off
         this.reverbActive = this.reverbActive ? this.reverbActive = false : this.reverbActive = true;
 
         if (this.reverbActive) {
