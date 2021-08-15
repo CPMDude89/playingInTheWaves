@@ -87,7 +87,7 @@ function setup() {
      textAlign(CENTER);  //  set up page title
      textSize(40);
      fill(0);       
-     text('Playing In The Waves:\nGranulation', 0.5 * w, 0.05 * h); //  page title
+     text('Playing In The Waves:\nGranulation: Multiple Class Instances', 0.5 * w, 0.05 * h); //  page title
  
      if (state == 1) {     //  if button is recording
          fill(255, 0, 0);    //  red for record light
