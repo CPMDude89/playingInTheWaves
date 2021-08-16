@@ -21,13 +21,16 @@ function draw() {
     
     noStroke();
     fill(112, 219, 112);
-    rect(0, 0, w * 0.33, h * 0.8);
+    //rect(0, 0, w * 0.33, h * 0.8);
+    rect(0, 0, w * 0.5, h * 0.6);
 
     fill(71, 209, 71);
-    rect(w * 0.33, 0, w * 0.34, h * 0.8);
+    //rect(w * 0.33, 0, w * 0.34, h * 0.8);
+    rect(w * 0.5, 0, w * 0.5, h * 0.6);
 
     fill(46, 184, 46);
-    rect(w * 0.67, 0, w * 0.33, h * 0.8);
+    //rect(w * 0.67, 0, w * 0.33, h * 0.8);
+    rect(0, h * 0.6, w, h * 0.2);
 
     fill(0);
     rect(0, h * 0.8, w, h * 0.2);
@@ -35,7 +38,7 @@ function draw() {
     noStroke();
     textAlign(CENTER);
     fill(0);
-    textSize(40);
+    textSize(w * 0.03);
     text('Playing In The Waves: A Play-Based Approach to Web Audio', 0.5 * w, 0.1 * h);    
 
     textSize(20)
