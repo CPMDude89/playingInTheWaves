@@ -13,7 +13,7 @@
 let w=window.innerWidth, h=window.innerHeight;
 let mic;
 let recButX=(0.1 * w), recButY=(0.13 * h), recButWd=(0.8 * w), recButHt=(0.2 * h);
-let samplerButton1, samplerButton2, controls1, controls2;
+let sampler1, sampler2, controls1, controls2;
 let volNode1, volNode2, effectBus, limiter;
 let delay;
 let ampModLFO;
@@ -24,12 +24,6 @@ function preload() {
     volNode1 = new Tone.Volume().connect(limiter);
     volNode2 = new Tone.Volume().connect(limiter);
     effectBus = new Tone.Volume().connect(limiter);
-
-    stockSample1 = new Tone.Player("./sounds/snaps.wav").connect(volNode1);
-    stockSample1.set({
-        loop: true,
-        volume: -100
-    })
 }
 
 function setup() {
@@ -39,20 +33,20 @@ function setup() {
     mic.open();     //  turn on audio input
 
     //  new SamplerButton instances to record user input
-    samplerButton1 = new SamplerButton(recButX, recButY, recButWd, recButHt);  
-    samplerButton1.player.connect(volNode1);
+    sampler1 = new SamplerButton(recButX, recButY, recButWd, recButHt);  
+    sampler1.player.connect(volNode1);
     buttonSignal1 = new SignalCircle(recButX + (0.5 * recButWd), recButY - (0.2 * recButHt), 0.3 * recButHt);
 
-    samplerButton2 = new SamplerButton(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt);
-    samplerButton2.player.connect(volNode2);
+    sampler2 = new SamplerButton(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt);
+    sampler2.player.connect(volNode2);
     buttonSignal2 = new SignalCircle(recButX + (0.5 * recButWd), (recButY + (recButHt * 2.2)) - (0.3 * recButHt), 0.3 * recButHt);
 
-    mic.connect(samplerButton1.recorder);      //  connect microphone output to Tone recorder object
-    mic.connect(samplerButton2.recorder);      
+    mic.connect(sampler1.recorder);      //  connect microphone output to Tone recorder object
+    mic.connect(sampler2.recorder);      
 
-    controls1 = new PhoneControls(recButX, recButY, recButWd, recButHt, samplerButton1.player, volNode1);
+    controls1 = new PhoneControls(recButX, recButY, recButWd, recButHt, sampler1.player, volNode1);
 
-    controls2 = new PhoneControls(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt, samplerButton2.player, volNode2);
+    controls2 = new PhoneControls(recButX, (recButY + (recButHt * 2.1)), recButWd, recButHt, sampler2.player, volNode2);
     controls2.delayTimeLFO.frequency.value = 0.08;
     controls2.delayTimeLFO.min = 0.03;
     controls2.delayTimeLFO.max = 1;
@@ -64,11 +58,41 @@ function setup() {
     controls1.connectToBus(effectBus);
     controls2.connectToBus(effectBus);
 
-    sample1Active = false;
+    stockSample1Active = false;
+    sampler1.sampleActiveArray.push(stockSample1Active);
     stockSample1Button = createButton('SAMPLE 1');
     stockSample1Button.position(recButX + (recButWd * 0.55), recButY + (1.05 * recButHt));
     stockSample1Button.size(recButWd * 0.2, recButHt * 0.45);
-    stockSample1Button.mousePressed(triggerSample1);
+    stockSample1Button.mousePressed(() => {
+        stockSample1Active = stockSample1Active ? stockSample1Active = false : stockSample1Active = true;
+        if (stockSample1Active) {
+            sampler1.clearSampleActivity(0);
+        }
+        sampler1.player.load("./sounds/snaps.wav");
+        sampler1.button.html('PLAY SAMPLE 1');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+    sample1Signal = new SignalCircle(recButX + (recButWd * 0.52), (recButHt * 0.225) + recButY + (1.05 * recButHt), 0.3 * recButHt);
+
+    stockSample2Active = false;
+    sampler1.sampleActiveArray.push(stockSample2Active);
+    stockSample2Button = createButton('SAMPLE 2');
+    stockSample2Button.position(recButX + (recButWd * 0.55), recButY + (1.52 * recButHt));
+    stockSample2Button.size(recButWd * 0.2, recButHt * 0.45);
+    stockSample2Button.mousePressed(() => {
+        stockSample2Active = stockSample2Active ? stockSample2Active = false : stockSample2Active = true;
+        if (stockSample2Active) {
+            sampler1.clearSampleActivity(1);
+        }
+        sampler1.player.load("./sounds/slinky_lazer.wav");
+        sampler1.button.html('PLAY SAMPLE 2');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+    sample2Signal = new SignalCircle(recButX + (recButWd * 0.52), (recButHt * 0.225) + recButY + (1.52 * recButHt), 0.3 * recButHt);
 
     Tone.Transport.start();
 }
@@ -82,35 +106,31 @@ function draw() {
     fill(0);
     text('Playing In The Waves', 0.5 * w, 0.05 * h);     //  title text
 
-    if (samplerButton1.state == 'recording') {
+    if (sampler1.state == 'recording') {
         buttonSignal1.drawRecordingCircle();
     }
 
-    if (samplerButton2.state == 'recording') {
+    if (sampler2.state == 'recording') {
         buttonSignal2.drawRecordingCircle();
     }
 
-    if (samplerButton1.player.state == 'started') {
+    if (sampler1.player.state == 'started') {
         buttonSignal1.drawActiveCircle();
     }
 
-    if (samplerButton2.player.state == 'started') {
+    if (sampler2.player.state == 'started') {
         buttonSignal2.drawActiveCircle();
     }
 
+    if (sampler1.sampleActiveArray[0] == true) {
+        sample1Signal.drawActiveCircle();
+    }
+
+    if (sampler1.sampleActiveArray[1] == true) {
+        sample2Signal.drawActiveCircle();
+    }
+    
+
     controls1.checkForActivity();
     controls2.checkForActivity();
-}
-
-function triggerSample1() {
-    if (!sample1Active) {
-        stockSample1.start();
-        stockSample1.volume.rampTo(0, 0.05);
-        stockSample1Active = true;
-    }
-    else {
-        stockSample1.volume.rampTo(-100, 0.05);
-        stockSample1.stop("+0.05");
-        stockSample1Active = false;
-    }
 }

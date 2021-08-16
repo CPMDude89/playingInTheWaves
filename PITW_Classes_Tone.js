@@ -44,6 +44,7 @@ class SamplerButton {
         
         this.state = 'ready';   //  string to keep track of recording process and playback
         this.sampleLoaded = false;
+        this.sampleActiveArray = [];
 
         //  set up button
         this.button = createButton('RECORD');    //  p5 createButton()
@@ -119,9 +120,23 @@ class SamplerButton {
             this.button.position(this.Xpos, this.Ypos);
             this.button.html('RECORD');
             this.player.stop();
+            this.sampleLoaded = false;
+            this.clearSampleActivity(this.sampleActiveArray.length);
             this.state = 'ready';
             this.clearButton.remove();
         })
+    }
+    
+    clearSampleActivity(_activeSample) {
+        for (let i = 0; i < this.sampleActiveArray.length; i++) {
+            if (i == _activeSample) {
+                this.sampleActiveArray[i] = true;    
+            }
+            else {
+                this.sampleActiveArray[i] = false;
+            }
+            //console.log('i: ' + i + ' and the sampleActive is: ' + this.sampleActiveArray[i]);
+        }
     }
     
     /*
