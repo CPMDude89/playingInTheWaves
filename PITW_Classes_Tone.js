@@ -604,19 +604,15 @@ class PhoneControls {
         this.delay = new Tone.FeedbackDelay(0.2, 0.7);
         this.delayTimeLFO = new Tone.LFO(0.03, 0.01, 0.4).start().connect(this.delay.delayTime);
 
-        this.ampModActive = false;
-        this.ampModButton = createButton('AMP MOD');
-        this.ampModButton.position(this.parentXpos, this.parentYpos + (1.52 * this.parentButHt));
-        this.ampModButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
-        this.ampModButton.mousePressed(() => this.triggerAmpMod());
-        this.ampModSignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
+        this.pitchShifterActive = false;
+        this.shifterGoingDown = true;
+        this.pitchShifterButton = createButton('FREQ SHIFT');
+        this.pitchShifterButton.position(this.parentXpos, this.parentYpos + (1.52 * this.parentButHt));
+        this.pitchShifterButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
+        this.pitchShifterButton.mousePressed(() => this.triggerpitchShifter());
+        this.pitchShifterSignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
 
-        this.ampModLFO = new Tone.LFO(1, -100, 0).connect(this.player.volume);
-        this.ampModLFO.set({
-            amplitude: 0,
-            phase: 90
-        });
-        this.ampModLFOModulator = new Tone.LFO(0.1, 0.3, 50).start().connect(this.ampModLFO.frequency);
+        this.shifter = new Tone.PitchShift();
 
         this.playbackRateActive = false;
         this.playbackRateIncrement = 0.01;
@@ -637,6 +633,7 @@ class PhoneControls {
 
     connectToBus(_effBus) {
         this.delay.connect(_effBus);
+        this.shifter.connect(_effBus);
     }
 
     checkForActivity() {
@@ -645,8 +642,8 @@ class PhoneControls {
             this.delaySignal.drawActiveCircle();
         }
 
-        if (this.ampModActive) {
-            this.ampModSignal.drawActiveCircle();
+        if (this.pitchShifterActive) {
+            this.pitchShifterSignal.drawActiveCircle();
         }
 
         if (this.playbackRateActive) {
@@ -665,31 +662,58 @@ class PhoneControls {
         if (this.delayActive) {
             this.player.connect(this.delay);
             this.delay.wet.rampTo(1, 0.1);
+
+            if (this.pitchShifterActive) {
+                this.delay.connect(this.shifter);
+            }
         }
 
         else {
             this.delay.wet.rampTo(0, 0.1);
             this.player.disconnect(this.delay);
+            this.delay.disconnect(this.shifter);
 
             this.delayTimeLFO.start();
         }
     }
 
-    triggerAmpMod() {
+    triggerpitchShifter() {
         // flip amp mod on/off
-        this.ampModActive = this.ampModActive ? this.ampModActive = false : this.ampModActive = true;
+        this.pitchShifterActive = this.pitchShifterActive ? this.pitchShifterActive = false : this.pitchShifterActive = true;
 
-        if (this.ampModActive) {
-            this.player.volume.rampTo(-100, 0.1);
-            this.ampModLFO.amplitude.rampTo(1, 0.1);
-            this.ampModLFO.start("+0.1");
+        if (this.pitchShifterActive) {
+            this.player.connect(this.shifter);
+            this.shifter.wet.rampTo(1, 0.1);
+            this.volOut.volume.rampTo(-20, 0.5);
+            this.shifterLoop = new Tone.Loop((time) => this.shifterLFO(), 0.02);
+            this.shifterLoop.start();
+        }
+        else {
+            this.shifter.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.shifter);
+            this.volOut.volume.rampTo(-0, 0.5);
+            this.shifterLoop.stop();
+            this.shifterGoingDown = true;
+
+            this.shifter.pitch = 0;
+        }
+    }
+
+    shifterLFO() {
+        var shiftedPitch = this.shifter.pitch;
+
+        if (this.shifterGoingDown) {
+            this.shifter.pitch -= 0.08;
+        }
+        else {
+            this.shifter.pitch += 0.08;
         }
 
-        else {
-            this.ampModLFO.amplitude.rampTo(0, 0.1);
-            this.ampModLFO.phase = 90;
-            this.player.volume.rampTo(0, 0.1);
-            this.ampModLFO.stop("+0.1");
+        if (shiftedPitch < -20) {
+            this.shifterGoingDown = false;
+        }
+        else if (shiftedPitch > 20) {
+            this.shifterGoingDown = true;
         }
     }
 

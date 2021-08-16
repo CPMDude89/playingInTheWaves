@@ -50,9 +50,6 @@ function setup() {
     controls2.delayTimeLFO.frequency.value = 0.08;
     controls2.delayTimeLFO.min = 0.03;
     controls2.delayTimeLFO.max = 1;
-    controls2.ampModLFOModulator.frequency.value = 0.15;
-    controls2.ampModLFOModulator.min = 1;
-    controls2.ampModLFOModulator.max = 400;
     controls2.playbackRateIncrement = 0.02;
 
     controls1.connectToBus(effectBus);
@@ -64,10 +61,7 @@ function setup() {
     stockSample1Button.position(recButX + (recButWd * 0.55), recButY + (1.05 * recButHt));
     stockSample1Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample1Button.mousePressed(() => {
-        stockSample1Active = stockSample1Active ? stockSample1Active = false : stockSample1Active = true;
-        if (stockSample1Active) {
-            sampler1.clearSampleActivity(0);
-        }
+        sampler1.clearSampleActivity(0);
         sampler1.player.load("./sounds/snaps.wav");
         sampler1.button.html('PLAY SAMPLE 1');
         sampler1.sampleLoaded = true;
@@ -82,10 +76,7 @@ function setup() {
     stockSample2Button.position(recButX + (recButWd * 0.55), recButY + (1.52 * recButHt));
     stockSample2Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample2Button.mousePressed(() => {
-        stockSample2Active = stockSample2Active ? stockSample2Active = false : stockSample2Active = true;
-        if (stockSample2Active) {
-            sampler1.clearSampleActivity(1);
-        }
+        sampler1.clearSampleActivity(1);
         sampler1.player.load("./sounds/slinky_lazer.wav");
         sampler1.button.html('PLAY SAMPLE 2');
         sampler1.sampleLoaded = true;
@@ -93,6 +84,36 @@ function setup() {
         sampler1.state = 'play';
     })
     sample2Signal = new SignalCircle(recButX + (recButWd * 0.52), (recButHt * 0.225) + recButY + (1.52 * recButHt), 0.3 * recButHt);
+
+    stockSample3Active = false;
+    sampler1.sampleActiveArray.push(stockSample3Active);
+    stockSample3Button = createButton('SAMPLE 3');
+    stockSample3Button.position(recButX + (recButWd * 0.79), recButY + (1.05 * recButHt));
+    stockSample3Button.size(recButWd * 0.2, recButHt * 0.45);
+    stockSample3Button.mousePressed(() => {
+        sampler1.clearSampleActivity(2);
+        sampler1.player.load("./sounds/CD_h_gibberish_edit_4.wav");
+        sampler1.button.html('PLAY SAMPLE 3');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+    sample3Signal = new SignalCircle(recButX + (recButWd * 1.02), (recButHt * 0.225) + recButY + (1.05 * recButHt), 0.3 * recButHt);
+
+    stockSample4Active = false;
+    sampler1.sampleActiveArray.push(stockSample4Active);
+    stockSample4Button = createButton('SAMPLE 4');
+    stockSample4Button.position(recButX + (recButWd * 0.79), recButY + (1.52 * recButHt));
+    stockSample4Button.size(recButWd * 0.2, recButHt * 0.45);
+    stockSample4Button.mousePressed(() => {
+        sampler1.clearSampleActivity(3);
+        sampler1.player.load("./sounds/lazer_chargeUp.wav");
+        sampler1.button.html('PLAY SAMPLE 4');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+    sample4Signal = new SignalCircle(recButX + (recButWd * 1.02), (recButHt * 0.225) + recButY + (1.52 * recButHt), 0.3 * recButHt);
 
     Tone.Transport.start();
 }
@@ -128,6 +149,14 @@ function draw() {
 
     if (sampler1.sampleActiveArray[1] == true) {
         sample2Signal.drawActiveCircle();
+    }
+
+    if (sampler1.sampleActiveArray[2] == true) {
+        sample3Signal.drawActiveCircle();
+    }
+
+    if (sampler1.sampleActiveArray[3] == true) {
+        sample4Signal.drawActiveCircle();
     }
     
 
