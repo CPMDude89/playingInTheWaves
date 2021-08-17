@@ -13,6 +13,7 @@ let tourLink;
 let testSlider;
 let pageRecorder;
 
+
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
 
@@ -26,7 +27,7 @@ function preload() {
 }
 
 function setup() {
-    frameRate(45);
+    frameRate(30);
 
     canv = createCanvas(w, h);
 
@@ -62,9 +63,11 @@ function setup() {
     //controls2.filterSweep.frequency.value = 10;
     controls2.filterSweep.octaves = 4.5;
     controls2.filterSweep.filter.Q.value = 4;
+    /*
     controls2.freqShifterLFO.frequency.value = 0.05;
     controls2.freqShifterLFO.min = -500;
     controls2.freqShifterLFO.max = 400;
+    */
     //controls2.pannerFreqLFO.frequency.value = 0.1;
     controls2.pannerFreqLFO.frequency.value = 0.5;
     controls2.pannerFreqLFO.min = 0.5;
@@ -86,9 +89,11 @@ function setup() {
     controls3.filterSweep.baseFrequency = 100
     controls3.filterSweep.octaves = 5;
     controls3.filterSweep.filter.Q.value = 7;
+    /*
     controls3.freqShifterLFO.frequency.value = 0.03;
     controls3.freqShifterLFO.min = -500;
     controls3.freqShifterLFO.max = 600;
+    */
     //controls3.pannerFreqLFO.frequency.value = 0.07;
     controls3.pannerFreqLFO.frequency.value = 1;
     controls3.pannerFreqLFO.min = 0.08;
@@ -128,6 +133,18 @@ function setup() {
         sampler3.showControls();
         sampler3.state = 'play';
     })
+
+    volSlider1 = createSlider(-20, 0, -6, 0.5);
+    volSlider1.position(w * 0.01, recButY);
+    volSlider1.size(0.1 * w, 0.05 * h);
+
+    volSlider2 = createSlider(-20, 0, -6, 0.5);
+    volSlider2.position(w * 0.01, recButY * 2.25);
+    volSlider2.size(0.1 * w, 0.05 * h);
+
+    volSlider3 = createSlider(-20, 0, -6, 0.5);
+    volSlider3.position(w * 0.01, recButY * 3.5);
+    volSlider3.size(0.1 * w, 0.05 * h);
 
     tourLink = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'TAKE THE TOUR');
     tourLink.position(0.05 * w, 0.05 * h);
@@ -177,6 +194,16 @@ function draw() {
     controls2.checkForActivity();
     controls3.checkForActivity();
 
+    sampler1.player.volume.value = volSlider1.value();
+    sampler2.player.volume.value = volSlider2.value();
+    sampler3.player.volume.value = volSlider3.value();
+
+    noStroke();
+    textSize(16);
+    fill(0);
+    text('TRACK 1 VOLUME', w * 0.015, recButY * 0.95);
+    text('TRACK 2 VOLUME', w * 0.015, recButY * 2.23);    
+    text('TRACK 3 VOLUME', w * 0.015, recButY * 3.3);    
 }
 
 //  if any key is pressed down
@@ -355,8 +382,8 @@ function mousePressed() {
 
         if (!controls1.freqShifterParamTrackActive) {
             controls1.freqShifterParamTrackActive = true;
-            controls1.freqShifter.wet.rampTo(0, 0.1);
-            controls1.freqShifterParamTrack.wet.rampTo(1, 0.1);
+            //controls1.freqShifter.wet.rampTo(0, 0.1);
+            //controls1.freqShifterParamTrack.wet.rampTo(1, 0.1);
         }
         else if (controls1.freqShifterParamTrackActive && !controls1.freqShifterParamTrackActive_Y) {
             controls1.freqShifterParamTrackActive_Y = true;
@@ -366,8 +393,8 @@ function mousePressed() {
             controls1.freqShifterParamTrackActive = false;
             controls1.freqShifterParamTrackActive_Y = false;
 
-            controls1.freqShifter.wet.rampTo(1, 0.1);
-            controls1.freqShifterParamTrack.wet.rampTo(0, 0.1);
+            //controls1.freqShifter.wet.rampTo(1, 0.1);
+            //controls1.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
     }
 
@@ -501,8 +528,8 @@ function mousePressed() {
 
         if (!controls2.freqShifterParamTrackActive) {
             controls2.freqShifterParamTrackActive = true;
-            controls2.freqShifter.wet.rampTo(0, 0.1);
-            controls2.freqShifterParamTrack.wet.rampTo(1, 0.1);
+            //controls2.freqShifter.wet.rampTo(0, 0.1);
+            //controls2.freqShifterParamTrack.wet.rampTo(1, 0.1);
         }
         else if (controls2.freqShifterParamTrackActive && !controls2.freqShifterParamTrackActive_Y) {
             controls2.freqShifterParamTrackActive_Y = true;
@@ -645,8 +672,8 @@ function mousePressed() {
 
         if (!controls3.freqShifterParamTrackActive) {
             controls3.freqShifterParamTrackActive = true;
-            controls3.freqShifter.wet.rampTo(0, 0.1);
-            controls3.freqShifterParamTrack.wet.rampTo(1, 0.1);
+            //controls3.freqShifter.wet.rampTo(0, 0.1);
+            //controls3.freqShifterParamTrack.wet.rampTo(1, 0.1);
         }
         else if (controls3.freqShifterParamTrackActive && !controls3.freqShifterParamTrackActive_Y) {
             controls3.freqShifterParamTrackActive_Y = true;
@@ -656,8 +683,8 @@ function mousePressed() {
             controls3.freqShifterParamTrackActive = false;
             controls3.freqShifterParamTrackActive_Y = false;
 
-            controls3.freqShifter.wet.rampTo(1, 0.1);
-            controls3.freqShifterParamTrack.wet.rampTo(0, 0.1);
+            //controls3.freqShifter.wet.rampTo(1, 0.1);
+            //controls3.freqShifterParamTrack.wet.rampTo(0, 0.1);
         }
     }
 

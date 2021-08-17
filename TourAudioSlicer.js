@@ -123,9 +123,16 @@ function draw() {
         endShape();
 
         textSize(30);
-        stroke(0);
+        noStroke();
         if (playActive) {
             text('Click anywhere on black box to STOP playback.', 0.5 * w, 0.85 * topSide);
+            strokeWeight(5);
+            stroke(0);
+            line(0.06 * w, topSide + (0.1 * soundVizHt), 0.06 * w, bottomSide - (0.1 * soundVizHt));
+            textSize(20)
+            noStroke();
+            text('LARGER SLICE', 0.06 * w, topSide + (0.08 * soundVizHt));
+            text('SMALLER SLICE', 0.06 * w, bottomSide - (0.05 * soundVizHt));
         }
         else {
             text('Click anywhere on black box to START playback.', 0.5 * w, 0.85 * topSide);
@@ -173,8 +180,11 @@ function draw() {
     }
 
     stroke(255, 0, 0);
+    strokeWeight(1.5);
         line(startLine, topSide, startLine, bottomSide); //  start line
         line(endLine, topSide, endLine, bottomSide);   //  end line
+
+    
 }
 
 async function recordIn() {

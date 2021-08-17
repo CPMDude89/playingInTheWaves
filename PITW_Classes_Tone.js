@@ -909,6 +909,9 @@ class PlaygroundControls {
         this.freqShifterButton.mousePressed(() => this.triggerFreqShifter());
         this.freqShifterSignal = new SignalCircle((0.6 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
 
+        this.freqShifter = new Tone.PitchShift(0);
+
+        /*
         this.freqShifter = new Tone.FrequencyShifter({
             frequency: 0
         });
@@ -924,6 +927,7 @@ class PlaygroundControls {
             wet: 0
         });
         this.player.connect(this.freqShifterParamTrack);
+        */
 
         this.playbackRateIncrement = 0.01;
         this.playbackRateActive = false;
@@ -982,7 +986,7 @@ class PlaygroundControls {
         this.delay.connect(_output);
         this.filterSweep.connect(_output);
         this.freqShifter.connect(_output);
-        this.freqShifterParamTrack.connect(_output);
+        //this.freqShifterParamTrack.connect(_output);
         this.panner.connect(_output);
         this.pannerParamTrack.connect(_output);
     }
@@ -1194,8 +1198,11 @@ class PlaygroundControls {
                 }
 
                 else {  //  if effect has NOT been frozen
-                    var frs = map(mouseX, 0, w, 0, 500);    //  scale x-axis value for freqshifter base freq
-                    this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);  //  apply scaled value
+                    //var frs = map(mouseX, 0, w, 0, 500);    //  scale x-axis value for freqshifter base freq
+                    var frs = map(mouseX, 0, w, -24, 20);    //  scale x-axis value for freqshifter base freq
+                    //this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);  //  apply scaled value
+                    //if (frs == 0) {frs= 0.001};
+                    this.freqShifter.pitch = frs;
                     noStroke();
                     this.freqShifterSignal.drawLavenderCircle();    //  draw signal circle
 
@@ -1219,8 +1226,10 @@ class PlaygroundControls {
                 }
 
                 else {  //  if effect has NOT been frozen
-                    var frs = map(mouseY, h, 0, 0, 500);    //  scale y-axis value for freqshifter base freq
-                    this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);   //  apply scaled value
+                    //var frs = map(mouseY, h, 0, 0, 500);    //  scale y-axis value for freqshifter base freq
+                    var frs = map(mouseY, h, 0, -24, 20);    //  scale y-axis value for freqshifter base freq
+                    //this.freqShifterParamTrack.frequency.rampTo(frs, 0.1);   //  apply scaled value
+                    this.freqShifter.pitch = frs;
                     noStroke();
                     this.freqShifterSignal.drawGoldCircle();    //  draw signal circle
 
@@ -1363,18 +1372,6 @@ class PlaygroundControls {
             this.reverseSignal.drawActiveCircle();
         }
     }
-
-    checkParamTracks() {
-        var check = 0;
-
-        if (this.delayParamTrackActive) {check++;}
-        if (this.ampModParamTrackActive) {check++;}
-
-        if (check > 0) {this.paramTrackActive = true;}
-        else {this.paramTrackActive = false;}
-
-        //console.log(this.paramTrackActive);
-    }
     
     triggerDelay() {
         //  flip delay on/off
@@ -1442,15 +1439,52 @@ class PlaygroundControls {
         if (this.freqShifterActive) {
             this.player.connect(this.freqShifter);
             this.freqShifter.wet.rampTo(1, 0.1);
+            this.volOut.volume.rampTo(-20, 0.5);
+            this.shifterLoop = new Tone.Loop((time) => this.shifterLFO(), 0.01);
+            this.shifterLoop.start();
+            /*
+            this.player.connect(this.freqShifter);
+            this.freqShifter.wet.rampTo(1, 0.1);
             this.freqShifterLFO.start();
+            */
         }
 
         else {
             this.freqShifter.wet.rampTo(0, 0.1);
             this.player.disconnect(this.freqShifter);
+            this.volOut.volume.rampTo(-0, 0.5);
+            this.shifterLoop.stop();
+            this.freqShifterGoingDown = true;
+
+            this.freqShifter.pitch = 0;
+
+            this.freqShifterParamTrackActive = false;
+            this.freqShifterParamTrackActive_Y = false;
+            /*
+            this.freqShifter.wet.rampTo(0, 0.1);
+            this.player.disconnect(this.freqShifter);
             this.freqShifterParamTrack.wet.rampTo(0, 0.1);
             this.freqShifterParamTrackActive = false;
             this.freqShifterParamTrackActive_Y = false;
+            */
+        }
+    }
+
+    shifterLFO() {
+        var shiftedPitch = this.freqShifter.pitch;
+
+        if (this.freqShifterGoingDown) {
+            this.freqShifter.pitch -= 0.05;
+        }
+        else {
+            this.freqShifter.pitch += 0.05;
+        }
+
+        if (shiftedPitch < -20) {
+            this.freqShifterGoingDown = false;
+        }
+        else if (shiftedPitch > 20) {
+            this.freqShifterGoingDown = true;
         }
     }
 
@@ -1476,11 +1510,9 @@ class PlaygroundControls {
         var curRate = this.player.playbackRate;
         
         if (this.playbackRateGoingDown) {
-            //this.player.playbackRate -= 0.01;
             this.player.playbackRate -= this.playbackRateIncrement;
         }
         else {
-            //this.player.playbackRate += 0.01;
             this.player.playbackRate += this.playbackRateIncrement;
         }
 
@@ -1577,11 +1609,27 @@ class PlaygroundControls {
 
         if (this.reverbActive) {
             this.player.connect(this.verb);
+            this.makeReverbRouteButton();
         }
 
         else {
             this.player.disconnect(this.verb);
+            this.reverbRouteButton.remove();
+            this.delay.disconnect(this.verb);
         }
+    }
+
+    makeReverbRouteButton() {
+        this.reverbRouteActive = false;
+        this.reverbRouteButton = createButton('DELAY -> VERB');
+        this.reverbRouteButton.position(0.2 * this.parentXpos, this.parentYpos + 1.1 * this.parentButHt);
+        this.reverbRouteButton.size(0.5 * this.parentButWd, 0.5 * this.parentButHt);
+        this.reverbRouteButton.mousePressed(() => {
+            this.reverbRouteActive = this.reverbRouteActive ? this.reverbRouteActive = false : this.reverbRouteActive = true;
+            if (this.reverbRouteActive) {this.delay.connect(this.verb);}
+            else {this.delay.disconnect(this.verb);}
+            
+        })
     }
 
     freezeDelay(_x, _y) {
