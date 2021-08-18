@@ -167,10 +167,15 @@ function setup() {
     })
     sample8Signal = new SignalCircle(recButX + (recButWd * 1.02), (recButHt * 0.225) + (recButY + (recButHt * 2.1)) + (1.52 * recButHt), 0.3 * recButHt);
     
+    linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html', 'BACK TO HOMEPAGE');
+    linkBackward.position(0.05 * w, 0.04 * h);
+    linkBackward.style('font-size', '1.5vw');
+
     Tone.Transport.start();
 }
 
 function draw() {
+    textOutput();
     background(0, 150, 80);     //  background color
 
     noStroke();     //  set up title text

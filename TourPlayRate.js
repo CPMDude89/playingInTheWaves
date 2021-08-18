@@ -13,7 +13,7 @@ let volNode, volNodeWave;
 let shifter;
 let sample1Button, sample1Active=false, sample2Button, sample2Active=false;
 let seekLoop;
-let linkForward;
+let linkForward, linkBackward;
 let pageRecorder, pageRecButX = w * 0.9, pageRecButY = 0.85 * h, pageRecButWd=0.65 * recButWd;
 
 function preload() {
@@ -73,9 +73,13 @@ function setup() {
     sample2Button.size(recButWd, recButHt);
     sample2Button.mousePressed(triggerSample2); 
 
-    textSize(50)
     linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html', 'NEXT TOUR STOP');
-    linkForward.position(0.8 * w, 0.05 * h);
+    linkForward.position(0.8 * w, 0.04 * h);
+    linkForward.style('font-size', '1.5vw');
+
+    linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html', 'BACK TO HOMEPAGE');
+    linkBackward.position(0.05 * w, 0.04 * h);
+    linkBackward.style('font-size', '1.5vw');
     
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     volNode.connect(pageRecorder.recorder);
@@ -85,6 +89,7 @@ function setup() {
 }
 
 function draw() {
+    textOutput();
     background(0, 150, 80);     // nice shade of forest green
 
     noStroke();

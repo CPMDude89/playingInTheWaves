@@ -92,10 +92,12 @@ function setup() {
     })
 
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'PREVIOUS TOUR STOP');
-    linkBackward.position(0.05 * w, 0.05 * h);
+    linkBackward.position(0.05 * w, 0.04 * h);
+    linkBackward.style('font-size', '1.5vw');
     
     linkForward = createA('https://cpmdude89.github.io/playingInTheWaves/TourDelay.html', 'NEXT TOUR STOP');
-    linkForward.position(0.8 * w, 0.05 * h);
+    linkForward.position(0.8 * w, 0.04 * h);
+    linkForward.style('font-size', '1.5vw');
 
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     limiter.connect(pageRecorder.recorder);
@@ -105,6 +107,7 @@ function setup() {
 }
 
 function draw() {
+    textOutput();
     background(0, 150, 80);     // nice shade of forest green
 
     noStroke();     //  set up page title

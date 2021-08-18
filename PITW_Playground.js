@@ -9,7 +9,7 @@ let longSample1
 let volSlider1, volSlider2, volSlider3;
 let reverb;
 let YDepth, XFreq;
-let tourLink;
+let tourLink, homepageLink;
 let testSlider;
 let pageRecorder;
 
@@ -147,7 +147,12 @@ function setup() {
     volSlider3.size(0.1 * w, 0.05 * h);
 
     tourLink = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'TAKE THE TOUR');
-    tourLink.position(0.05 * w, 0.05 * h);
+    tourLink.position(0.05 * w, 0.04 * h);
+    tourLink.style('font-size', '1.5vw');
+
+    homepageLink = createA('https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html', 'BACK TO HOMEPAGE');
+    homepageLink.position(0.8 * w, 0.04 * h);
+    homepageLink.style('font-size', '1.5vw');
 
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     limiter.connect(pageRecorder.recorder);
@@ -157,6 +162,7 @@ function setup() {
 }
 
 function draw() {
+    textOutput();
     background(0, 150, 80);
 
     noStroke();
