@@ -13,7 +13,7 @@ let volNode, volNodeWave;
 let shifter;
 let sample1Button, sample1Active=false, sample2Button, sample2Active=false;
 let seekLoop;
-let linkForward, linkBackward;
+let linkForward, linkBackward, titleLink;
 let pageRecorder, pageRecButX = w * 0.9, pageRecButY = 0.85 * h, pageRecButWd=0.65 * recButWd;
 
 function preload() {
@@ -80,6 +80,29 @@ function setup() {
     linkBackward = createA('https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html', 'BACK TO HOMEPAGE');
     linkBackward.position(0.05 * w, 0.04 * h);
     linkBackward.style('font-size', '1.5vw');
+
+    //titleLinkA = createA('http://127.0.0.1:5500/TourPlayRate_Explainer.md', '');
+    //titleLinkA.id('link_to_explainer');
+
+    titleLink = createDiv('Tour: Play Back Rate and Pitch Shift');
+    titleLink.position(0.26 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.style('font-weight', 'bold');
+        titleLink.position(0.25 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.26 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('http://127.0.0.1:5500/TourPlayRate_Explainer.md');
+    })
+    
     
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     volNode.connect(pageRecorder.recorder);
@@ -96,7 +119,7 @@ function draw() {
     textAlign(CENTER);  //  set up page title
     textSize(40);
     fill(0);       
-    text('Playing In The Waves:\nPlayback Rate and Pitch Shift', 0.5 * w, 0.05 * h); //  page title
+    //text('Playing In The Waves:\nPlayback Rate and Pitch Shift', 0.5 * w, 0.05 * h); //  page title
 
 
     if (samplerButton.state == 'recording') {     //  if button is recording

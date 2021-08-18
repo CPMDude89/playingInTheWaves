@@ -231,7 +231,4 @@ function draw() {
     if (sampler2.sampleActiveArray[3] == true) {
         sample8Signal.drawActiveCircle();
     }
-
-    controls1.checkForActivity();
-    controls2.checkForActivity();
 }

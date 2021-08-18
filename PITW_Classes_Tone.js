@@ -599,8 +599,7 @@ class PhoneControls {
         this.delayButton.position(this.parentXpos, this.parentYpos + (1.05 * this.parentButHt));
         this.delayButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.delayButton.mousePressed(() => this.triggerDelay());
-        this.delaySignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.05 * this.parentButHt), 0.3 * this.parentButHt);
-
+        
         this.delay = new Tone.FeedbackDelay(0.2, 0.7);
         this.delayTimeLFO = new Tone.LFO(0.03, 0.01, 0.4).start().connect(this.delay.delayTime);
 
@@ -610,8 +609,6 @@ class PhoneControls {
         this.pitchShifterButton.position(this.parentXpos, this.parentYpos + (1.52 * this.parentButHt));
         this.pitchShifterButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.pitchShifterButton.mousePressed(() => this.triggerpitchShifter());
-        this.pitchShifterSignal = new SignalCircle(this.parentXpos - (this.parentButWd * 0.03), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
-
         this.shifter = new Tone.PitchShift();
 
         this.playbackRateActive = false;
@@ -620,39 +617,17 @@ class PhoneControls {
         this.playbackRateButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.05 * this.parentButHt));
         this.playbackRateButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.playbackRateButton.mousePressed(() => this.triggerPlaybackRate());
-        this.playbackRateSignal = new SignalCircle(this.parentXpos + (this.parentButWd * 0.48), (this.parentButHt * 0.225) + this.parentYpos + (1.05 * this.parentButHt), 0.3 * this.parentButHt);
         
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
         this.reverseButton.position(this.parentXpos + (this.parentButWd * 0.25), this.parentYpos + (1.52 * this.parentButHt));
         this.reverseButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.reverseButton.mousePressed(() => this.triggerReverse());
-        this.reverseSignal = new SignalCircle(this.parentXpos + (this.parentButWd * 0.48), (this.parentButHt * 0.225) + this.parentYpos + (1.52 * this.parentButHt), 0.3 * this.parentButHt);
-
     }
 
     connectToBus(_effBus) {
         this.delay.connect(_effBus);
         this.shifter.connect(_effBus);
-    }
-
-    checkForActivity() {
-        //  in draw() loop, check if any effects are active, and if so, draw the active circle indicator
-        if (this.delayActive) {
-            this.delaySignal.drawActiveCircle();
-        }
-
-        if (this.pitchShifterActive) {
-            this.pitchShifterSignal.drawActiveCircle();
-        }
-
-        if (this.playbackRateActive) {
-            this.playbackRateSignal.drawActiveCircle();
-        }
-
-        if (this.reverseActive) {
-            this.reverseSignal.drawActiveCircle();
-        }
     }
 
     triggerDelay() {
@@ -666,14 +641,25 @@ class PhoneControls {
             if (this.pitchShifterActive) {
                 this.delay.connect(this.shifter);
             }
+
+            this.delayButton.style('background-color', 'Blue');
+            this.delayButton.style('color', 'White');
+            console.log(this.delayActive);
         }
 
-        else {
+        else if (!this.delayActive) {
             this.delay.wet.rampTo(0, 0.1);
             this.player.disconnect(this.delay);
-            this.delay.disconnect(this.shifter);
+
+            if (this.pitchShifterActive) {
+                this.delay.disconnect(this.shifter);
+            }
 
             this.delayTimeLFO.start();
+
+            this.delayButton.style('background-color', 'White');
+            this.delayButton.style('color', 'Black');
+            console.log(this.delayActive);
         }
     }
 
@@ -687,6 +673,9 @@ class PhoneControls {
             this.volOut.volume.rampTo(-20, 0.5);
             this.shifterLoop = new Tone.Loop((time) => this.shifterLFO(), 0.02);
             this.shifterLoop.start();
+
+            this.pitchShifterButton.style('background-color', 'Blue');
+            this.pitchShifterButton.style('color', 'White');
         }
         else {
             this.shifter.wet.rampTo(0, 0.1);
@@ -696,6 +685,9 @@ class PhoneControls {
             this.shifterGoingDown = true;
 
             this.shifter.pitch = 0;
+
+            this.pitchShifterButton.style('background-color', 'White');
+            this.pitchShifterButton.style('color', 'Black');
         }
     }
 
@@ -724,12 +716,18 @@ class PhoneControls {
         if (this.playbackRateActive) {
             this.playbackRateLoop = new Tone.Loop((time) => this.playbackRateLFO(), 0.05);
             this.playbackRateLoop.start();
+
+            this.playbackRateButton.style('background-color', 'Blue');
+            this.playbackRateButton.style('color', 'White');
         }
         else {
             this.playbackRateLoop.stop();
             this.playbackRateGoingDown = true;
 
             this.player.playbackRate = 1;
+
+            this.playbackRateButton.style('background-color', 'White');
+            this.playbackRateButton.style('color', 'Black');
         }
     }
 
@@ -755,11 +753,6 @@ class PhoneControls {
         //  flip track reverse on/off
         this.reverseActive = this.reverseActive ? this.reverseActive = false : this.reverseActive = true;
 
-        if (this.playbackRateActive) {
-            this.playbackRateActive = false;
-            this.playbackRateFrozen = false;
-        }
-
         if (this.reverseActive) {
             this.reverseLoop = new Tone.Loop((time) => {
                 if (this.player.playbackRate > 0.02 && !this.player.reverse) {
@@ -780,6 +773,9 @@ class PhoneControls {
                     this.reverseLoop.stop();
                 }
             }, 0.01).start();
+
+            this.reverseButton.style('background-color', 'Blue');
+            this.reverseButton.style('color', 'White');
         }
 
         else {
@@ -802,6 +798,9 @@ class PhoneControls {
                     this.reverseLoop.stop();
                 }
             }, 0.01).start();
+
+            this.reverseButton.style('background-color', 'White');
+            this.reverseButton.style('color', 'Black');
         }
     }
 }
