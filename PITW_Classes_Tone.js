@@ -599,7 +599,7 @@ class PhoneControls {
         this.delayButton.position(this.parentXpos, this.parentYpos + (1.05 * this.parentButHt));
         this.delayButton.size(this.parentButWd * 0.2, this.parentButHt * 0.45);
         this.delayButton.mousePressed(() => this.triggerDelay());
-        
+
         this.delay = new Tone.FeedbackDelay(0.2, 0.7);
         this.delayTimeLFO = new Tone.LFO(0.03, 0.01, 0.4).start().connect(this.delay.delayTime);
 
@@ -894,7 +894,7 @@ class PlaygroundControls {
             depth: 0.8,
             octaves: 4
         });
-        this.filterSweep.filter.Q.value = 6;
+        this.filterSweep.filter.Q.value = 4;
 
         this.freqShifterActive = false;
         this.freqShifterFrozen = false;
@@ -1419,6 +1419,7 @@ class PlaygroundControls {
         if (this.filterSweepActive) {
             this.player.connect(this.filterSweep);
             this.filterSweep.start();
+            this.filterSweep.wet = 0.8;
         }
 
         else {

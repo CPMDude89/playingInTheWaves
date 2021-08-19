@@ -101,12 +101,25 @@ function setup() {
     controls3.pannerFreqLFO.max = 50;
     controls3.panner.depth.value = 1;
 
-    shortSample1Button = createButton('SHORT SAMPLE 1');
+    //  ---- SHORT SAMPLE 1 ---- //
+    shortSample1Button = createButton('SAMPLE 1');
     shortSample1Button.position(recButX, (recButY) + 1.7 * recButHt);
     shortSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
     shortSample1Button.mousePressed(() => {
         sampler1.player.load("./sounds/martina_3.wav");
         sampler1.button.html('PLAY SAMPLE 1');
+        sampler1.sampleLoaded = true;
+        sampler1.showControls();
+        sampler1.state = 'play';
+    })
+
+    //  ---- SHORT SAMPLE 2 ---- //
+    shortSample2Button = createButton('SAMPLE 2');
+    shortSample2Button.position(recButX * 0.85, (recButY) + 1.7 * recButHt);
+    shortSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
+    shortSample2Button.mousePressed(() => {
+        sampler1.player.load("./sounds/shortOpenE.wav");
+        sampler1.button.html('PLAY SAMPLE 2');
         sampler1.sampleLoaded = true;
         sampler1.showControls();
         sampler1.state = 'play';
@@ -123,11 +136,33 @@ function setup() {
         sampler2.state = 'play';
     })
 
+    mediumSample2Button = createButton('MED SAMPLE 1');
+    mediumSample2Button.position(recButX * 0.85, (2.25 * recButY) + 1.7 * recButHt);
+    mediumSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
+    mediumSample2Button.mousePressed(() => {
+        sampler2.player.load("./sounds/5thsDown.wav");
+        sampler2.button.html('PLAY SAMPLE 1');
+        sampler2.sampleLoaded = true;
+        sampler2.showControls();
+        sampler2.state = 'play';
+    })
+
     longSample1Button = createButton('LONG SAMPLE 1');
     longSample1Button.position(recButX, (3.5 * recButY) + 1.7 * recButHt);
     longSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
     longSample1Button.mousePressed(() => {
         sampler3.player.load("./sounds/martina_1.wav");
+        sampler3.button.html('PLAY SAMPLE 1');
+        sampler3.sampleLoaded = true;
+        sampler3.showControls();
+        sampler3.state = 'play';
+    })
+
+    longSample2Button = createButton('LONG SAMPLE 1');
+    longSample2Button.position(recButX * 0.85, (3.5 * recButY) + 1.7 * recButHt);
+    longSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
+    longSample2Button.mousePressed(() => {
+        sampler3.player.load("./sounds/chordsUp.wav");
         sampler3.button.html('PLAY SAMPLE 1');
         sampler3.sampleLoaded = true;
         sampler3.showControls();
