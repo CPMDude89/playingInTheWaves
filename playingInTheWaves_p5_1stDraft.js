@@ -26,8 +26,7 @@ let reverseReverbButton, reverbReverse=false;
 
 function preload()
 {
-    //sound1 = loadSound("sounds/CD_boilingWater_hiss_01.wav");
-    //sound2 = loadSound("sounds/CD_paper_slide_lazer_03.wav");
+
 }
 
 // ======================================================== SETUP ======================================================== //

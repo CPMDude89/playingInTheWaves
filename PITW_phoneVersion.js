@@ -117,7 +117,7 @@ function setup() {
     stockSample5Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample5Button.mousePressed(() => {
         sampler2.clearSampleActivity(0);
-        sampler2.player.load("./sounds/groove_clip.wav");
+        sampler2.player.load("./sounds/slinky_lazer_edit.wav");
         sampler2.button.html('PLAY SAMPLE 1');
         sampler2.sampleLoaded = true;
         sampler2.showControls();
@@ -145,7 +145,7 @@ function setup() {
     stockSample7Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample7Button.mousePressed(() => {
         sampler2.clearSampleActivity(2);
-        sampler2.player.load("./sounds/Mike_Hayes_beat.wav");
+        sampler2.player.load("./sounds/rulerSlaps.wav");
         sampler2.button.html('PLAY SAMPLE 3');
         sampler2.sampleLoaded = true;
         sampler2.showControls();

@@ -30,7 +30,7 @@
  function preload() {
      volNode = new Tone.Volume().toDestination();
      limiter = new Tone.Limiter(-2).connect(volNode);
-     sample1 = new Tone.ToneAudioBuffer("./sounds/groove_clip.wav");
+     sample1 = new Tone.ToneAudioBuffer("./sounds/bassOrbit1.wav");
      sample2 = new Tone.ToneAudioBuffer("./sounds/metal_water_bottle.wav");
  }
  

@@ -27,7 +27,7 @@ let fftActive = false;
 function preload() 
 {
   //soundFormats('ogg', 'mp3'); 
-  soundFile = loadSound('sounds/mothership_short.mp3');
+  soundFile = loadSound('sounds/bassOrbit2.wav');
 }
 
 function playSong()
