@@ -1292,6 +1292,9 @@ class PlaygroundControls {
 
                 else {  //  if effect has NOT been frozen
                     var pr = map(mouseY, h, 0, 0.001, 2.0);     //  scale value of mouse y-axis on screen to playback rate
+                    if (pr < 0) {
+                        pr = 0;
+                    } 
                     this.player.playbackRate = pr;       //  apply scaled value
                     noStroke();
                     this.playbackRateSignal.drawGoldCircle();   //  draw signal circle
@@ -1426,7 +1429,6 @@ class PlaygroundControls {
         if (this.filterSweepActive) {
             this.player.connect(this.filterSweep);
             this.filterSweep.start();
-            this.filterSweep.wet = 0.8;
         }
 
         else {
@@ -1530,6 +1532,7 @@ class PlaygroundControls {
 
         if (curRate < 0.18) {
             this.playbackRateGoingDown = false;
+            //this.player.playbackRate = 0.18;
         }        
         else if (curRate > 1.6) {
             this.playbackRateGoingDown = true;

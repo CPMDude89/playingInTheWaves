@@ -82,7 +82,7 @@ function setup() {
     controls3.delayTimeLFO.max = 1;
     controls3.ampModLFOModulator.frequency.value = 0.05;
     controls3.ampModLFOModulator.min = 2;
-    controls3.ampModLFOModulator.max = 250;
+    controls3.ampModLFOModulator.max = 150;
     controls3.filterSweep.frequency.value = 15;
     controls3.filterSweep.baseFrequency = 100
     controls3.filterSweep.octaves = 5;
@@ -813,7 +813,7 @@ function mousePressed() {
 //  STOCK SAMPLE FUNCTIONS
 //  ---- SHORT ---- //
 function triggerShortSample1() {
-    sampler1.player.load("./sounds/martina_3.wav");
+    sampler1.player.load("./sounds/bassThump.wav");
     sampler1.button.html('PLAY SAMPLE 1');
     sampler1.sampleLoaded = true;
     sampler1.showControls();
@@ -821,7 +821,7 @@ function triggerShortSample1() {
 }
 
 function triggerShortSample2() {
-    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.player.load("./sounds/carla3.wav");
     sampler1.button.html('PLAY SAMPLE 2');
     sampler1.sampleLoaded = true;
     sampler1.showControls();
@@ -837,7 +837,7 @@ function triggerShortSample3() {
 }
 
 function triggerShortSample4() {
-    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.player.load("./sounds/slinky_lazer_edit.wav");
     sampler1.button.html('PLAY SAMPLE 4');
     sampler1.sampleLoaded = true;
     sampler1.showControls();
@@ -845,7 +845,7 @@ function triggerShortSample4() {
 }
 
 function triggerShortSample5() {
-    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.player.load("./sounds/rulerSlaps.wav");
     sampler1.button.html('PLAY SAMPLE 5');
     sampler1.sampleLoaded = true;
     sampler1.showControls();
@@ -854,7 +854,7 @@ function triggerShortSample5() {
 
 //  ---- MEDIUM ---- //
 function triggerMediumSample1() {
-    sampler2.player.load("./sounds/martina_2.wav");
+    sampler2.player.load("./sounds/5thsDown.wav");
     sampler2.button.html('PLAY SAMPLE 1');
     sampler2.sampleLoaded = true;
     sampler2.showControls();
@@ -862,7 +862,7 @@ function triggerMediumSample1() {
 }
 
 function triggerMediumSample2() {
-    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.player.load("./sounds/birds_acaracle.wav");
     sampler2.button.html('PLAY SAMPLE 2');
     sampler2.sampleLoaded = true;
     sampler2.showControls();
@@ -878,7 +878,7 @@ function triggerMediumSample3() {
 }
 
 function triggerMediumSample4() {
-    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.player.load("./sounds/CD_jump.wav");
     sampler2.button.html('PLAY SAMPLE 4');
     sampler2.sampleLoaded = true;
     sampler2.showControls();
@@ -886,7 +886,7 @@ function triggerMediumSample4() {
 }
 
 function triggerMediumSample5() {
-    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.player.load("./sounds/bassHarmonics.wav");
     sampler2.button.html('PLAY SAMPLE 5');
     sampler2.sampleLoaded = true;
     sampler2.showControls();
@@ -895,7 +895,7 @@ function triggerMediumSample5() {
 
 //  ---- LONG ---- //
 function triggerlongSample1() {
-    sampler3.player.load("./sounds/martina_1.wav");
+    sampler3.player.load("./sounds/synth1.wav");
     sampler3.button.html('PLAY SAMPLE 1');
     sampler3.sampleLoaded = true;
     sampler3.showControls();
@@ -903,7 +903,7 @@ function triggerlongSample1() {
 }
 
 function triggerLongSample2() {
-    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.player.load("./sounds/paper_glide.wav");
     sampler3.button.html('PLAY SAMPLE 2');
     sampler3.sampleLoaded = true;
     sampler3.showControls();
@@ -919,7 +919,7 @@ function triggerlongSample3() {
 }
 
 function triggerLongSample4() {
-    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.player.load("./sounds/waves.wav");
     sampler3.button.html('PLAY SAMPLE 4');
     sampler3.sampleLoaded = true;
     sampler3.showControls();
@@ -927,7 +927,7 @@ function triggerLongSample4() {
 }
 
 function triggerLongSample5() {
-    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.player.load("./sounds/bassOrbit1.wav");
     sampler3.button.html('PLAY SAMPLE 5');
     sampler3.sampleLoaded = true;
     sampler3.showControls();
