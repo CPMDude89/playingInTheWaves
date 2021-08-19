@@ -71,7 +71,7 @@ function setup() {
     controls2.pannerFreqLFO.min = 0.5;
     controls2.pannerFreqLFO.max = 30;
 
-    //  track 3 effect buttons
+    //  track 3 effect buttons and new default presets
     controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, volNode3, reverb, 15);
     controls3.connectToBus(effectBus);
 
@@ -92,6 +92,11 @@ function setup() {
     controls3.pannerFreqLFO.max = 2;
     controls3.panner.depth.value = 1;
 
+    sampler1Signal = new SignalCircle(recButX + (0.5 * recButWd), recButY - (0.5 * recButHt), 0.4 * recButHt);
+    sampler2Signal = new SignalCircle(recButX + (0.5 * recButWd), 2.25 * recButY - (0.5 * recButHt), 0.4 * recButHt);
+    sampler3Signal = new SignalCircle(recButX + (0.5 * recButWd), 3.5 * recButY - (0.5 * recButHt), 0.4 * recButHt);
+
+    // -------- STOCK SAMPLE BUTTONS -------- //
     shortSample1Button = createButton('SAMPLE 1');
     shortSample1Button.position(recButX, (recButY) + 1.7 * recButHt);
     shortSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
@@ -166,7 +171,9 @@ function setup() {
     longSample5Button.position(recButX * 0.4, (3.5 * recButY) + 1.7 * recButHt);
     longSample5Button.size(0.75 * recButWd, 0.75 * recButHt);
     longSample5Button.mousePressed(triggerLongSample5);
+    // -------- END STOCK SAMPLE BUTTONS -------- //
 
+    //  track volume controls
     volSlider1 = createSlider(-20, 0, -6, 0.5);
     volSlider1.position(w * 0.01, recButY);
     volSlider1.size(0.1 * w, 0.05 * h);
@@ -179,6 +186,7 @@ function setup() {
     volSlider3.position(w * 0.01, recButY * 3.5);
     volSlider3.size(0.1 * w, 0.05 * h);
 
+    //  navigational links
     tourLink = createA('https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html', 'TAKE THE TOUR');
     tourLink.position(0.05 * w, 0.04 * h);
     tourLink.style('font-size', '1.5vw');
@@ -187,6 +195,7 @@ function setup() {
     homepageLink.position(0.8 * w, 0.04 * h);
     homepageLink.style('font-size', '1.5vw');
 
+    //  page recorder to save page audio output
     pageRecorder = new PageRecorder(pageRecButX, pageRecButY, pageRecButWd, recButHt);
     limiter.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + 0.5*(0.65 * recButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
@@ -204,35 +213,48 @@ function draw() {
     textSize(40);
     text('Playing In The Waves: Playground', 0.5 * w, 0.1 * h);
 
+    //  suggested track lengths
     textAlign(LEFT);
     textSize(25)
     text('--SHORT LOOP--\n2 SECONDS OR LESS', 0.82 * w, recButY + (0.5 * recButHt));
     text('--MEDIUM LOOP--\n5 SECONDS OR LESS', 0.82 * w, 2.25 * recButY + (0.5 * recButHt));
     text('--LONG LOOP--\n10 SECONDS OR LESS', 0.82 * w, 3.5 * recButY + (0.5 * recButHt));
 
+    //  signal circles
     if (sampler1.state == 'recording') {
-        fill(255, 0, 0);
-        circle(recButX + (0.5 * recButWd), recButY - (0.5 * recButHt), 0.4 * recButHt);
+        sampler1Signal.drawRecordingCircle();
     }
 
     if (sampler2.state == 'recording') {
-        fill(255, 0, 0);
-        circle(recButX + (0.5 * recButWd), 2.25 * recButY - (0.5 * recButHt), 0.4 * recButHt);
+        sampler2Signal.drawRecordingCircle();
     }
 
     if (sampler3.state == 'recording') {
-        fill(255, 0, 0);
-        circle(recButX + (0.5 * recButWd), 3.5 * recButY - (0.5 * recButHt), 0.4 * recButHt);
+        sampler3Signal.drawRecordingCircle();
+    }
+
+    if (sampler1.player.state == 'started') {
+        sampler1Signal.drawActiveCircle();
+    }
+
+    if (sampler2.player.state == 'started') {
+        sampler2Signal.drawActiveCircle();
+    }
+
+    if (sampler3.player.state == 'started') {
+        sampler3Signal.drawActiveCircle();
     }
 
     if (pageRecorder.state == 'recording') {
         pageRecorderSignal.drawRecordingCircle();
     }
 
+    //  check each effect rack for drawing signal circles and track effect parameters
     controls1.checkForActivity();
     controls2.checkForActivity();
     controls3.checkForActivity();
 
+    //  track volume control
     sampler1.player.volume.value = volSlider1.value();
     sampler2.player.volume.value = volSlider2.value();
     sampler3.player.volume.value = volSlider3.value();
@@ -248,6 +270,7 @@ function draw() {
 //  if any key is pressed down
 function keyPressed() {
     //  if spacebar is pressed
+    //  this handles freezing the effect parameters in place
     if (keyCode == 32) {
         if (controls1.delayParamTrackActive && !controls1.delayFrozen) {
             controls1.freezeDelay(mouseX, mouseY);
@@ -345,7 +368,8 @@ function keyPressed() {
 
 //===================================================================================================================================================//
 //===================================================================================================================================================//
-
+//  TRACK BY TRACK EFFECT BY EFFECT PARAMETER MOUSE-ON-SCREEN TRACKING
+//  sorry this section is so long
 
 function mousePressed() {
     //  check if clicked on Track 1 Delay Signal Circle
@@ -782,6 +806,12 @@ function mousePressed() {
     }
 }
 
+//===================================================================================================================================================//
+//===================================================================================================================================================//
+//  END TRACK BY TRACK EFFECT BY EFFECT PARAMETER MOUSE-ON-SCREEN TRACKING ---- //
+
+//  STOCK SAMPLE FUNCTIONS
+//  ---- SHORT ---- //
 function triggerShortSample1() {
     sampler1.player.load("./sounds/martina_3.wav");
     sampler1.button.html('PLAY SAMPLE 1');
@@ -822,6 +852,7 @@ function triggerShortSample5() {
     sampler1.state = 'play';
 }
 
+//  ---- MEDIUM ---- //
 function triggerMediumSample1() {
     sampler2.player.load("./sounds/martina_2.wav");
     sampler2.button.html('PLAY SAMPLE 1');
@@ -862,6 +893,7 @@ function triggerMediumSample5() {
     sampler2.state = 'play';
 }
 
+//  ---- LONG ---- //
 function triggerlongSample1() {
     sampler3.player.load("./sounds/martina_1.wav");
     sampler3.button.html('PLAY SAMPLE 1');

@@ -828,10 +828,9 @@ class PlaygroundControls {
         this.verb = verb;
         this.filterSweepFreq = filterSweepFreq;
 
-        this.playerSignal = new SignalCircle(this.parentXpos + 0.65 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
-
         this.paramTrackActive = false;
 
+        //  DELAY
         this.delayActive = false;
         this.delayFrozen = false;
         this.delayFrozenX = 0;
@@ -851,6 +850,7 @@ class PlaygroundControls {
         });
         this.delayTimeLFO = new Tone.LFO(0.03, 0.05, 0.3).start().connect(this.delay.delayTime);
 
+        // AMPLITUDE MODULATION
         this.ampModActive = false;
         this.ampModFrozen = false;
         this.ampModFrozenX = 0;
@@ -876,6 +876,7 @@ class PlaygroundControls {
             phase: 90
         });
 
+        //  FILTER SWEEP
         this.filterSweepActive = false;
         this.filterSweepFrozen = false;
         this.filterSweepFrozenX = 0;
@@ -896,6 +897,7 @@ class PlaygroundControls {
         });
         this.filterSweep.filter.Q.value = 4;
 
+        //  USED TO BE FREQUENCY SHIFTER, NOW IS PITCH SHIFTER
         this.freqShifterActive = false;
         this.freqShifterFrozen = false;
         this.freqShifterFrozenX = 0;
@@ -928,6 +930,7 @@ class PlaygroundControls {
         this.player.connect(this.freqShifterParamTrack);
         */
 
+        //  PLAYBACK RATE MODULATOR
         this.playbackRateIncrement = 0.01;
         this.playbackRateActive = false;
         this.playbackRateFrozen = false;
@@ -942,6 +945,7 @@ class PlaygroundControls {
         this.playbackRateButton.mousePressed(() => this.triggerPlaybackRateLoop());
         this.playbackRateSignal = new SignalCircle((0.5 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
+        //  REVERSE
         this.reverseActive = false;
         this.reverseButton = createButton('REVERSE');
         this.reverseButton.position(0.4 * parentXpos, parentYpos);
@@ -949,6 +953,7 @@ class PlaygroundControls {
         this.reverseButton.mousePressed(() => this.triggerReverse());
         this.reverseSignal = new SignalCircle((0.4 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt)
 
+        // AUTOPANNER
         this.pannerActive = false;
         this.pannerFrozen = false;
         this.pannerFrozenX = 0;
@@ -973,6 +978,7 @@ class PlaygroundControls {
             depth: 1
         });
 
+        //  REVERB
         this.reverbActive = false;
         this.reverbButton = createButton('REVERB');
         this.reverbButton.position(0.2 * parentXpos, parentYpos);
@@ -981,6 +987,7 @@ class PlaygroundControls {
         this.reverbSignal = new SignalCircle((0.2 * this.parentXpos) + 0.25 * this.parentButWd, this.parentYpos - (0.5 * parentButHt), 0.5 * parentButHt);
     }
 
+    //  connect effects to output volume node
     connectToBus(_output) {
         this.delay.connect(_output);
         this.filterSweep.connect(_output);
@@ -990,11 +997,9 @@ class PlaygroundControls {
         this.pannerParamTrack.connect(_output);
     }
 
-    checkForActivity() {
-        if (this.player.state == 'started') {
-            noStroke();
-            this.playerSignal.drawActiveCircle();
-        }
+    //  this function is checked in the draw loop for each track
+    //  this is where the class handles effect parameter mouse-on-screen tracking
+    checkForActivity() {    
         // -------- DELAY -------- //
         if (this.delayParamTrackActive) {
             if (!this.delayParamTrackActive_Y) {    //  X-axis control on
@@ -1372,6 +1377,8 @@ class PlaygroundControls {
         }
     }
     
+    //  TRIGGER EFFECT FUNCTIONS
+
     triggerDelay() {
         //  flip delay on/off
         this.delayActive = this.delayActive ? this.delayActive = false : this.delayActive = true;
@@ -1433,6 +1440,9 @@ class PlaygroundControls {
         }
     }
 
+    //  this function was recently changed because I decided the Tone.PitchShifter sounds better
+    //  than Tone.FrequencyShift
+    //  uses same technique as playbackrate
     triggerFreqShifter() {
         this.freqShifterActive = this.freqShifterActive ? this.freqShifterActive = false : this.freqShifterActive = true;
 
@@ -1440,7 +1450,7 @@ class PlaygroundControls {
             this.player.connect(this.freqShifter);
             this.freqShifter.wet.rampTo(1, 0.1);
             this.volOut.volume.rampTo(-20, 0.5);
-            this.shifterLoop = new Tone.Loop((time) => this.shifterLFO(), 0.01);
+            this.shifterLoop = new Tone.Loop((time) => this.shifterLFO(), 0.01);    //  calls below function every 0.01 seconds
             this.shifterLoop.start();
             /*
             this.player.connect(this.freqShifter);
@@ -1470,6 +1480,7 @@ class PlaygroundControls {
         }
     }
 
+    //  this is the callback function
     shifterLFO() {
         var shiftedPitch = this.freqShifter.pitch;
 
@@ -1506,6 +1517,7 @@ class PlaygroundControls {
         }
     }
 
+    //  this is the callback function
     playbackRateLFO() {
         var curRate = this.player.playbackRate;
         
@@ -1534,6 +1546,7 @@ class PlaygroundControls {
             this.playbackRateFrozen = false;
         }
 
+        //  handles a nice little effect of slowing down the track before flipping buffer direction
         if (this.reverseActive) {
             this.reverseLoop = new Tone.Loop((time) => {
                 if (this.player.playbackRate > 0.02 && !this.player.reverse) {
@@ -1619,6 +1632,7 @@ class PlaygroundControls {
         }
     }
 
+    //  route delay line into reverb
     makeReverbRouteButton() {
         this.reverbRouteActive = false;
         this.reverbRouteButton = createButton('DELAY -> VERB');
@@ -1632,6 +1646,8 @@ class PlaygroundControls {
         })
     }
 
+
+    //  FREEZE IN PLACE EFFECT PARAMETERS IF SPACEBAR IS PRESSED
     freezeDelay(_x, _y) {
         this.delayFrozenX = _x;
         this.delayFrozenY = _y;
