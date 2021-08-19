@@ -49,7 +49,7 @@ function setup() {
 
     //  initialize sampler button for recording and playback
     samplerButton = new SamplerButton(recButX, recButY, recButWd, recButHt);   
-    samplerSignal = new SignalCircle(((recButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt) 
+    samplerSignal = new SignalCircle(((recButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt); 
 
     samplerButton.player.connect(volNode);  //  connect to ouput
     mic.connect(samplerButton.recorder);    //  connect user microphone to sampler button for recording
