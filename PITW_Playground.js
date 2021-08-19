@@ -13,32 +13,34 @@ let tourLink, homepageLink;
 let testSlider;
 let pageRecorder;
 
-
+//  set up volume nodes
 function preload() {
     limiter = new Tone.Limiter(-1).toDestination();
 
     reverb = new Tone.Reverb(4).toDestination();
 
-    volNode1 = new Tone.Volume(-6).connect(limiter);
-    volNode2 = new Tone.Volume(-6).connect(limiter);
-    volNode3 = new Tone.Volume(-6).connect(limiter);
+    volNode1 = new Tone.Volume(-6).connect(limiter);    //  track 1
+    volNode2 = new Tone.Volume(-6).connect(limiter);    //  track 2
+    volNode3 = new Tone.Volume(-6).connect(limiter);    //  track 3
 
     effectBus = new Tone.Volume(-4).connect(limiter);
 }
 
 function setup() {
-    frameRate(30);
+    frameRate(30);  //  reduce draw() frame rate to save power
 
     canv = createCanvas(w, h);
 
-    mic = new Tone.UserMedia();
+    mic = new Tone.UserMedia();     //  set up input source from device to record
     mic.open();
 
-    sampler1 = new SamplerButton(recButX, recButY, recButWd, recButHt);
-    sampler2 = new SamplerButton(recButX, 2.25 * recButY, recButWd, recButHt);    
-    sampler3 = new SamplerButton(recButX, 3.5 * recButY, recButWd, recButHt);
+    //  SamplerButtons to record and playback user input
+    sampler1 = new SamplerButton(recButX, recButY, recButWd, recButHt);     
+    sampler2 = new SamplerButton(recButX, 2.25 * recButY, recButWd, recButHt);  
+    sampler3 = new SamplerButton(recButX, 3.5 * recButY, recButWd, recButHt);   
 
-    sampler1.player.connect(volNode1);
+    //  connect each track with its volume node and input source
+    sampler1.player.connect(volNode1);  
     mic.connect(sampler1.recorder);
     
     sampler2.player.connect(volNode1);
@@ -47,9 +49,11 @@ function setup() {
     sampler3.player.connect(volNode1);
     mic.connect(sampler3.recorder);
     
+    //  track 1 effects and buttons
     controls1 = new PlaygroundControls(recButX, recButY, recButWd, recButHt, sampler1.player, volNode1, reverb, 1.2);
-    controls1.connectToBus(effectBus);
+    controls1.connectToBus(effectBus); 
 
+    //  track 2 effects and buttons, plus new presets
     controls2 = new PlaygroundControls(recButX, 2.25 * recButY, recButWd, recButHt, sampler2.player, volNode2, reverb, 10);
     controls2.connectToBus(effectBus);
 
@@ -60,20 +64,14 @@ function setup() {
     controls2.ampModLFOModulator.frequency.value = 0.04;
     controls2.ampModLFOModulator.min = 1;
     controls2.ampModLFOModulator.max = 300;
-    //controls2.filterSweep.frequency.value = 10;
+    controls2.filterSweep.frequency.value = 10;
     controls2.filterSweep.octaves = 4.5;
     controls2.filterSweep.filter.Q.value = 4;
-    /*
-    controls2.freqShifterLFO.frequency.value = 0.05;
-    controls2.freqShifterLFO.min = -500;
-    controls2.freqShifterLFO.max = 400;
-    */
-    //controls2.pannerFreqLFO.frequency.value = 0.1;
     controls2.pannerFreqLFO.frequency.value = 0.5;
     controls2.pannerFreqLFO.min = 0.5;
-    //controls2.pannerFreqLFO.max = 3;
     controls2.pannerFreqLFO.max = 30;
 
+    //  track 3 effect buttons
     controls3 = new PlaygroundControls(recButX, 3.5 * recButY, recButWd, recButHt, sampler3.player, volNode3, reverb, 15);
     controls3.connectToBus(effectBus);
 
@@ -85,89 +83,89 @@ function setup() {
     controls3.ampModLFOModulator.frequency.value = 0.05;
     controls3.ampModLFOModulator.min = 2;
     controls3.ampModLFOModulator.max = 250;
-    //controls3.filterSweep.frequency.value = 15;
+    controls3.filterSweep.frequency.value = 15;
     controls3.filterSweep.baseFrequency = 100
     controls3.filterSweep.octaves = 5;
     controls3.filterSweep.filter.Q.value = 7;
-    /*
-    controls3.freqShifterLFO.frequency.value = 0.03;
-    controls3.freqShifterLFO.min = -500;
-    controls3.freqShifterLFO.max = 600;
-    */
-    //controls3.pannerFreqLFO.frequency.value = 0.07;
     controls3.pannerFreqLFO.frequency.value = 1;
     controls3.pannerFreqLFO.min = 0.08;
-    //controls3.pannerFreqLFO.max = 2;
-    controls3.pannerFreqLFO.max = 50;
+    controls3.pannerFreqLFO.max = 2;
     controls3.panner.depth.value = 1;
 
-    //  ---- SHORT SAMPLE 1 ---- //
     shortSample1Button = createButton('SAMPLE 1');
     shortSample1Button.position(recButX, (recButY) + 1.7 * recButHt);
     shortSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
-    shortSample1Button.mousePressed(() => {
-        sampler1.player.load("./sounds/martina_3.wav");
-        sampler1.button.html('PLAY SAMPLE 1');
-        sampler1.sampleLoaded = true;
-        sampler1.showControls();
-        sampler1.state = 'play';
-    })
+    shortSample1Button.mousePressed(triggerShortSample1) 
 
-    //  ---- SHORT SAMPLE 2 ---- //
     shortSample2Button = createButton('SAMPLE 2');
     shortSample2Button.position(recButX * 0.85, (recButY) + 1.7 * recButHt);
     shortSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
-    shortSample2Button.mousePressed(() => {
-        sampler1.player.load("./sounds/shortOpenE.wav");
-        sampler1.button.html('PLAY SAMPLE 2');
-        sampler1.sampleLoaded = true;
-        sampler1.showControls();
-        sampler1.state = 'play';
-    })
+    shortSample2Button.mousePressed(triggerShortSample2);
 
-    mediumSample1Button = createButton('MED SAMPLE 1');
+    shortSample3Button = createButton('SAMPLE 3');
+    shortSample3Button.position(recButX * 0.7, (recButY) + 1.7 * recButHt);
+    shortSample3Button.size(0.75 * recButWd, 0.75 * recButHt);
+    shortSample3Button.mousePressed(triggerShortSample3) 
+
+    shortSample4Button = createButton('SAMPLE 4');
+    shortSample4Button.position(recButX * 0.55, (recButY) + 1.7 * recButHt);
+    shortSample4Button.size(0.75 * recButWd, 0.75 * recButHt);
+    shortSample4Button.mousePressed(triggerShortSample4);
+
+    shortSample5Button = createButton('SAMPLE 5');
+    shortSample5Button.position(recButX * 0.4, (recButY) + 1.7 * recButHt);
+    shortSample5Button.size(0.75 * recButWd, 0.75 * recButHt);
+    shortSample5Button.mousePressed(triggerShortSample5);
+
+    mediumSample1Button = createButton('SAMPLE 1');
     mediumSample1Button.position(recButX, (2.25 * recButY) + 1.7 * recButHt);
     mediumSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
-    mediumSample1Button.mousePressed(() => {
-        sampler2.player.load("./sounds/martina_2.wav");
-        sampler2.button.html('PLAY SAMPLE 1');
-        sampler2.sampleLoaded = true;
-        sampler2.showControls();
-        sampler2.state = 'play';
-    })
+    mediumSample1Button.mousePressed(triggerMediumSample1);
 
-    mediumSample2Button = createButton('MED SAMPLE 1');
+    mediumSample2Button = createButton('SAMPLE 2');
     mediumSample2Button.position(recButX * 0.85, (2.25 * recButY) + 1.7 * recButHt);
     mediumSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
-    mediumSample2Button.mousePressed(() => {
-        sampler2.player.load("./sounds/5thsDown.wav");
-        sampler2.button.html('PLAY SAMPLE 1');
-        sampler2.sampleLoaded = true;
-        sampler2.showControls();
-        sampler2.state = 'play';
-    })
+    mediumSample2Button.mousePressed(triggerMediumSample2);
 
+    mediumSample3Button = createButton('SAMPLE 3');
+    mediumSample3Button.position(recButX * 0.7, (2.25 * recButY) + 1.7 * recButHt);
+    mediumSample3Button.size(0.75 * recButWd, 0.75 * recButHt);
+    mediumSample3Button.mousePressed(triggerMediumSample3);
+
+    mediumSample4Button = createButton('SAMPLE 4');
+    mediumSample4Button.position(recButX * 0.55, (2.25 * recButY) + 1.7 * recButHt);
+    mediumSample4Button.size(0.75 * recButWd, 0.75 * recButHt);
+    mediumSample4Button.mousePressed(triggerMediumSample4);
+
+    mediumSample5Button = createButton('SAMPLE 5');
+    mediumSample5Button.position(recButX * 0.4, (2.25 * recButY) + 1.7 * recButHt);
+    mediumSample5Button.size(0.75 * recButWd, 0.75 * recButHt);
+    mediumSample5Button.mousePressed(triggerMediumSample5);
+        
     longSample1Button = createButton('LONG SAMPLE 1');
     longSample1Button.position(recButX, (3.5 * recButY) + 1.7 * recButHt);
     longSample1Button.size(0.75 * recButWd, 0.75 * recButHt);
-    longSample1Button.mousePressed(() => {
-        sampler3.player.load("./sounds/martina_1.wav");
-        sampler3.button.html('PLAY SAMPLE 1');
-        sampler3.sampleLoaded = true;
-        sampler3.showControls();
-        sampler3.state = 'play';
-    })
+    longSample1Button.mousePressed(triggerlongSample1);
 
     longSample2Button = createButton('LONG SAMPLE 1');
     longSample2Button.position(recButX * 0.85, (3.5 * recButY) + 1.7 * recButHt);
     longSample2Button.size(0.75 * recButWd, 0.75 * recButHt);
-    longSample2Button.mousePressed(() => {
-        sampler3.player.load("./sounds/chordsUp.wav");
-        sampler3.button.html('PLAY SAMPLE 1');
-        sampler3.sampleLoaded = true;
-        sampler3.showControls();
-        sampler3.state = 'play';
-    })
+    longSample2Button.mousePressed(triggerLongSample2);
+
+    longSample3Button = createButton('SAMPLE 3');
+    longSample3Button.position(recButX * 0.7, (3.5 * recButY) + 1.7 * recButHt);
+    longSample3Button.size(0.75 * recButWd, 0.75 * recButHt);
+    longSample3Button.mousePressed(triggerlongSample3);
+
+    longSample4Button = createButton('SAMPLE 4');
+    longSample4Button.position(recButX * 0.55, (3.5 * recButY) + 1.7 * recButHt);
+    longSample4Button.size(0.75 * recButWd, 0.75 * recButHt);
+    longSample4Button.mousePressed(triggerLongSample4);
+
+    longSample5Button = createButton('SAMPLE 5');
+    longSample5Button.position(recButX * 0.4, (3.5 * recButY) + 1.7 * recButHt);
+    longSample5Button.size(0.75 * recButWd, 0.75 * recButHt);
+    longSample5Button.mousePressed(triggerLongSample5);
 
     volSlider1 = createSlider(-20, 0, -6, 0.5);
     volSlider1.position(w * 0.01, recButY);
@@ -784,5 +782,122 @@ function mousePressed() {
     }
 }
 
+function triggerShortSample1() {
+    sampler1.player.load("./sounds/martina_3.wav");
+    sampler1.button.html('PLAY SAMPLE 1');
+    sampler1.sampleLoaded = true;
+    sampler1.showControls();
+    sampler1.state = 'play';
+}
 
+function triggerShortSample2() {
+    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.button.html('PLAY SAMPLE 2');
+    sampler1.sampleLoaded = true;
+    sampler1.showControls();
+    sampler1.state = 'play';
+}
 
+function triggerShortSample3() {
+    sampler1.player.load("./sounds/martina_3.wav");
+    sampler1.button.html('PLAY SAMPLE 3');
+    sampler1.sampleLoaded = true;
+    sampler1.showControls();
+    sampler1.state = 'play';
+}
+
+function triggerShortSample4() {
+    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.button.html('PLAY SAMPLE 4');
+    sampler1.sampleLoaded = true;
+    sampler1.showControls();
+    sampler1.state = 'play';
+}
+
+function triggerShortSample5() {
+    sampler1.player.load("./sounds/bassThump.wav");
+    sampler1.button.html('PLAY SAMPLE 5');
+    sampler1.sampleLoaded = true;
+    sampler1.showControls();
+    sampler1.state = 'play';
+}
+
+function triggerMediumSample1() {
+    sampler2.player.load("./sounds/martina_2.wav");
+    sampler2.button.html('PLAY SAMPLE 1');
+    sampler2.sampleLoaded = true;
+    sampler2.showControls();
+    sampler2.state = 'play';
+}
+
+function triggerMediumSample2() {
+    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.button.html('PLAY SAMPLE 2');
+    sampler2.sampleLoaded = true;
+    sampler2.showControls();
+    sampler2.state = 'play';
+}
+
+function triggerMediumSample3() {
+    sampler2.player.load("./sounds/martina_2.wav");
+    sampler2.button.html('PLAY SAMPLE 3');
+    sampler2.sampleLoaded = true;
+    sampler2.showControls();
+    sampler2.state = 'play';
+}
+
+function triggerMediumSample4() {
+    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.button.html('PLAY SAMPLE 4');
+    sampler2.sampleLoaded = true;
+    sampler2.showControls();
+    sampler2.state = 'play';
+}
+
+function triggerMediumSample5() {
+    sampler2.player.load("./sounds/5thsDown.wav");
+    sampler2.button.html('PLAY SAMPLE 5');
+    sampler2.sampleLoaded = true;
+    sampler2.showControls();
+    sampler2.state = 'play';
+}
+
+function triggerlongSample1() {
+    sampler3.player.load("./sounds/martina_1.wav");
+    sampler3.button.html('PLAY SAMPLE 1');
+    sampler3.sampleLoaded = true;
+    sampler3.showControls();
+    sampler3.state = 'play';
+}
+
+function triggerLongSample2() {
+    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.button.html('PLAY SAMPLE 2');
+    sampler3.sampleLoaded = true;
+    sampler3.showControls();
+    sampler3.state = 'play';
+}
+
+function triggerlongSample3() {
+    sampler3.player.load("./sounds/martina_1.wav");
+    sampler3.button.html('PLAY SAMPLE 3');
+    sampler3.sampleLoaded = true;
+    sampler3.showControls();
+    sampler3.state = 'play';
+}
+
+function triggerLongSample4() {
+    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.button.html('PLAY SAMPLE 4');
+    sampler3.sampleLoaded = true;
+    sampler3.showControls();
+    sampler3.state = 'play';
+}
+
+function triggerLongSample5() {
+    sampler3.player.load("./sounds/chordsUp.wav");
+    sampler3.button.html('PLAY SAMPLE 5');
+    sampler3.sampleLoaded = true;
+    sampler3.showControls();
+    sampler3.state = 'play';
+}
