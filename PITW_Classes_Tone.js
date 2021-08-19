@@ -904,7 +904,7 @@ class PlaygroundControls {
         this.freqShifterFrozenY = 0;
         this.freqShifterParamTrackActive = false;
         this.freqShifterParamTrackActive_Y = false;
-        this.freqShifterButton = createButton('FREQ SHIFT');
+        this.freqShifterButton = createButton('PITCH SHIFT');
         this.freqShifterButton.position(0.6 * parentXpos, parentYpos);
         this.freqShifterButton.size(0.5 * parentButWd, parentButHt);
         this.freqShifterButton.mousePressed(() => this.triggerFreqShifter());

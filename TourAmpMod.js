@@ -33,7 +33,7 @@ function preload() {
     //  load stock samples
     sample1 = new Tone.Player("./sounds/water_bottle_shake.wav").connect(volNode);     
     sample1.loop = true;
-    sample2 = new Tone.Player("./sounds/paper_glide.wav").connect(volNode);
+    sample2 = new Tone.Player("./sounds/birds_acaracle.wav").connect(volNode);
     sample2.loop = true;
     sample3 = new Tone.Player("./sounds/martina_2.wav").connect(volNode);
     sample3.loop = true;
@@ -128,6 +128,29 @@ function setup() {
     limiter.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 
+
+    //  set up title link -> explainer
+    titleLink = createDiv('Tour: Amplitude Modulation');
+    titleLink.position(0.31 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.style('text-align', 'center');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.style('font-weight', 'bold');
+        titleLink.position(0.29 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.31 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('./explainers/explainer_ampMod.html');
+    })
+
+
     Tone.Transport.start();     //  start Tone.Transport to set up events
 }
 
@@ -135,11 +158,11 @@ function draw() {
     textOutput();
     background(0, 150, 80);     // nice shade of forest green
 
-    noStroke();     //  set up page title
+    noStroke();     
     textAlign(CENTER);  
     textSize(40);
     fill(0);       
-    text('Playing In The Waves:\nAmplitude Modulation', 0.5 * w, 0.05 * h); //  page title
+
 
         //  signal circles
     if (samplerButton.state == 'recording') {     

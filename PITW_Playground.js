@@ -200,6 +200,29 @@ function setup() {
     limiter.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + 0.5*(0.65 * recButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 
+
+    //  set up title link -> explainer
+    titleLink = createDiv('Playing In The Waves: Playground');
+    titleLink.position(0.27 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.style('text-align', 'center');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.position(0.27 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.27 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('./explainers/explainer_playground.html');
+    })
+
+
+
     Tone.Transport.start();
 }
 
@@ -211,7 +234,7 @@ function draw() {
     textAlign(CENTER);
     fill(0);
     textSize(40);
-    text('Playing In The Waves: Playground', 0.5 * w, 0.1 * h);
+
 
     //  suggested track lengths
     textAlign(LEFT);

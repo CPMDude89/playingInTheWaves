@@ -149,6 +149,29 @@ function setup() {
     limiter.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 
+
+    //  set up title link -> explainer
+    titleLink = createDiv('Tour: Delay');
+    titleLink.position(0.42 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.style('text-align', 'center');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.style('font-weight', 'bold');
+        titleLink.position(0.41 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.42 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('./explainers/explainer_delay.html');
+    })
+
+
     Tone.Transport.start();
 }
 
@@ -160,7 +183,6 @@ function draw() {
     textAlign(CENTER);  //  set up page title
     textSize(40);
     fill(0);       
-    text('Playing In The Waves:\nDelay', 0.5 * w, 0.05 * h); //  page title
 
     //  Signal Circles
     if (samplerButton.state == 'recording') {     

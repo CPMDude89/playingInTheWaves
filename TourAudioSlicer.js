@@ -94,6 +94,30 @@ function setup() {
     volNode.connect(pageRecorder.recorder);
     pageRecorderSignal = new SignalCircle(pageRecButX + (0.5 * pageRecButWd), pageRecButY - (0.5 * recButHt), 0.4 * recButHt);
 
+
+    //  set up title link -> explainer
+    titleLink = createDiv('Tour: Audio Slicing');
+    titleLink.position(0.37 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.style('text-align', 'center');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.style('font-weight', 'bold');
+        titleLink.position(0.36 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.37 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('./explainers/explainer_audioSlicer.html');
+    })
+
+
+
     Tone.Transport.start();     //  start Tone.js timing architecture
 }
 
@@ -105,7 +129,7 @@ function draw() {
     textAlign(CENTER);  //  set up page title
     textSize(40);
     fill(0);       
-    text('Playing In The Waves:\nAudio Slicing', 0.5 * w, 0.05 * h); //  page title
+
 
     //  signal circles
     if (state == 1) {     //    signal circle for main 'samplerButton'

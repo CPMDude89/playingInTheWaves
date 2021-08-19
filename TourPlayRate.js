@@ -122,7 +122,7 @@ function setup() {
         titleLink.position(0.26 * w, 0.03 * h);
     })
     titleLink.mousePressed(() => {
-        window.open('http://127.0.0.1:5500/TourPlayRate_Explainer.md');
+        window.open('./explainers/explainer_playRate.html');
     })
     
     //  page recorder to record output

@@ -33,6 +33,27 @@ function setup() {
     blog = createA("https://chrisduvallmusic.com/2021/05/20/beginning/", 'Blog');
     blog.position(w * 0.8, h * 0.85);
     blog.style('font-size', '3vw');
+
+    //  set up title link -> explainer
+    titleLink = createDiv('Playing In The Waves:<br>A Play-Based Approach to Web Audio');
+    titleLink.position(0.22 * w, 0.03 * h);
+    titleLink.class('popup');
+    titleLink.style('font-size', '3.5vw');
+    titleLink.style('font-family', 'sans-serif');
+    titleLink.style('text-align', 'center');
+    titleLink.mouseOver(() => {
+        titleLink.style('color', 'DarkOrchid');
+        titleLink.style('font-weight', 'bold');
+        titleLink.position(0.2 * w, 0.03 * h)
+    })
+    titleLink.mouseOut(() => {
+        titleLink.style('color', 'Black');
+        titleLink.style('font-weight', 'normal');
+        titleLink.position(0.22 * w, 0.03 * h);
+    })
+    titleLink.mousePressed(() => {
+        window.open('./explainers/explainer_PITW.html');
+    })
 }
 
 function draw() {
@@ -57,7 +78,7 @@ function draw() {
     fill(0);
     textSize(w * 0.03);
     textStyle(BOLD);
-    text('Playing In The Waves:\nA Play-Based Approach to Web Audio', 0.5 * w, 0.08 * h);    
+    //text('', 0.5 * w, 0.08 * h);    
 
     textSize(w * 0.03)
     textStyle(NORMAL)
