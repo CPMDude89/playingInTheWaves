@@ -32,9 +32,9 @@ function preload() {
     limiter = new Tone.Limiter(0).toDestination();      //  final out destination
     sample1 = new Tone.Player('./sounds/snaps.wav');
     sample1.loop = true;
-    sample2 = new Tone.Player('./sounds/slinky_lazer.wav');
+    sample2 = new Tone.Player('./sounds/slinky_lazer_edit.wav');
     sample2.loop = true;
-    sample3 = new Tone.Player('./sounds/bassSlide.wav');
+    sample3 = new Tone.Player('./sounds/carla1.wav');
     sample3.loop = true;
     sample4 = new Tone.Player('./sounds/beat1.wav');
     sample4.loop = true;
