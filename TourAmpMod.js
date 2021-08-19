@@ -11,28 +11,34 @@
 let w = window.innerWidth;
 let h = window.innerHeight;
 let mic;
-let recButX=(0.11 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.08 * h);
-let samp1ButX=(0.3 * w), samp2ButX=(0.49 * w);
+let recButX=(0.06 * w), recButY=(0.2 * h), recButWd=(0.1 * w), recButHt=(0.08 * h);
+let samp1ButX=(0.18 * w), samp2ButX=(0.3 * w), samp3ButX=(0.42 * w), samp4ButX=(0.54 * w);
 let soundVizX=0.5 * w, soundVizY=0.68 * h, soundVizWd=0.55 * w, soundVizHt=0.57 * h;
 let lfoVizRectX=(0.88 * w), lfoVizRectY=(recButY), lfoVizRectWd=(0.03 * w), lfoVizRectHt=(0.72 * h);
 let lfoFreqSlider, sliderWd=(0.6 * w);
 let testToneButton, testTone, testToneActive=false;
 let ampModButton, ampModLFO, ampModActive = false, ampModHighFreq=false;
 let volNode;
-let sample1, sample1Active=false, sample2, sample2Active=false;
+let sample1, sample1Active=false, sample2, sample2Active=false, sample3, sample3Active=false, sample4, sample4Active=false;
 let loop, transport;
 let linkForward, linkBackward;
 let scopeTypeButton;
 let pageRecorder, pageRecButX = w * 0.93, pageRecButY = soundVizY + (0.5 * soundVizHt) - recButHt, pageRecButWd=0.5 * recButWd;
 
+//  load sound files and volume nodes
 function preload() {
     limiter = new Tone.Limiter(0).toDestination();
     volNode = new Tone.Volume().connect(limiter);    //  primary output node
-    sample1 = new Tone.Player("./sounds/water_bottle_shake.wav").connect(volNode);     //  stock samples
+    
+    //  load stock samples
+    sample1 = new Tone.Player("./sounds/water_bottle_shake.wav").connect(volNode);     
     sample1.loop = true;
-    sample1.volume.value = 3;
-    sample2 = new Tone.Player("./sounds/waterFall.wav").connect(volNode);
+    sample2 = new Tone.Player("./sounds/paper_glide.wav").connect(volNode);
     sample2.loop = true;
+    sample3 = new Tone.Player("./sounds/martina_2.wav").connect(volNode);
+    sample3.loop = true;
+    sample4 = new Tone.Player("./sounds/bassHarmonics.wav").connect(volNode);
+    sample4.loop = true;
 }
 
 function setup() {
@@ -41,23 +47,41 @@ function setup() {
     mic = new Tone.UserMedia();     //  set up microphone input
     mic.open();     //  turn on audio input 
 
-    samplerButton = new SamplerButton(recButX, recButY, recButWd, recButHt);    //  initialize sampler button for recording and playback
+    //  initialize sampler button for recording and playback
+    samplerButton = new SamplerButton(recButX, recButY, recButWd, recButHt);   
+    samplerSignal = new SignalCircle(((recButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt) 
 
     samplerButton.player.connect(volNode);  //  connect to ouput
     mic.connect(samplerButton.recorder);    //  connect user microphone to sampler button for recording
 
+    //  STOCK SAMPLES
     sample1Button = createButton('SAMPLE 1');
     sample1Button.position(samp1ButX, recButY);
     sample1Button.size(recButWd, recButHt);
     sample1Button.mousePressed(triggerSample1);
+    sample1Signal = new SignalCircle(((samp1ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
 
     sample2Button = createButton('SAMPLE 2');
     sample2Button.position(samp2ButX, recButY);
     sample2Button.size(recButWd, recButHt);
     sample2Button.mousePressed(triggerSample2);
+    sample2Signal = new SignalCircle(((samp2ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
 
+    sample3Button = createButton('SAMPLE 3');
+    sample3Button.position(samp3ButX, recButY);
+    sample3Button.size(recButWd, recButHt);
+    sample3Button.mousePressed(triggerSample3);
+    sample3Signal = new SignalCircle(((samp3ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+
+    sample4Button = createButton('SAMPLE 4');
+    sample4Button.position(samp4ButX, recButY);
+    sample4Button.size(recButWd, recButHt);
+    sample4Button.mousePressed(triggerSample4);
+    sample4Signal = new SignalCircle(((samp4ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+
+    //  TEST TONE OSCILLATOR BUTTON
     testToneButton = createButton('TEST TONE');
-    testToneButton.position(0.06 * w, soundVizY - (0.5 * soundVizHt));
+    testToneButton.position(recButX, soundVizY - (0.5 * soundVizHt));
     testToneButton.size(recButWd, recButHt);
     testToneButton.mousePressed(triggerTestTone);
 
@@ -84,6 +108,7 @@ function setup() {
     lfoViz = new LFOVisualizer(lfoVizRectX, lfoVizRectY, lfoVizRectWd, lfoVizRectHt, 100, 150, 200);    //  initialize lfo visualizer
     ampModLFO.connect(lfoViz.wave);     //  connect amp mod lfo to visualizer
 
+    //  switch between amplitude and fft based visualization
     fftButton = createButton('CHANGE SCOPE TYPE');
     fftButton.position(0.79 * w, soundVizY + (0.5 * soundVizHt) - recButHt);
     fftButton.size(0.5 * recButWd, recButHt);
@@ -116,24 +141,29 @@ function draw() {
     fill(0);       
     text('Playing In The Waves:\nAmplitude Modulation', 0.5 * w, 0.05 * h); //  page title
 
-    if (samplerButton.state == 'recording') {     //  if sampler button is recording
-        fill(255, 0, 0);    //  red for record light
-        circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+        //  signal circles
+    if (samplerButton.state == 'recording') {     
+        samplerSignal.drawRecordingCircle();
     }
 
-    if (samplerButton.player.state == 'started') {    //  if sampler button is playing
-        fill(0, 0, 255);    //  blue
-        circle((recButX + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    if (samplerButton.player.state == 'started') {    
+        samplerSignal.drawActiveCircle();
     }
 
-    if (sample1Active) {    //  signal light for stock sample 1
-        fill(0, 0, 255);    //  blue
-        circle(((samp1ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    if (sample1Active) {    
+        sample1Signal.drawActiveCircle();
     }
 
-    if (sample2Active) {    //  signal light for stock sample 2
-        fill(0, 0, 255);    //  blue
-        circle(((samp2ButX) + (0.5 * recButWd)), (recButY - (0.4 * recButHt)), 0.4 * recButHt);
+    if (sample2Active) {    
+        sample2Signal.drawActiveCircle();
+    }
+
+    if (sample3Active) {    
+        sample3Signal.drawActiveCircle();
+    }
+
+    if (sample4Active) {    
+        sample4Signal.drawActiveCircle();
     }
 
     if (pageRecorder.state == 'recording') {
@@ -146,6 +176,8 @@ function draw() {
         textSize(30);
         fill(0)
         text('Test Tone wave type is:\n' + testTone.type, 0.11 * w, 0.92 * soundVizY);
+        
+        //  test tone volume warning
         fill(220, 0, 50);
         stroke(0);
         strokeWeight(2);
@@ -153,6 +185,7 @@ function draw() {
         text('WARNING:\n Different wave types are\nnaturally different volumes.\nStart with a low volume when\nchanging wave types!', 0.11 * w, 1.15 * soundVizY)
     }
 
+    //  type of OscScope currently active
     if (scope.fftActive) {
         textSize(26);
         fill(0);
@@ -164,7 +197,8 @@ function draw() {
         text('WAVEFORM', 0.82 * w, soundVizY + (0.45 * soundVizHt) - recButHt);
     }
 
-    if (ampModActive) {     //  if amplitude modulation is engaged, enable changing modulating frequency and show lfo viz
+    //  if amplitude modulation is engaged, enable changing modulating frequency and show lfo viz
+    if (ampModActive) {     
         ampModLFO.frequency.rampTo(lfoFreqSlider.value(), 0.05);
 
         fill(0);
@@ -178,6 +212,7 @@ function draw() {
     scope.process(); //  draw oscilloscope to visualize sound
 }
 
+//  stock sample functions
 function triggerSample1() {
     if (!sample1Active) {
         sample1.start();
@@ -204,6 +239,33 @@ function triggerSample2() {
     }
 }
 
+function triggerSample3() {
+    if (!sample3Active) {
+        sample3.start();
+        sample3.volume.rampTo(0, 0.05);
+        sample3Active = true;
+    }
+    else {
+        sample3.volume.rampTo(-100, 0.05);
+        sample3.stop("+0.05");
+        sample3Active = false;
+    }
+}
+
+function triggerSample4() {
+    if (!sample4Active) {
+        sample4.start();
+        sample4.volume.rampTo(0, 0.05);
+        sample4Active = true;
+    }
+    else {
+        sample4.volume.rampTo(-100, 0.05);
+        sample4.stop("+0.05");
+        sample4Active = false;
+    }
+}
+
+//  test tone function
 function triggerTestTone() {
     if (!testToneActive) {
         testTone.start();
@@ -217,7 +279,6 @@ function triggerTestTone() {
         testToneTypeButton.mousePressed(() => {
             if (testTone.type == 'sine') {
                 testTone.type = 'triangle';
-                
             }
             else if (testTone.type == 'triangle') {
                 testTone.type = 'sawtooth';
