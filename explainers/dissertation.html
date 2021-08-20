@@ -1,0 +1,858 @@
+<!DOCTYPE html><html><head>
+      <title>Playing In The Waves: A Play-Based Approach to Web Audio</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:////Users/christopherduvall/.vscode/extensions/shd101wyy.markdown-preview-enhanced-0.5.22/node_modules/@shd101wyy/mume/dependencies/katex/katex.min.css">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <style>
+      /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+
+  -moz-tab-size: 8;
+  -o-tab-size: 8;
+  tab-size: 8;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: .8em;
+  overflow: auto;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  /* background: #fff; */
+  background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+  color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+  color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+  color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+  color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+  color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+  color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+  color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+  color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+  color: #63a35c;
+}
+
+code.language-yaml {
+  color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+  color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+  color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+  color: #795da3;
+}
+
+.language-makefile .token.variable {
+  color: #183691;
+}
+
+.language-makefile .token.builtin {
+  color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+  color: #0086b3;
+}
+
+/* highlight */
+pre[data-line] {
+  position: relative;
+  padding: 1em 0 1em 3em;
+}
+pre[data-line] .line-highlight-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  display: block;
+  width: 100%;
+}
+
+pre[data-line] .line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: inherit 0;
+  margin-top: 1em;
+  background: hsla(24, 20%, 50%,.08);
+  background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
+  pointer-events: none;
+  line-height: inherit;
+  white-space: pre;
+}
+
+pre[data-line] .line-highlight:before, 
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-start);
+  position: absolute;
+  top: .4em;
+  left: .6em;
+  min-width: 1em;
+  padding: 0 .5em;
+  background-color: hsla(24, 20%, 50%,.4);
+  color: hsl(24, 20%, 95%);
+  font: bold 65%/1.5 sans-serif;
+  text-align: center;
+  vertical-align: .3em;
+  border-radius: 999px;
+  text-shadow: none;
+  box-shadow: 0 1px white;
+}
+
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-end);
+  top: auto;
+  bottom: .4em;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{padding:0 1.6em;margin-top:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li{margin-bottom:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{list-style-type:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  150px);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview  ">
+      <link rel="stylesheet" href="/Users/christopherduvall/Documents/Final_Project/writings/splendor.css">
+<h1 class="mume-header" id="playing-in-the-waves-a-play-based-approach-to-web-audio">Playing In The Waves: A Play-Based Approach To Web Audio</h1>
+
+<h2 class="mume-header" id="by-christopher-paul-miller-duvall">By Christopher Paul Miller Duvall</h2>
+
+<h3 class="mume-header" id="sound-design-msc-dissertation">Sound Design MSc Dissertation</h3>
+
+<h3 class="mume-header" id="university-of-edinburgh-college-of-arts-humanities-and-social-sciences">University of Edinburgh: College of Arts, Humanities, and Social Sciences</h3>
+
+<h3 class="mume-header" id="20-august-2021">20, August 2021</h3>
+
+<h1 class="mume-header" id="acknowledgements">Acknowledgements</h1>
+
+<p>I would like to thank all my supervisors at The University of Edinburgh who encouraged me and continually challenged me. When I would show some completed piece of this project to Dr. Martin Parker, Dr. Julian Rawlinson, or Dr. Tom Mudd, they would always have some &#x2018;little idea&#x2019; to add on. I tried them all, spent sleepless nights on some,  and was always better for it.</p>
+<p>A huge thank you to Carla Sayer(poetry) and Martina Maclachlan(sung vocals) for providing amazing vocal samples to store in various parts of Playing In The Waves.</p>
+<p>Thank you to every fellow Sound Design MSc student to tried out early builds of the project and gave me feedback.</p>
+<p>CSS by Markdown CSS,  <a href="https://github.com/markdowncss/splendor">&#x2018;Splendor&#x2019; by John Otander</a></p>
+<h1 class="mume-header" id="abstract">Abstract</h1>
+
+<p>This dissertation is primarily a practical work. The main focus was building an audio application that would run in a computer&#x2019;s internet browser. Please experience the final product before reading this paper at <a href="https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html">https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html</a>. By clicking on the title of the page upon arrival, a popup window will display further information summarizing this work.<br>
+This document explains why I built what I built,  and a technical look into some of the interesting aspects of the finished product. Because web audio is a relatively new field and the technological limitations I encountered directly stem from its history, I document how browser audio came to be what it is today.</p>
+<ul>
+<li>All code for this project is in the &#x2018;code&#x2019; folder included with this submission. It can all found as well on my Github page at <a href="https://github.com/CPMDude89/playingInTheWaves">https://github.com/CPMDude89/playingInTheWaves</a>.</li>
+<li>In the folder labelled &#x2018;videos&#x2019; are the demo and code walkthrough videos</li>
+<li>Inside the &#x2018;code&#x2019; folder is the &#x2018;sounds&#x2019; folder which contains all the samples used and the &#x2018;explainers&#x2019; folder which has all the .html files used as explainers in the final product.<br>
+The final version of Playing In The Waves was built with Tone.js, but I left in some of the early builds made with p5.sound. These should run on the browser or live server, just not very well compared to the final version.</li>
+<li>Refer to Appendix A for more information on setting up a live server on a personal computer.</li>
+<li>If possible, please visit Playing In The Waves on your browser!<br>
+Homepage: <a href="https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html">https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html</a>
+<ul>
+<li>Tour: <a href="https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html">https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html</a></li>
+<li>Playground: <a href="https://cpmdude89.github.io/playingInTheWaves/PITW_Playground.html">https://cpmdude89.github.io/playingInTheWaves/PITW_Playground.html</a></li>
+<li>Phone Version: <a href="https://cpmdude89.github.io/playingInTheWaves/PITW_phoneVersion.html">https://cpmdude89.github.io/playingInTheWaves/PITW_phoneVersion.html</a></li>
+</ul>
+</li>
+</ul>
+<h1 class="mume-header" id="introduction">Introduction</h1>
+
+<h2 class="mume-header" id="what-playing-in-the-waves-is">What <em>Playing In The Waves</em> Is</h2>
+
+<p><em>Playing In The Waves</em> is a fun, interactive sound experience intended to educate the user on certain fundamental aspects of digital audio and provide an accessible platform for experimenting with the user&apos;s immediate sonic surroundings. It is a website and an audio application focused on on leveraging the relatively new tools that makes complex digital audio processing possible in the browser.</p>
+<h2 class="mume-header" id="desired-learning-outcomes">Desired Learning Outcomes</h2>
+
+<p>For my final project, I set out to learn the fundamentals of JavaScript and web audio through creating a product that could be immediately usable and reached on any device by a URL. What does web audio mean? What can a web audio application do that no other kind of audio software can do? What are the limits of web audio technology and what unique technical considerations to keep in mind when making a web audio program? These are the questions I set out to answer by diving into the web audio community online, learning the basics, and creating an actual product.</p>
+<h2 class="mume-header" id="what-to-expect-from-this-document">What To Expect From This Document</h2>
+
+<p>The first chapter of paper will cover my philosophical motivations behind the design choices in <em>Playing In The Waves</em>, and what influences led me to those choices. The second chapter will explain some of the reasons how web audio is unique and why it suits my project goals. The third chapter will cover the specifics of those design choices, and how they were implemented with the use of JavaScript libraries.</p>
+<h2 class="mume-header" id="what-to-know-going-into-this-document">What To Know Going Into This Document</h2>
+
+<p>This dissertation assumes the reader understands the basics of DSP to save room for more discussion on the basics of web audio. For an overview on the libraries I used, refer to the <a href="#3rd-party-libraries">Appendix A</a>. <a href="#currentwebaudio">Appendix B</a> has a few inspiring examples of current web audio and how they have influenced this project. <a href="#tutorials">Appendix C</a> contains tutorials I made to get past some tricky quirks of these libraries as well.</p>
+<h1 class="mume-header" id="chapter-1-influences-and-motivation">Chapter 1: Influences and Motivation</h1>
+
+<h2 class="mume-header" id="influences">Influences</h2>
+
+<h2 class="mume-header" id="personal-passion-for-science">Personal Passion for Science</h2>
+
+<p>As a child growing up in San Diego, California, my parents would often take me to the Fleet Science Center in Balboa Park. All the exhibits in the Fleet are interactive and encourage visitors to experience for themselves a sense of wonder while playing with science. I spent many carefree afternoons running around with all the other kids, being chased by our parents as we ran under and climbed over science exhibits designed just for that purpose.</p>
+<p>My father fostered in me a passion for science and science fiction. When I was a teenager, he gifted me a copy of Issac Asimov&apos;s <em>Foundation</em>. It is a story of a mathematical genius trying to save a future galactic human empire from succumbing to an impending Dark Age. Early in the book, the hero is asked how he will accomplish this task, and he responds:</p>
+<blockquote>
+<p>By saving the knowledge of the race. The sum of human knowing is beyond any one man... <em>But,</em> if we now prepare a giant summary of <em>all</em> knowledge, it will never be lost&quot;<br>
+(Asimov, 28)</p>
+</blockquote>
+<p>The concept of saving the human race from its worst impulses through promotion of science alone is a concept that I still naively cling to. I believe that science and more importantly, the critical thinking that comes with the scientific method, is a force for good in the world.</p>
+<p>I also believe that science is an extremely difficult thing to communicate to many people. Sometimes, people don&apos;t know they are interested in a scientific topic until it is presented to them in a way that is inspiring or exciting. I don&apos;t think the science I was exposed to at the Fleet Science Center was cheapened in any way by encouraging the visitors to &apos;play&apos; with it. My life was enriched by being exposed to new ways of thinking, and I was more open to it because I was having fun at the same time.</p>
+<h2 class="mume-header" id="communicating-sense-of-wonder-and-awe-at-science">Communicating Sense of Wonder and Awe at Science</h2>
+
+<p>Eloquent science communication unites people by revealing a glimpse of a cosmos that is bigger than all of us. In the introduction to his famous book/television series, <em>Cosmos</em>, Carl Sagan writes:</p>
+<blockquote>
+<p>It is dedicated to the proposition that the public is far more intelligent than it has generally been given credit for; that the deepest scientific questions on the nature and origin of the world excite the interests and passions of enormous numbers of people.<br>
+(Sagan, 14)</p>
+</blockquote>
+<p>I grew up watching the <em>Cosmos</em> program and anything else Carl Sagan would present on TV, and am deeply inspired by him in my creative practice. I share the belief that the mysteries of the universe are endlessly fascinating and should be shared.</p>
+<blockquote>
+<p>... it turns out we <em>are</em> connected - not in the personal, small-scale unimaginative fashion that the astrologers pretend, but in the deepest ways, involving the origin of matter, the habitability of the Earth, the evolution and destiny of the human species...<br>
+(Sagan, 65)</p>
+</blockquote>
+<p>Carl Sagan&apos;s beautiful prose humanizes science and imparts a sense of profundity that inspires. The ability to communicate the reasons <em>why</em> science is so interesting while at the same time educating an audience on the science itself is an important balance to strike. In this way I see The Fleet Science Center&apos;s focus on fun and Carl Sagan&apos;s inspirational expression as achieving the same goal.</p>
+<h2 class="mume-header" id="amplitude-modulation-a-personal-story">Amplitude Modulation - A Personal Story</h2>
+
+<p>Early in semester 1 during Tom Mudd&apos;s Creative Coding for Sound class, he demonstrated what amplitude modulation on a sine tone looks like on a Max MSP Spectrogram. The modulation frequency started out low, around 1 Hz, to just hear the overall volume fluctuate and see the lone bump on the visualizer move up and down. When the modulating LFO&apos;s frequency increased, I saw and heard another tone emerge. A second bump emerge from the fundamental and another pitch slowly grew into existence.</p>
+<p>Maybe it is the sound design equivalent of a party trick, but it seemed like pure magic to me. During this demonstration, I could not hear when the tone started or stopped. It&apos;s as if it was always there, and turning the amplitude modulation frequency up from 1Hz to 50Hz just increases the volume up on a sound that was there the whole time. It is like creating something from nothing.</p>
+<p>I know there is a more technical explanation for amplitude modulation, but I am more interested the sensation of discovering something new from something familiar. <em>Playing In The Waves</em> is not a project exploring all the different kinds of amplitude modulation, but a project exploring the magic feeling of <em>experiencing</em> amplitude modulation for the first time.</p>
+<h2 class="mume-header" id="play-spreading-joy-and-awe">Play: Spreading Joy and Awe</h2>
+
+<p>Last semester, my final project submission for Interactive Sound Design played with the idea of hearing stories told by people in their own voice. I was able to interview friends, family, and classmates and record their stories for me to inset into my virtual world. Once the project was completed I showed three of my fellow Sound Design MSc students the project and played each person&apos;s recorded story back to them. Although it is a small sample size, I was struck that everyone&apos;s reaction was a surprised sense of joy. Even if a little embarrassed at hearing their own voice, there were lots of laughs had and what I observed to be moments of pure joy.</p>
+<p>Every page in <em>Playing In The Waves</em> makes the user&apos;s own voice available to experiment on and play with. It makes the science behind basic audio processes more real and hopefully more fun.</p>
+<h2 class="mume-header" id="accessibility">Accessibility</h2>
+
+<h3 class="mume-header" id="basic-accessibility">Basic Accessibility</h3>
+
+<p>Accessibility is a word with lots of different meanings. I made a web audio application that is &apos;accessible&apos; by requiring the lowest amount of effort to &apos;reach&apos; or interface directly with it. Not everyone has a DAW or even a computer to run it on, but almost every device has a browser. Internet browsers are everywhere, come pre-installed on almost all computers and mobile devices, and most importantly: are free.</p>
+<h3 class="mume-header" id="accessibility-through-simplicity-of-design">Accessibility Through Simplicity of Design</h3>
+
+<p>The primary design principle in <em>Playing In The Waves</em> is maintaining simplicity. On every page of my web application, the user is always no more than two clicks of the mouse away from generating an interesting sound. Even if the user doesn&apos;t understand some component, randomly interacting with the page will result in sounds and effects that are designed to pull the user in and learn by experimenting. There just aren&apos;t enough buttons to get lost in or break the program.</p>
+<h3 class="mume-header" id="accessibility-for-the-visually-impaired">Accessibility for the Visually-Impaired</h3>
+
+<p>Screen-readers help unlock internet browsing for visually-impaired individuals. These are programs that scan the computer screen and read aloud a description of what is on the page. Making websites compatible with screen reader technology can be an easy win for web developers to reach a wider audience. Considering I am creating a primarily audio focused web application, it is the logical next step to make a web audio program easily accessible to this demographic.</p>
+<p>p5.js is a creative coding library that creates a &apos;canvas&apos; on the webpage, which does not store the kind of data that a screen reader can understand. Adding the p5.js object <code>textOutput()</code> to the top of the <code>draw()</code> loop, will help screen readers understand what is going on on the page.</p>
+<h2 class="mume-header" id="so-who-is-this-product-for-anyway">So Who Is This Product For Anyway?</h2>
+
+<p>I hope that many different kinds of people will find different things about <em>Playing In The Waves</em> to enjoy. Each &apos;stop&apos; on the <em>Tour</em> is designed to be entertaining and simple enough to capture the attention of someone totally new to audio software and might otherwise be intimidated by lots of buttons and sliders onscreen. The <em>Playground</em> is a much deeper program than any one part of the <em>Tour</em> and is there to provide more control and stimulation to someone already comfortable with a DAW. Anyone who is interested in sound generally should find something to enjoy in this project.</p>
+<h1 class="mume-header undefined" id="chapter-2">Chapter 2: Web Audio</h1>
+
+<p>Web audio technology today looks nothing like it did 10 years ago.<br>
+It is no secret that computer technology, especially software, moves fast. It takes a lot of effort to keep up with new trends as companies compete with each other to constantly output new products that iterate and change the way things were done previously. When I started working on this project, I assumed that web audio would be just more audio programming like I had done with Max MSP or C++ and JUCE. I was wrong. Web audio technology is extremely new, and after more than a decade of stagnation, has recently exploded in both power and usability. I expect the field of web audio to expand in credibility and demand in the coming years as the uptake of the technology by audio programmers increases.</p>
+<h2 class="mume-header" id="1-a-very-brief-history-of-web-audio">1: A (very) Brief History of Web Audio</h2>
+
+<p>In 1995, NetScape released its next generation browser: Navigator 2.0. With this release came the <code>&lt;embed&gt;</code> tag, that would allow the user to &apos;embed&apos; a piece of media into the webpage. This tag supported many different file types, including image and video, as well as audio.</p>
+<p>Later in 1997, Internet Explorer 4.0 was released, and supported a new  Microsoft-proprietary HTML tag called <code>&lt;bgsound&gt;</code>, standing for &apos;background sound&apos;. It was designed to just play or loop an audio file in the background of the webpage, without any control from the user or being able to turn it off. It was designed to only ever work on Internet Explorer, which is obsolete now, but if a developer even thinks about using <code>&lt;bgsound&gt;</code> they need only look at the W3C doc page to see what the rest of the internet thinks about it. In the &apos;examples&apos; section of the page, there is only a single sentence saying:</p>
+<blockquote>
+<p>&quot;No, really. Don&apos;t use it.&quot;<br>
+(W3C Wiki, 2010)</p>
+</blockquote>
+<p>Despite this, <code>&lt;bgsound&gt;</code> gets credit for being the first audio-specific HTML element created.</p>
+<p>The most popular browser plug-in was Future Splash Animator, which would later become Adobe Flash Player. The memory of being constantly bothered to update Flash Player on your computer is likely a painful one. From the mid 1990&apos;s to the late 2000&apos;s plug-ins like Flash, ActiveX, Quicktime, and Shockwave were the primary way to watch videos, listen to music, or play games on the browser. In 2007, Apple released the first version of the iPhone, but it didn&apos;t support Flash. This was the beginning of the end for browser plug-ins. In 2010, Steve Jobs wrote <a href="https://www.cnet.com/news/steve-jobs-letter-explaining-apples-flash-distaste/">&apos;Thoughts on Flash&apos;</a>, an open letter explaining why Apple was moving all its products away from supporting Flash, siting lax security, no touch support, and a desire to focus the most recent version of HTML.</p>
+<blockquote>
+<p>Though the operating system for the iPhone, iPod and iPad is proprietary, we strongly believe that all standards pertaining to the web should be open. Rather than use Flash, Apple has adopted HTML5, CSS and JavaScript--all open standards. Apple&apos;s mobile devices all ship with high performance, low power implementations of these open standards. HTML5, the new web standard that has been adopted by Apple, Google and many others, lets web developers create advanced graphics, typography, animations and transitions without relying on third party browser plug-ins (like Flash). HTML5 is completely open and controlled by a standards committee, of which Apple is a member.<br>
+(Jobs, 2010)</p>
+</blockquote>
+<p>HTML5, which would become the standard version of HTML later in 2014, provided browsers with <a href="https://www.w3.org/TR/html5-diff/">newer and better tools</a> for handling audio and video with the <code>&lt;audio&gt;</code> and <code>&lt;video&gt;</code> tags.</p>
+<p>With Apple signaling a new era, new technologies began appearing in the 2010&apos;s that would become the foundation for modern web audio. In 2011, the first version of the <a href="https://www.w3.org/TR/2011/WD-webaudio-20111215/">Web Audio API</a> was released by Mozilla (makers of Firefox), and is the bedrock technology that <em>Playing In The Waves</em> is based on. In 2015, <a href="https://www.w3schools.com/js/js_es6.asp">ES6</a>, the next version big update to JavaScript was released, and allowed for the creation of &apos;classes&apos;. This enabled real object-oriented programming for web developers and is how most other kinds of audio software is structured. In 2014, <a href="https://github.com/processing/p5.js-sound">p5.sound</a> and <a href="https://github.com/Tonejs/Tone.js/">Tone.js</a>, the two web audio libraries I studied for this project were first published on GitHub. These libraries provide a friendly wrapper around The Web Audio API and lowers the minimum amount of web programming experience it requires to make a web audio application.</p>
+<p>All the above technologies have been iterated and improved significantly since their initial release, along with newer and more powerful browsers to develop for. Now in 2021, web audio tools have a small but dedicated online community to learn from and interact with. There are interesting examples of audio programming that are idiomatic to the web space, like the <a href="https://taperinstruments.github.io/autosampler/">autosampler</a> and the <a href="https://musiclab.chromeexperiments.com/Experiments">Chrome Music Lab</a>. The web audio field is beginning to compare in power and capability to other forms of audio programming, but still has a few unique technical idiosyncrasies that separate it from more traditional audio software.</p>
+<h2 class="mume-header" id="how-is-web-audio-different-from-other-digital-audio-sources">How is Web Audio Different from Other Digital Audio Sources</h2>
+
+<h3 class="mume-header" id="the-browser">The Browser</h3>
+
+<p>All web audio starts with the browser. Sending a request to the server, which could be anywhere in the world, and getting a data packet back is too long of a process to happen mid-audio stream. So we are stuck doing all our digital processes in the browser, which is not specifically designed for the purpose. Web browsers present a wide range of inconsistencies across the various brands, devices, and versions. Please refer to my <a href="https://chrisduvallmusic.com/2021/05/28/browser-issues/">second post</a> in my short-lived blog, where I first ran into the problem of different browsers interpreting the same JavaScript code in very different ways.</p>
+<p>The Web Audio API is an impressive piece of technology, and lists a <a href="https://www.w3.org/TR/webaudio-usecases/">wide variety of use cases</a>. However, in the official recommendation by the W3C, they admit:</p>
+<blockquote>
+<p>...modern desktop audio software can have very advanced capabilities, some of which would be difficult or impossible to build with this system. Apple&#x2019;s Logic Audio is one such application which has support for external MIDI controllers, arbitrary plug-in audio effects and synthesizers, highly optimized direct-to-disk audio file reading/writing, tightly integrated time-stretching, and so on.<br>
+(W3C, 2021)</p>
+</blockquote>
+<p>The fact that they list &apos;highly optimized direct-to-disk&apos; audio processes as one of the features that the Web Audio API can&apos;t replicate is a clue that running in the browser creates a processing bottleneck.</p>
+<h3 class="mume-header" id="the-clock">The Clock</h3>
+
+<p>Another, less obvious obstacle that all web audio programmers must overcome is lack of access to a sample-accurate clock.</p>
+<p>Desktop audio applications like Apple&apos;s Logic are installed directly to the computer&apos;s hard drive, which gives them direct access to the computer&apos;s extremely accurate, internal clock. Considering the high sample rates audio software must keep up with, and a single sample out of place may result in an audible glitch, having a precise clock to rely on is critical. Programs on the internet do not have direct access to a computer&apos;s internal clock, as any internet program exists between the push and pull of the browser and the server it&apos;s communicating with.</p>
+<p>All programs on the browser run on the <em>JavaScript clock</em>, which has an accuracy only to the nearest millisecond. This may seem accurate to us humans, but audio processing must run at <em>sample rate</em> which is usually no slower than 44100 Hz. So by the time a single millisecond has gone by, an audio program must run its processes 44 (.1) times. This kind of latency doesn&apos;t matter when simply triggering audio on/off or changing the volume, but even basic audio programming processes like shaping an amplitude envelope need to run at audio sample rate.</p>
+<p>This problem was circumvented first by Adobe because Flash was a plug-in, downloaded to the computer hard drive and therefore directly accessible to the device&apos;s internal clock. The Web Audio API overcomes the inaccuracy of the JavaScript clock by digging down past the browser and accessing the system internal clock and putting a JavaScript wrapper around it. The Web Audio Clock is returned to the browser as a 32-bit float, or a &apos;double&apos;, which is accurate to 15 decimal points. Much of The Web Audio API&apos;s complex audio processing would not be possible without this critical component.</p>
+<h2 class="mume-header" id="so-why-use-web-audio-in-the-first-place">So Why Use Web Audio In The First Place?</h2>
+
+<h3 class="mume-header" id="new-technology">New Technology</h3>
+
+<p>As this whole chapter shows, web audio technology is an extremely new field. I had no idea that web audio was such a young field of work when I began, but now the challenge of working in a field that is changing so fast is very exciting to me. While I was working on this project, on 17 June 2021, the <a href="https://www.w3.org/2021/06/pressrelease-webaudio.html.en">W3C confirmed the Web Audio API</a>, the foundational technology my project is based on, as an &apos;official standard&apos;. While this is mostly a formality, it is a sign that web audio technology is both new and growing.</p>
+<p>Being a self-taught learner for years before attending University of Edinburgh, I have benefitted from a world-wide community of programmers and educators that were kind enough to share their knowledge with the world for free. In its current form, web audio only has a few good, free online resources to rely on. I have the opportunity to share what I have learned and contribute to a growing body of knowledge. Please refer to the <a href="#problems-overcome">Problems Overcome</a> for specific problems I encountered with Tone.js and p5.sound that I did not find easy solutions in the documentation for and had to solve on my own.</p>
+<h3 class="mume-header" id="recording-users-voice-immediate-surroundings">Recording User&apos;s Voice/ Immediate Surroundings</h3>
+
+<p>As the <a href="https://taperinstruments.github.io/autosampler/">autosampler</a> demonstrates, there is so much sonic potential in our day-to-day environment. By having quick and easy access to manipulate our immediate sonic surroundings, new depths can be found in sounds that are taken for granted. A clap, a dog barking across the street, our own breath, can be the foundation of interesting new sounds. Knowing what a clap or your own voice sounds modulated by some process can also bring a new appreciation for the acoustic space we take for granted. I want to give a set of quick-access tools for anyone to record whats going on around them and experiment with them.</p>
+<h3 class="mume-header" id="accessibility-1">Accessibility</h3>
+
+<p>As with everything, there is a trade off. I have spent large amounts of this chapter discussing the drawbacks of web audio, but there is one major and undeniable benefit to making a web audio application: reach. It is much easier to look up a URL than download a plug-in or an indie game. <em>Playing In The Waves</em> will remain free to access and can be reached on any device with an internet browser. It is accessible on a phone without having to download yet another app. I wanted to make a project that would appeal to many different kinds of people, and spread knowledge and joy.</p>
+<h1 class="mume-header" id="chapter-3-design-considerations">Chapter 3: Design Considerations</h1>
+
+<h2 class="mume-header" id="overall-design">Overall Design</h2>
+
+<p>In short, my design goal for this project was to make something approachable to a wide range of people, but also be capable of generating complex and interesting sounds. To this end, <a href="https://cpmdude89.github.io/playingInTheWaves/playingInTheWaves.html"><em>Playing In The Waves</em></a> is split into two parts: the <a href="https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html"><em>Tour</em></a> and the <a href="https://cpmdude89.github.io/playingInTheWaves/PITW_Playground.html"><em>Playground</em></a>. The <em>Tour</em> is a friendly, visually stimulating experience aimed at people who are less familiar with DSP concepts. The <em>Tour</em> then culminates in the <em>Playground</em>, which is aimed at more experienced audio software users. The <em>Playground</em> is also available from the <em>Playing In The Waves</em> homepage.</p>
+<p>Each page, except for the phone version, in <em>Playing In The Waves</em> has the ability to hit a &#x2018;record&#x2019; button and record the audio output from the page, then download it as a .webm file. This provides a very basic was to &#x2018;bounce&#x2019; out new sounds for the user to keep or use in other projects. Saving the audio output is a standard function all audio software has, and web audio should be no different.</p>
+<p>I hope the visual design of each page encourages the user to try things to see what happens and learn by doing. However I understand not everybody learns in a trial-and-error way, so each page will have a popup link to access a more detailed explainer on how the page itself works and the basics of the underlying audio processes at work.</p>
+<h2 class="mume-header" id="the-tour">The Tour</h2>
+
+<p>The <em>Tour</em> section is a 4-part walkthrough of 4 aspects of digital audio that I find particularly interesting. Each &apos;stop&apos; on the <em>Tour</em> is designed to encourage playful experimentation with large interactive objects featured prominently, and rewards the user with interesting sounds within one or two clicks. Explanatory information is initially withheld from the user to set up exciting surprises as they interact with the program, but can be reached by clicking on the title of the page.</p>
+<h2 class="mume-header" id="tour-stop-1-play-ratehttpscpmdude89githubioplayinginthewavestourplayratehtml"><a href="https://cpmdude89.github.io/playingInTheWaves/TourPlayRate.html">Tour Stop 1: Play Rate</a></h2>
+
+<p>The first stop on the <em>Tour</em> focuses on one of the oldest and most famous ways of manipulating audio: changing the rate of play. The primary feature on this page is a large 2-dimensional graph in the middle of the page. The x-axis controls the audio rate, with negative values reversing the audio. The y-axis controls the pitch shift of the audio, giving the user easy access to experiment with the relationship between time shifting and pitch shifting.</p>
+<p>There is a smaller red box that represents the value &apos;1.0&apos; in all directions, which results in no time stretching on the x-axis, or one octave up or down on the y-axis. There are deliberately no numbers explaining this fact on the graph itself, instead the numbers are continuously updated on the side for the user to keep track of.</p>
+<p>The audio manipulation in this sketch is made possible by using the <a href="https://p5js.org/reference/#/p5/map">p5.js function <code>map()</code></a> to scale the dimensions of one half of the x-axis of the graph to between 0.0 and 1.51, which is then used to continuously update <a href="https://tonejs.github.io/docs/14.7.77/Player">the Tone.Player</a> and the <a href="https://tonejs.github.io/docs/14.7.77/PitchShift">Tone.PitchShifter</a>. Surprisingly, the values are being updated out of the <code>draw()</code>loop, so are not being modulated at audio rate, but do not cause audible pops or glitches. Because <code>Tone.Player</code> will not accept a negative play rate value, there are actually two <code>Player()</code> objects playing at the same time, with one&apos;s buffer reversed. Which side of the &apos;0&apos; the user&apos;s mouse is on the graph&apos;s x-axis determines if the forward or backward <code>Tone.Player</code>&apos;s is audible. To facilitate this, I extended my custom class <code>SamplerButton</code> to create the <code>ForwardsAndBackwardsSamplerButton</code>. This allows the user to record into a single buffer, which is then copied over to two <code>Tone.Player()</code>s, one of which will be reversed.</p>
+<h2 class="mume-header" id="tour-stop-2-amplitude-modulationhttpscpmdude89githubioplayinginthewavestourampmodhtml"><a href="https://cpmdude89.github.io/playingInTheWaves/TourAmpMod.html">Tour Stop 2: Amplitude Modulation</a></h2>
+
+<p>I considered placing the amplitude modulation page first in the <em>Tour</em> because of the story in Chapter 2 and my personal fascination with the effect. Maybe that&apos;s why this is the most complex &apos;stop&apos; on the <em>Tour</em>. In the end I decided it&apos;s better to start the <em>Tour</em> with such a classic audio effect like time shifting, but this is still my favorite page.</p>
+<p>Just like the other &apos;stops&apos; in the <em>Tour</em>, the user is able to record directly to the page via a <code>SamplerButton</code>, or trigger preloaded samples. However, <em>Tour: Amplitude Modulation</em> is the only &apos;stop&apos; that has the option to trigger a &apos;TEST TONE&apos;. Since my interest was initially sparked by watching amplitude modulation via a single oscillator, I thought it appropriate to include one here.</p>
+<p>Activating the &apos;TEST TONE&apos; button will bring up a warning about volume while changing wave types. The sawtooth and square waves produce extremely interesting visuals but are much louder and abrasive than the sine or triangle waves. The <code>OscScope</code> window is based on amplitude, so automatically scaling down the volume would diminish the depiction of the signal in the visualizer. I tried to find a compromise by scaling down the sawtooth and square waves a little bit and adding a bold volume warning. That said, experimenting with higher modulation frequencies on various wave types results in the most interesting visuals in all of <em>Playing In The Waves</em>.</p>
+<p>Clicking on the &apos;ACTIVATE AMP MOD&apos; button will engage the modulating LFO, which will trigger the first appearance of a <code>LFOVisualizer</code>. Seeing the LFO ball move up and down in sync with the growing and diminishing of the audio signal in the <code>OscScope</code> provides a very clear visual of the amplitude modulation process at low frequencies.</p>
+<p>Activating the amplitude modulation signal will also bring up a horizontal slider to change the rate of the LFO. The amplitude modulation has two ranges, a high range and a low range. Different modulation frequency ranges have different flavors, and being able to zoom in on the 0-20Hz range emphasizes this point. In &apos;HIGH FREQ&apos; mode, the user is then able to sweep through multiple frequency ranges and try to find the sweet spot where an oscillating volume magically transforms into a new, independent sound.</p>
+<p>Even though this is the most cluttered user interface, it is balanced by being able to toggle chunks on and off. This implicitly tells the user what certain buttons like are connected to. This subconscious conversation with the user communicates the systems at work in the program without having to explicitly spell it out, but of course, the full explanation is always a click away.</p>
+<h2 class="mume-header" id="tour-stop-3-delayhttpscpmdude89githubioplayinginthewavestourdelayhtml"><a href="https://cpmdude89.github.io/playingInTheWaves/TourDelay.html">Tour Stop 3: Delay</a></h2>
+
+<p>The delay stop on the <em>Tour</em> functions in a very similar way to the previous stop. There is the <code>SamplerButton</code> and the preloaded samples to generate sound, but no test tone. Amplitude modulation is an audio process that clearest to hear in long, sustained sounds, but delay is most obvious with short, impactful sounds.</p>
+<p>At first the page only shows buttons to interact with, sound activating buttons on the left and delay controls on the right. Two <code>OscScope</code>s are positioned under their sound sources, and appear as their corresponding sound is activated. By connecting the appearance and positioning of each sound visualizer with each sound source, the relationship between the fundamental and delay line are made clear implicitly.</p>
+<p>One of the most impactful experiences sounds in the entire project is when the delay time LFO approaches 0.0 and the <code>LFOVisualizer</code> is about to reach the bottom of the track. The delay suddenly sounds metallic and the two <code>OscScope</code>s temporarily sync. Sometimes it looks like the two independent <code>OscScopes</code> are connect into one single window as the sound originates on the left and smoothly moves right across the entire screen.</p>
+<h2 class="mume-header" id="tour-stop-4-audio-slicinghttpscpmdude89githubioplayinginthewavestouraudioslicerhtml"><a href="https://cpmdude89.github.io/playingInTheWaves/TourAudioSlicer.html">Tour Stop 4: Audio Slicing</a></h2>
+
+<p>This page has the simplest design, but was the most difficult technical puzzle to solve. I still don&apos;t feel like I have figured out the &apos;right&apos; way to accomplish what I want from this &apos;stop&apos;. My intention was to visualize the process of granulation synthesis, but I fell a little short of that grandiose aim. The end result is still very engaging and I imagine will be a new way of experiencing sound for many users.</p>
+<p>I settled for a smooth way to visualize cutting up, or &apos;slicing&apos;, an audio file and looping the slices. These &apos;audio slices&apos; can be as small as 0.01 seconds long and can be slid by the user across an audio file. In a similar way as hearing a tone emerge out of an amplitude modulated audio file, hearing something like a tone emerge out of an extremely small loop is a fascinating experience I want to share with the users of this project.</p>
+<p>I still do not understand the solution I achieved in this &apos;stop&apos;. For a more detailed description of my journey getting dynamically-sized loops to sound good in the project as a whole, refer to <a href="#record-loop">this appendix tutorial</a>. What is happening on this page is best understood from looking at the code, from lines 146 to 183 in TourAudioSlicer.js.</p>
+<p>I had initially named this page <em>Tour: Granulation</em>, but because there is no grain overlap or randomization present in the program I eventually decided to name it &apos;Audio Slicing&apos;. The other limitation in this program is the presence of only a single slice. I did copy my code from the <code>draw()</code> loop into a class named <code>GranulationSlicer</code> and tried to instantiate multiple &apos;slicers&apos; in a single script, but it ran too slow. It worked in principle, but something about the processing it takes to constantly calculate the loop size was too much for the <code>draw()</code> loop. The loop lines&apos; movement was jerky and often the clip would play all the way through instead of looping a specific &apos;slice&apos;. Sometimes this happens anyway in the final version, just refresh the page if it does.</p>
+<h2 class="mume-header" id="the-playgroundhttpscpmdude89githubioplayinginthewavespitw_playgroundhtml"><a href="https://cpmdude89.github.io/playingInTheWaves/PITW_Playground.html">The Playground</a></h2>
+
+<p>The <em>Playground</em> is visually utilitarian, but has a lot of sonic potential. This is the part of the project designed specifically for more experienced users. Aside from having easy access to a bank of effects, the <em>Playground</em>&apos;s playful aspect comes in the form of being able to map effect parameter controls to the mouse&apos;s position on screen.</p>
+<p>The first thing the user will likely notice is the three horizontal rows of buttons. Each &apos;track&apos; on the <em>Playground</em> is an instance of two classes, the <code>SamplerButton</code> and the <code>PlaygroundControls</code>. The <code>PlaygroundControls</code> class manages the effect rack set on each track and communicates back with the <code>draw()</code> loop of PITW_Playground.js for effect parameter mouse tracking.</p>
+<p>Six out of the eight available effects on each track also are, by default,  being modulated by LFOs to make the output a little more interesting. For example, the delay&apos;s delay time is being affected by an LFO to bring out the pitch effect that the user might have explored earlier in the <em>Tour</em>. Presenting the user with a non-static set of effects was a choice made for two main reasons.</p>
+<ul>
+<li>The first reason is to show a wide range of what each effect can do.</li>
+<li>The second reason is to free up the user&apos;s energy to explore as much as possible, freed from the choice of having to pick a specific amount of any one effect. A user&apos;s decision-making power is a finite resource, and I want to preserve it as much as possible for <em>combinations</em> of effects. US president Barak Obama also considered decision-making energy a valuable resource to be protected.</li>
+</ul>
+<blockquote>
+<p>You&#x2019;ll see I wear only gray or blue suits,... I&#x2019;m trying to pare down decisions. I don&#x2019;t want to make decisions about what I&#x2019;m eating or wearing. Because I have too many other decisions to make.<br>
+(Obama, 2012)</p>
+</blockquote>
+<p>If the user wants more control on the effects or to stop the default LFO, there is a system in place to map an effect&apos;s parameter to the mouse&apos;s position on screen. This system is designed to give the user agency over the shape of the sound, but in a less precise and more playful way. The user can select pink for x-axis control, or yellow for y-axis control, so they can have multiple effects changing in interesting ways while moving the mouse diagonally across the screen.</p>
+<p>The final bit of control the user has over the effects is the ability to &apos;freeze&apos; in place their selected mouse position/effect parameter by pressing the spacebar. I hope that by shaping a sound in such a visual way it can open new avenues of sonic experimentation to experienced sound designers and whet the appetite for even more detailed control for beginner sound designers.</p>
+<p>The <em>Playground</em> makes the same trade off that p5.sound makes between control and accessibility. p5.js and p5.sound are designed to be easy to use, but not to enable every possible permutation of digital sound manipulation. p5.sound&apos;s design lowers the bar of effort it takes to just experiment with its library of tools by herding the user into making connections in specific ways. It&apos;s ironic that I then used the more powerful, less accessible library of the two (Tone.js) to make a more accessible, less directly controllable audio program.</p>
+<h2 class="mume-header" id="the-phone-versionhttpscpmdude89githubioplayinginthewavespitw_phoneversionhtml"><a href="https://cpmdude89.github.io/playingInTheWaves/PITW_phoneVersion.html">The Phone Version</a></h2>
+
+<p>During the entire 3-month development process, whenever I would send a link of an early build of <em>Playing In The Waves</em>, the friend or family member who received the link would open it on their phone. Then tell me the website I sent them is broken. Most people expect any website that works on a computer will also work on a phone. For a professional web developer accommodating multiple platforms is a standard part of the process, but for me this posed a significant problem.</p>
+<p>All the size variables in the code are some percentage of the width or height of the screen it is displayed on. In this way, the program is dynamic and scales whatever device it is accessed by. The main issue is computer screens, which I have been developing for primarily, are horizontal and smart phone screens are vertical. The <em>Playground</em> looks squashed sideways on a phone screen, making the buttons too small to accurately push. For this reason I made a phone version of the <em>Playground</em>, which gives a usable option for users who primarily interface with the internet on a mobile device.</p>
+<p>The phone version of the <em>Playground</em> is a much simpler design, and has only two tracks. The effects available were chosen to be the most interesting to a new user and most audible on a phone speaker. It can be assumed that if a user is accessing the phone version, they are likely not to be using headphones so the audio effects must be immediately audible and interesting on low-quality speakers. At least with this program, recording a sound to hear it slowed down or backwards is only a URL away for most people with a smart phone.</p>
+<h1 class="mume-header" id="final-thoughts">Final Thoughts</h1>
+
+<h2 class="mume-header" id="what-went-right">What Went Right</h2>
+
+<p>This is by far the most lines of code I have ever written in a single project and in is the biggest programming project I have ever worked on by myself. Now, at the end of this journey all I can say is &apos;it works!&apos; After hours and hours of trial and error, reading the same documentation page over and over again, and fixing countless bugs, it all works. For the most part.</p>
+<p>I hope my tutorials in <a href="#tutorials">Appendix C</a> can help future web audio programmers as well. I have benefitted for years by the free sharing of knowledge on the internet, and this is the first time I have made a concerted effort to give back to that space. Part of writing this dissertation was to provide some foundational understanding and context to web audio technology so others can teach it in the future.</p>
+<h2 class="mume-header" id="what-went-wrong">What Went Wrong</h2>
+
+<p>There were a few things that did not get solved by the time I submit this project.</p>
+<p>The <em>Phone Version</em> is a sub-par compromise to allow mobile device users the same access as computer users to this program. Sometimes, especially on Android phones the <em>Phone Version</em> glitches out or doesn&apos;t allow the user to record in. Ideally the whole site would be built from the group up with HTML and CSS, which would scale much nicer between different screen types.</p>
+<p>This project focused much more on the technical aspects of web audio than the actual sounds it produces. The reverb, playback rate stretching, and pitch shifting all sound very digital as they are just default effect nodes from Tone.js. When lots of sounds are happening at once, there is still some clipping. This can be mitigated somewhat by user controls, like the volume sliders in the <em>Playground</em>, but so much time was devoted to getting everything working that there just was not enough time to polish the sounds themselves.</p>
+<h2 class="mume-header" id="whats-next">What&apos;s Next?</h2>
+
+<p>There is a lot work to do going forward. A complete rebuild of this project <em>without</em> p5.js would be the first step. This would save a lot of processing power and would help the program work better across all devices. Completing this project opens the door for lots of other web audio ideas, like focusing on generative processes or real-time sound recognition.</p>
+<p>Web audio is an exciting space to work in and is only getting more powerful. While it can never keep up with more traditional kinds of audio software, it does have reach and speed of access that other programs can&apos;t get close to. I hope this program can go on to bring a little audio magic into the world.</p>
+<h1 class="mume-header" id="bibliography">Bibliography</h1>
+
+<ul>
+<li>
+<p>The Audio Working Group. &#x201C;Audio Working Group.&#x201D; Accessed August 1, 2021. <a href="https://www.w3.org/2011/audio/">https://www.w3.org/2011/audio/</a>.</p>
+</li>
+<li>
+<p>Asimov, Isaac. <em>Foundation</em>. 1953, London: Weidenfield &amp; Nicolson Ltd.</p>
+</li>
+<li>
+<p>Borgeat, Patrick. &#x201C;Audio in the Web 02: The Past and Forgotten,&#x201D; cappel:nord. July 21, 2021. <a href="http://www.cappel-nord.de/b/audio-in-the-web-02-the-past-and-forgotten/">www.cappel-nord.de/b/audio-in-the-web-02-the-past-and-forgotten/</a></p>
+</li>
+<li>
+<p>Bouchard, David. &quot;Week 6 - Part 1 - Tone.Js, Drones&quot;. YouTube.  Accessed July 15, 2021. <a href="https://www.youtube.com/watch?v=ddVrGY1dveY&amp;t=2093s&amp;ab_channel=DavidBouchard">https://www.youtube.com/watch?v=ddVrGY1dveY&amp;t=2093s&amp;ab_channel=DavidBouchard</a>.</p>
+</li>
+<li>
+<p>Duvander, Adam. &#x201C;The History of IMG and EMBED Tags | WIRED.&#x201D; Accessed August 1, 2021. <a href="https://www.wired.com/2008/09/history-of-img-and-embed-tags/">https://www.wired.com/2008/09/history-of-img-and-embed-tags/</a>.</p>
+</li>
+<li>
+<p>Fisher, Tyler. &#x201C;Audio in the Browser: Horrors and Joys.&quot; Accessed July 20, 2021. <a href="https://source.opennews.org/articles/audio-browser/">https://source.opennews.org/articles/audio-browser/</a>.</p>
+</li>
+<li>
+<p>Github. &#x201C;Tone.Js Docs.&#x201D; Accessed June 15, 2021. <a href="https://tonejs.github.io/docs/14.7.77/index.html">https://tonejs.github.io/docs/14.7.77/index.html</a>.</p>
+</li>
+<li>
+<p>Github. &#x201C;Global and Instance Mode &#xB7; Processing/P5.Js Wiki.&#x201D; p5.sound,  Accessed July 15, 2021. <a href="https://github.com/processing/p5.js">https://github.com/processing/p5.js</a>.</p>
+</li>
+<li>
+<p>Kearney-Volpe, Claire. &#x201C;P5 Accessibility.&#x201D; Processing Foundation (blog), Medium. Accessed August 12, 2021. <a href="https://medium.com/processing-foundation/p5-accessibility-115d84535fa8">https://medium.com/processing-foundation/p5-accessibility-115d84535fa8</a>.</p>
+</li>
+<li>
+<p>Lewis, Micheal. &quot;Obama&apos;s Way&quot;.<em>Vanity Fair</em> September, 12, 2012. Accessed August 18, 2021. <a href="https://www.vanityfair.com/news/2012/10/michael-lewis-profile-barack-obama">https://www.vanityfair.com/news/2012/10/michael-lewis-profile-barack-obama</a></p>
+</li>
+<li>
+<p>LSU STEM Pathways. &#x201C;Sound and Music&#x202F;:: Educational Material for LSU Programming Digital Media.&#x201D; LSU Stem Pathways Course. Accessed July 15, 2021.<br>
+<a href="https://pdm.lsupathways.org/6_resources/7_soundandmusic/">https://pdm.lsupathways.org/6_resources/7_soundandmusic/</a>.</p>
+</li>
+<li>
+<p>Max 7 Documentation. &#x201C;MSP Delay Tutorial 4: Flanging&#x201D; Accessed July 25, 2021. <a href="https://docs.cycling74.com/max8/tutorials/06_synthesischapter03">https://docs.cycling74.com/max8/tutorials/06_synthesischapter03</a>.</p>
+</li>
+<li>
+<p>Max 8 Documentation. &#x201C;MSP Synthesis Tutorial 3: Using Amplitude Modulation&#x201D; Accessed July 25, 2021. <a href="https://docs.cycling74.com/max8/tutorials/06_synthesischapter03">https://docs.cycling74.com/max8/tutorials/06_synthesischapter03</a>.</p>
+</li>
+<li>
+<p>MDN Web Docs. &#x201C;Hit Regions and Accessibility&quot;  Accessed August 12, 2021. <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility</a>.</p>
+</li>
+<li>
+<p>Nast, Cond&#xE9;. &#x201C;The Rise and Fall of Flash, the Annoying Plugin That Shaped the Modern Web.&#x201D; <em>Wired UK</em>. Accessed July 20, 2021. <a href="https://www.wired.co.uk/article/history-of-macromedia-flash">https://www.wired.co.uk/article/history-of-macromedia-flash</a>.</p>
+</li>
+<li>
+<p>Negus, Chris. <em>Internet Explorer 4 Bible</em>. Foster City, CA&#x202F;: IDG Books Worldwide, 1997. <a href="http://archive.org/details/internetexplorer00negu">http://archive.org/details/internetexplorer00negu</a>.</p>
+</li>
+<li>
+<p>The Processing Foundation. &#x201C;Reference | p5.js.&#x201D; Accessed June 15, 2021. <a href="https://p5js.org/reference/">https://p5js.org/reference/</a>.</p>
+</li>
+<li>
+<p>The Processing Foundation. &quot;Sound Library Reference | p5.js.&#x201D; Accessed June 15, 2021. <a href="https://p5js.org/reference/#/libraries/p5.sound">https://p5js.org/reference/#/libraries/p5.sound</a>.</p>
+</li>
+<li>
+<p>The Processing Foundation. &#x201C;Learn | p5.Jjs.&#x201D; j5.js Reference. Accessed August 12, 2021. <a href="https://p5js.org/learn/p5-screen-reader.html">https://p5js.org/learn/p5-screen-reader.html</a>.</p>
+</li>
+<li>
+<p>Sagan, Carl. <em>Cosmos</em>. London: Abacus, 1995.</p>
+</li>
+<li>
+<p>Shankland, Stephen. &#x201C;Steve Jobs&#x2019; Letter Explaining Apple&#x2019;s Flash Distaste.&#x201D; CNET. Accessed August 1, 2021. <a href="https://www.cnet.com/news/steve-jobs-letter-explaining-apples-flash-distaste/">https://www.cnet.com/news/steve-jobs-letter-explaining-apples-flash-distaste/</a>.</p>
+</li>
+<li>
+<p>Shiffman, Daniel. &#x201C;Code! Programming with P5.Js Video Playlist - YouTube.&#x201D; Accessed June 14, 2021. <a href="https://www.youtube.com/playlist?list=PLRqwX-V7Uu6Zy51Q-x9tMWIv9cueOFTFA">https://www.youtube.com/playlist?list=PLRqwX-V7Uu6Zy51Q-x9tMWIv9cueOFTFA</a></p>
+</li>
+<li>
+<p>Shiffman, Daniel. &quot;P5.Js Sound Tutorial Video Playlist - YouTube.&#x201D; The Coding Train. Accessed June 14, 2021. <a href="https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aFcVjlDAkkGIixw70s7jpW">https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aFcVjlDAkkGIixw70s7jpW</a></p>
+</li>
+<li>
+<p>Shiffman, Daniel. &#x201C;Topics of JavaScript/ES6-ES8 Video Playlist - YouTube.&#x201D; The Coding Train. Accessed June 14, 2021. <a href="https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YgpA3Oht-7B4NBQwFVe3pr">https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YgpA3Oht-7B4NBQwFVe3pr</a></p>
+</li>
+<li>
+<p>Tokui, Nao. &#x201C;(Example) Tone.Js / Microphone Input to Player.&#x201D; Codepen. Accessed July 15, 2021. <a href="https://codepen.io/naotokui/details/abBvBmW">https://codepen.io/naotokui/details/abBvBmW</a>.</p>
+</li>
+<li>
+<p>Tramte, Dan. &quot;Browser Noise: Web Audio Tutorials&quot;. YouTube. The Audio Programmer. Accessed July 15, 2021. <a href="https://www.youtube.com/playlist?list=PLLgJJsrdwhPywJe2TmMzYNKHdIZ3PASbr">https://www.youtube.com/playlist?list=PLLgJJsrdwhPywJe2TmMzYNKHdIZ3PASbr</a></p>
+</li>
+<li>
+<p>W3C. &#x201C;Elements/Bgsound - HTML Wiki.&#x201D; Accessed August 1, 2021. <a href="https://www.w3.org/html/wiki/Elements/bgsound">https://www.w3.org/html/wiki/Elements/bgsound</a>.</p>
+</li>
+<li>
+<p>W3C. &#x201C;Web Audio API, W3C Recommendation&#x201D; Accessed July 20, 2021. <a href="https://www.w3.org/TR/webaudio/">https://www.w3.org/TR/webaudio/</a>.</p>
+</li>
+<li>
+<p>W3C. &#x201C;HTML5 Differences from HTML4.&#x201D; Accessed August 1, 2021. <a href="https://www.w3.org/TR/html5-diff/">https://www.w3.org/TR/html5-diff/</a>.</p>
+</li>
+<li>
+<p>W3Schools. &#x201C;JavaScript ES6.&#x201D; Accessed June 17, 2021. <a href="https://www.w3schools.com/js/js_es6.asp">https://www.w3schools.com/js/js_es6.asp</a>.</p>
+</li>
+<li>
+<p>W3C. &#x201C;Web Audio API Brings Audio Design to the Web as It Becomes a World Wide Web Consortium (W3C) Recommendation.&quot; Accessed August 1, 2021. <a href="https://www.w3.org/2021/06/pressrelease-webaudio.html.en">https://www.w3.org/2021/06/pressrelease-webaudio.html.en</a>.</p>
+</li>
+<li>
+<p>&#x201C;Web Audio Modules | Community Site.&#x201D; Accessed August 12, 2021. <a href="https://www.webaudiomodules.org/">https://www.webaudiomodules.org/</a>.</p>
+</li>
+<li>
+<p>Wilson, Chris &#x201C;A Tale of Two Clocks - Scheduling Web Audio with Precision - HTML5 Rocks.&#x201D; HTML5 Rocks - A resource for open web HTML5 developers. Accessed July 20, 2021. <a href="https://www.html5rocks.com/en/tutorials/audio/scheduling/">https://www.html5rocks.com/en/tutorials/audio/scheduling/</a>.</p>
+</li>
+<li>
+<p>Web Design Museum. &#x201C;Internet Explorer 4.0&quot; Accessed August 1, 2021. <a href="https://www.webdesignmuseum.org/old-software/web-browsers/internet-explorer-4-0">https://www.webdesignmuseum.org/old-software/web-browsers/internet-explorer-4-0</a>.</p>
+</li>
+<li>
+<p>Web Design Museum. &#x201C;Netscape Navigator 2.0&quot; Accessed August 1, 2021. <a href="https://www.webdesignmuseum.org/old-software/web-browsers/netscape-navigator-2-0">https://www.webdesignmuseum.org/old-software/web-browsers/netscape-navigator-2-0</a>.</p>
+</li>
+<li>
+<p>WHATWG. &#x201C;HTML Living Standard.&#x201D; Accessed July 16, 2021. <a href="https://html.spec.whatwg.org/multipage/introduction.html#history-2">https://html.spec.whatwg.org/multipage/introduction.html#history-2</a>.</p>
+</li>
+</ul>
+<h1 class="mume-header undefined" id="appendix">Appendix</h1>
+
+<h2 class="mume-header undefined" id="3rd-party-libraries">Appendix A: 3rd Party JavaScript Libraries</h2>
+
+<p>Manipulating The Web Audio API in conjunction with HTML and CSS is complicated, and beyond my current skills. Thankfully there are many open-source web audio libraries that make that task a little easier.</p>
+<h3 class="mume-header undefined" id="start-up">Getting All The Files Working Together</h3>
+
+<h4 class="mume-header" id="setting-up-npm-local-server">Setting Up NPM Local Server</h4>
+
+<p>Here is my method for standing up and testing all my projects made with p5.js and Tone.js. This method works because:</p>
+<ul>
+<li>I am root and only user on my private machine.</li>
+<li>I am hosting everything on Github Pages and using p5.js, so no need for a backend.</li>
+</ul>
+<p>I downloaded Node Package Manager (npm), and Node.js Local Server to run my websites off my personal computer. There are a lot of resources that recommend against installing Node.js with the <code>sudo</code> keyword, but this is the method I used because it was the easiest, fastest, and I am the only user on my private machine. I also am using VS Code, with the &apos;Live Server&apos; extension by Ritwick Dey.</p>
+<h4 class="mume-header" id="setting-up-the-html-file">Setting Up The HTML File</h4>
+
+<p>Getting all the JavaScript files and libraries working together on the same HTML file can be tricky. My HTML files all are very bare as all the processing is done in JavaScript files. So the order that the <code>&lt;script&gt;</code> tags are loaded in is important.</p>
+<p>If using p5.sound, then the first 3 JavaScript files should be:</p>
+<pre data-role="codeBlock" data-info="html" class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>p5/p5.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>p5/p5.sound.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>PITW_Classes_p5sound.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+</pre><p>If using Tone.js, then the first 3 JavaScript files should be loaded like this:</p>
+<pre data-role="codeBlock" data-info="html" class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>p5/p5.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>https://unpkg.com/tone@14.7.58/build/Tone.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">&quot;</span>PITW_Classes_Tone.js<span class="token punctuation">&quot;</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+</pre><p>You&apos;ll notice that there are two &apos;PITW&apos; libraries. These are my two custom class libraries, separated by sound library. Every HTML file I submit as part of the final project has Tone.js, so all are set up like the second example. Also Tone.js has to be loaded in via external link to stay out of the &apos;Global Mode&apos; p5.js is set up in.</p>
+<h3 class="mume-header" id="p5js">p5.js</h3>
+
+<p>I am not a seasoned web developer. I learned the basics of JavaScript during the development of this project and I had a secret weapon: p5.js. On <a href="https://p5js.org/">its own website</a>, p5.js is described as:</p>
+<blockquote>
+<p>a JavaScript library for creative coding, with a focus on making coding accessible and inclusive for artists, designers, educators, beginners, and anyone else!<br>
+(The Processing Foundation, 2021)</p>
+</blockquote>
+<p>p5.js is much more than just a library. It is a set of tools to make 3D graphics, animation, HTML elements, and can be used to make all the components of a simple website. This is how I was able to make all of <em>Playing In The Waves</em> coding exclusively in JavaScript, using HTML only to link the necessary files together.</p>
+<p>p5.js was developed by The Processing Foundation to be an entry point for people, like me, new to writing JavaScript code, or even for artists who have never written a single line of code and want to put a creative idea on a web page. Writing JavaScript code in p5.js is much simpler than writing inline JavaScript in an HTML file, which frees up someone like me to focus purely on the sound design. It is also home to the first web audio library I studied to develop <em>Playing In The Waves</em></p>
+<h3 class="mume-header" id="p5sound">p5.sound</h3>
+
+<p>The <a href="https://github.com/processing/p5.js-sound">readme on Github for p5.sound</a> claims it:</p>
+<blockquote>
+<p>&quot;brings the Processing approach to Web Audio as an addon for p5.js.&quot;<br>
+(The Processing Foundation, 2021)</p>
+</blockquote>
+<p>p5.sound takes the code design principles of p5.js and applies them to audio programming in JavaScript. Oscillators, FFT analysers, audio recorders, and some basic effects are all present in p5.sound.</p>
+<p>I would guess that p5.sound is the most approachable and simplest web audio library available. It beings p5.js&apos;s accessibility principles to The Web Audio API, but comes with the tradeoff in flexibility. Because p5.sound was developed as just an addition to an entirely graphics-focused library, it is not the most powerful web audio tool available. It is running through the p5.js engine and is also standing on top of several other technologies, so any audio processing has to go through several layers of abstractions to complete whatever task it needs to. One of the libraries p5.sound uses and abstracts away to deliver its simplicity and ease of use is Tone.js, the other and more powerful web audio library I used for this project.</p>
+<h3 class="mume-header" id="tonejs">Tone.js</h3>
+
+<p>Tone.js a high-performance web audio library, made by Yotam Mann, that sits on top of The Web Audio API. The <a href="https://github.com/Tonejs/Tone.js/blob/dev/README.md">readme on Tone.js&apos;s GitHub page</a> describes the library as:</p>
+<blockquote>
+<p>&quot;a Web Audio framework for creating interactive music in the browser. The architecture of Tone.js aims to be familiar to both musicians and audio programmers creating web-based audio applications... Additionally, Tone provides high-performance building blocks to create your own synthesizers, effects, and complex control signals.&quot;<br>
+(Mann, 2021)</p>
+</blockquote>
+<p>Tone.js is the other side of the trade off between ease of use vs flexibility. Tone.js provides a powerful wrapper around the Web Audio API to schedule events with sample-accurate precision and create a timeline that can run parallel alongside another other processes. Tone.js has a well-organized, but much less friendly documentation page compared to p5.sound, with fewer examples to study. It was a significant time investment for me to understand how to accomplish even basic operations, but the effort was well worth it. Many critical components of the final version of <em>Playing In The Waves</em> rely on Tone.js functionality that does not exist in p5.sound.</p>
+<p><a href="https://github.com/processing/p5.js-sound/blob/main/README.md">p5.sound</a> actually is standing on Tone.js to some degree. The p5.sound readme gives credit to this fact:</p>
+<blockquote>
+<p>&quot;p5.sound is built with a few modules (Clock, TimelineSignal, and signal math components) from Tone.js...&quot;<br>
+(The Processing Foundation, 2021)</p>
+</blockquote>
+<p><code>Tone.Clock</code> is one of the most powerful components of the library. So powerful that p5.sound is built on top of it. As detailed in <a href="#chapter-2">Chapter 2</a>, having access to an accurate clock is a facet of audio programming that, for web audio programmers, is a hurdle to overcome. <a href="https://tonejs.github.io/docs/14.7.77/Clock">The <code>Tone.Clock</code> documentation page</a> explains the object as:</p>
+<blockquote>
+<p>&quot;A sample accurate clock which provides a callback at the given rate. While the callback is not sample-accurate (it is still susceptible to loose JS timing), the time passed in as the argument to the callback is precise.&quot;<br>
+(Mann, 2021)</p>
+</blockquote>
+<p>While Tone.js can&apos;t fix the fact that JavaScript is not a high-performance language like C++ is, it is an excellent tool for web audio programmers.</p>
+<h3 class="mume-header" id="comparing-tonejs-and-p5sound">Comparing Tone.js and p5.sound</h3>
+
+<h4 class="mume-header" id="reasons-to-use-tonejs">Reasons to Use Tone.js</h4>
+
+<h5 class="mume-header" id="direct-access-to-audio-buffer">Direct access to audio buffer</h5>
+
+<p>For me, the biggest disadvantage of p5.sound is the lack of direct access to the audio buffer array values. Coming from my Audio Programming class, which was focused on the JUCE framework and C++, I took for granted the ability to write a for loop to iterate over an array of audio data. Tone.js does allow the developer this access and has multiple ways to retrieving and manipulating the raw audio data. This access was critical in solving the issue in <a href="#record-loop">Appendix C</a>, and was a breakthrough that cleared the way for more interesting audio effect functionality in the final version.</p>
+<h5 class="mume-header" id="tonesignal"><code>Tone.Signal</code></h5>
+
+<p>Tone.js&apos;s &apos;Signal&apos; data type allows calculations to be processed at audio rate and gives the ability to modulate object parameters with audio signals. The above quote from p5.sound&apos;s readme also mentions Tone.js&apos;s &apos;signal math&apos; as a component that both libraries use. p5.sound does allow things like amplitude and frequency modulation, but Tone.js just allows more flexibility in general to perform audio rate processes. Tone.js&apos;s delay nodes will accept an audio signal from an LFO to modulate its delay time. To accomplish this in p5.sound, you would have to update the delay time in the <code>draw()</code> loop and smooth the values as you go. This is a much more processing-heavy approach and sucks power away from other potentially interesting sound design components.</p>
+<h5 class="mume-header" id="tonelfo"><code>Tone.LFO</code></h5>
+
+<p>Tone.js has a dedicated LFO object for controlling audio processes via other audio signals and its output can easily be scaled to different min/max values. p5.sound only has an oscillator object, and scaling the min/max output values is very sensitive. Refer to <a href="#scale">Appendix C, tutorial 6</a> to read more about this specific issue.</p>
+<h5 class="mume-header" id="power">Power</h5>
+
+<p>The class-based, multi-track design I implemented in the &apos;Playground&apos;, was not possible with p5.sound. I made track and effect rack classes in both p5.sound and Tone.js, both running on a p5.js script. Having multiple tracks with multiple, different effects running simultaneously created many audible glitches in p5.sound. You could say the entire <em>Playground</em> component of <em>Playing In The Waves</em> is an example of something Tone.js is capable of that p5.sound is not.</p>
+<h4 class="mume-header" id="reasons-to-use-p5sound">Reasons to Use p5.sound</h4>
+
+<p>Credit where credit is due. There are actually three examples of baked-in functionality that exist in p5.sound&apos;s objects that are not easily accessible in Tone.js.</p>
+<h5 class="mume-header" id="reversing-the-audio-buffer-with-p5soundfile">Reversing The Audio Buffer with <code>p5.SoundFile</code></h5>
+
+<p>You can get a file to play backwards easily by passing a negative number as an argument to the <code>p5.SoundFile().rate()</code> method, similar to the [~groove] object in Max MSP. Tone.js&apos;s main audio file handler object, <code>Tone.Player()</code>, will not accept a number less than zero to its playback rate parameter. It is possible set the <code>Tone.Player.reverse</code>  boolean to true, which would flip the buffer around, but will result in an audible pop if done in real-time. This is why I had to make the <code>ForwardsAndBackwardsSamplerButton</code> class.</p>
+<h5 class="mume-header" id="reverse-reverb">Reverse Reverb</h5>
+
+<p><code>p5.Reverb</code> has a boolean to flip its buffer and create a backwards reverb. This is a really cool effect that does not exist in an easily accessible way in Tone.js&apos;s reverb nodes. I&apos;m sure it&apos;s possible to create this effect with Tone.js by manually iterating over the <code>Tone.Reverb</code>&apos;s return signal&apos;s audio buffer, but I did not have time to try to find a solution to this problem. It&apos;s a shame because that would have been a really nice effect to include in the &apos;Playground&apos;.</p>
+<h5 class="mume-header" id="download-wav-audio-file">Download .wav Audio File</h5>
+
+<p>Both Tone.js and p5.sound allow the user to record the audio output of the webpage then download the returned file. p5.sound will return a .wav file, which is much nicer than to use than the .webm file type Tone.js returns. Using only Tone.js there is no option to convert its download file to a more usable file type like .wav or .mp3.</p>
+<h2 class="mume-header undefined" id="currentwebaudio">Appendix B: Examples of Interesting, Current Web Audio</h2>
+
+<h3 class="mume-header" id="autosamplerhttpstaperinstrumentsgithubioautosampler"><a href="https://taperinstruments.github.io/autosampler/">autosampler</a></h3>
+
+<p>After talking to Professor Jules Rawlinson about potentially working in web audio for my final project, he kindly pointed me to the <em>autosampler</em> early in the project developement. This web application showed me early on how web audio can achieve a level of accessibility that no other audio program I have used can reach. It is a program that with the click of one button (after asking permission to your device&apos;s microphone) will begin to record your surroundings and play back in multiple, layered loops. These loops are distorted by simple buffer manipulation techniques like reversing the audio or adjusting the playback rate, but create lots of new and interesting sounds. The transparency of the interface and depth of sonic complexity achieved from just the sound coming in from an open window proved to me that many of my initial ideas were possible.</p>
+<h3 class="mume-header" id="leimmaapotomehttpsisartumnet"><a href="https://isartum.net/">Leimma/Apotome</a></h3>
+
+<p>Leimma and Apotome are two of the most advanced web audio tools I have come across. Leimma is a source to experimenting with different kinds of tuning systems and Apotome is a generative web audio system that can be routed through Leimma. The sound quality generated by these two web audio applications is extremely high and are a very powerful and flexible sstem for sonic exploration. Leimma and Apotome represent the high water mark for technical sophistication and musical usability out of any web audio application I have used.</p>
+<p>The official W3C press release recommending the use of The Web Audio API on 17 June 2021 mentions Leimma and Apotome in a list of high profile applications that already use The Web Audio API like Spotify, SoundCloud, and Ableton. What an endorsement!</p>
+<p>In communicating with the team behind behind the technical aspects of Leimma and Apotome, (Tero Parviainen, email communication on 02, August, 2021) I learned they use Tone.js synth objects in some of the sound generation for both tools. However most of the synthesizers used in Leimma and Apotome were developed using Audio Web Modules. <a href="https://www.webaudiomodules.org/">Web Audio Modules</a> is a way to write C++ code that is then compiled into an assembly language that a browser can understand. Link below for more information on how &apos;WAM&apos;s work.</p>
+<h3 class="mume-header" id="chrome-music-labhttpsmusiclabchromeexperimentscomexperiments"><a href="https://musiclab.chromeexperiments.com/Experiments">Chrome Music Lab</a></h3>
+
+<p>The Chrome Music Lab is a child-friendly, interactive series of activities that provides a bright and colorful means of learning the basics of sound. In their own words:</p>
+<blockquote>
+<p>&quot;Chrome Music Lab is a website that makes learning music more accessible through fun, hands-on experiments.&quot;<br>
+(Chrome Music Lab, 2021)</p>
+</blockquote>
+<p>This website has more of a museum feel, and finds very interesting ways to visualize different aspects of sound. This is a great example of making education fun and appealing to young minds, but is still stimulating to more experienced sound designers. The &apos;Voice Spinner&apos;, &apos;Spectrogram&apos;, and &apos;Oscillators&apos; exhibits are stand outs on this platform.<br>
+&lt;&gt;</p>
+<p>As the name would suggest, Chrome Music Lab was made my a Google-backed team, which explains why the interface is so clean and dynamic. Further down in the &apos;About&apos; section, the website mentions both The Web Audio API and Tone.js as technologies foundational to the creation of the Chrome Music Lab.</p>
+<h3 class="mume-header" id="ableton-learning-synthshttpslearningsynthsabletoncom"><a href="https://learningsynths.ableton.com/">Ableton Learning Synths</a></h3>
+
+<p>Similar in many ways to the Chrome Music Lab, Ableton has a series of playful and educational inter-actives designed to educate an audience on the basics of synthesis. Unlike the Chrome Music Lab, the Ableton Learning Synths site is focused almost entirely on synthesizer concepts.</p>
+<p>This series of tutorials was also very influential to me during the development of <em>Playing In The Waves</em>. The box/oscillator example mentioned above is a technique used in quite a few web audio applications, including on p5.sound&apos;s documentation page. Mapping one effect to the x-axis of a rectangle and another effect to the y-axis is a core principle of <em>Tour: Play Rate</em> and <em>The Playground</em>.</p>
+<p>In fact, there are quite a lot of similarities between my project and the Ableton Learning Synths page that I did not realize until later in the development process. The overall structure of the Ableton site takes the user through a series of accessible and interactive tutorials before dumping that user out into a much more complex page called a &apos;Playground&apos;.  Ableton Learning Synths is almost entirely music focused and <em>Playing In The Waves</em> centers on pure sound and DSP concepts. Every single page in <em>Playing In The Waves</em> allows the user to record directly from their device microphone and apply that recording to my tutorials, while Ableton uses oscillators to generate all their sample sounds.</p>
+<h2 class="mume-header undefined" id="tutorials">Appendix C: Tutorials</h2>
+
+<h3 class="mume-header undefined" id="setup-draw">What Exactly Are <code>setup()</code> and <code>draw()</code>?</h3>
+
+<p><code>setup()</code> and <code>draw()</code> functions are the two halves of the p5.js system that is easy to understand and draw graphics to the screen.</p>
+<h4 class="mume-header" id="setup"><code>setup()</code></h4>
+
+<p><code>setup()</code> is a function that runs one time right as the program loads. It is the place where the user can initialize all their objects and set their initial parameters. Any objects or calculations that might need to accessed later in the program should be setup in <code>setup()</code>.</p>
+<h4 class="mume-header" id="draw"><code>draw()</code></h4>
+
+<p>Understanding the <code>draw()</code> loop is essential for understanding p5.js, and is where the majority of program actually happens. I refer to it as &apos;The <code>draw()</code> Loop&apos; because it is a giant loop that runs at 60 frames per second for as long as the program is open. By running at a high enough frame rate to simulate motion, graphics and animations can run smoothly in the <code>draw()</code> loop. Because it renders from top to bottom, objects at the top of the <code>draw()</code> loop will be rendered behind things at the bottom of the <code>draw()</code> loop. For example, it is always a good idea for the first line of the <code>draw()</code> loop to call the <code>background()</code> function.</p>
+<p><a href="https://editor.p5js.org/CPMDude89/sketches/EEPyTuXp_">EXAMPLE 1</a></p>
+<p><a href="https://editor.p5js.org/CPMDude89/sketches/K-fKtMfzF">EXAMPLE 2</a></p>
+<p>The <code>draw()</code> loop is generally the biggest performance bottleneck in the project. Running too many visual and audio processes based in the <code>draw()</code> loop will result in audible glitches and artifacts, so be careful. When using Tone.js this is not as much of a problem, but it will create a bottleneck with p5.sound if you&apos;re not careful.</p>
+<p>In above example, you will notice the <code>oscButton</code> does not exist at all in the <code>draw()</code> loop, but can be manipulated in real time. This is because you can create HTML elements with p5.js, that can have listeners and callback functions outside of the <code>draw()</code> loop. These objects are not being called or checked at 60 fps, so do not use as much valuable processing power. <code>createButton()</code> is one of these p5/HTML objects, and any function that is prefixed by <em>create</em> is a <a href="https://p5js.org/reference/#/p5.Element">p5/HTML element</a>. Using lots of p5.Elements is a strategy I use in every script to save on processing power. This is also why the buttons are so bland looking.</p>
+<h2 class="mume-header" id="problems-overcome">Problems Overcome</h2>
+
+<p>This project has tested my capabilities as an audio programmer and my patience. There have been quite a few issues that came up that had no ready-made solution for at all. I feel that the knowledge gained in this chapter is extremely valuable to me, and to any new web audio programmer. I wish I could send this chapter back in time to myself 3 months ago.</p>
+<h3 class="mume-header" id="1-recording-user-input-and-playing-back">1: Recording User Input and Playing Back</h3>
+
+<h4 class="mume-header" id="use-settimeout-to-avoid-mouse-click-in-recording">Use setTimeout() to avoid mouse click in recording</h4>
+
+<p>The first tip I have to give is more of a practical one than a technical one. When activating a <code>p5.SoundRecorder</code> or <code>Tone.Recorder</code> to begin recording, it will also record the mouse click, especially if the user input device is the computer (laptop) speaker. Just use <code>setTimeout()</code> to give yourself 100 - 200 milliseconds between the actual mouse click and the start of recording. I have 120 ms of space hard-coded in my <code>SamplerButton</code> class in this space.</p>
+<h5 class="mume-header" id="p5sound-1">p5.sound:</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token function">setTimeout</span><span class="token punctuation">(</span>recorder<span class="token punctuation">.</span><span class="token method function property-access">record</span><span class="token punctuation">(</span>soundFile<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">120</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</pre><h5 class="mume-header" id="tonejs-1">Tone.js:</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token function">setTimeout</span><span class="token punctuation">(</span>recorder<span class="token punctuation">.</span><span class="token method function property-access">start</span><span class="token punctuation">(</span>soundFile<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">120</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</pre><h4 class="mume-header undefined" id="record-loop">Recording and Looping</h4>
+
+<p>Getting the <code>SamplerButton</code> class working the way I wanted it to was the longest running technical issue in this entire development process. As it turns out, it&apos;s really difficult to create a looping audio file player that has an amplitude envelope that will shape itself dynamically in JavaScript. <code>Tone.Player</code> has a boolean to set to true to loop, so that was the easy part. However getting newly recorded user audio to loop without clicking at the beginning and (especially) the end was very tricky. I had moved on to Tone.js by the point I was ready to tackle this issue, so I do not have a solution for this problem in p5.sound.</p>
+<p>The <code>Tone.Player</code> also has built in <code>fadeIn</code> and <code>fadeOut</code> properties to set automatic fade times on either side of the audio file. These act like little built in ADSR attack and releases, but like ADSR they need to be triggered. When a <code>Tone.Player.loop</code> is set to <code>true</code> and the audio file is looping, the built in fades are inactive. The fades must be triggered by a <code>.start()</code> or a <code>.stop()</code> command to the <code>Player</code>.</p>
+<p>Tone.js has a tool called a <code>Loop</code> which will repeatedly callback a function given as an argument at a given &apos;interval&apos;. Knowing I had to call <code>.start()</code> and <code>.stop()</code> on the <code>Player</code> to trigger the built-in fade times, I made a <code>Tone.Loop</code> that did just that and had the <code>Loop.interval</code> dynamically set to the length of the recorded audio file. This worked pretty well, but would create runtime bugs where the <code>Loop</code> would be triggered on time, but the <code>Player</code> would not play. There would usually be a click at the end of the audio file every third or fourth repeat despite the built in fades triggering. I suspect that inaccurate JavaScript timing, even bolstered by the Tone.js and Web Audio API&apos;s Audio Clock, was throwing things off.<br>
+Finally the solution was a suggestion given to me by my professor Tom Mudd. He suggested using a simple method we had learned in his Audio Programming class: using a <code>for</code> loop to iterate over part of the audio buffer array and manually scale up or down the ends of the buffer. Thankfully, Tone.js allows direct access to the audio buffer to accomplish this. Tone.js does have its own audio buffer object, the <code>ToneAudioBuffer</code>, but so the <code>Player</code> via its <code>.buffer</code> attribute. The <code>ToneAudioBuffer</code> has a method called <code>getChannelData()</code>, which returns the actual array of digital audio data, provided you pass in the channel number (in most cases will be either 0 or 1 for stereo left and right).</p>
+<p>By just using a <code>for</code> loop immediately after recording user input, this also freed up a lot of processing power that was being taken up by repeated calls to a <code>Tone.Loop</code>. Before I successfully implemented this solution, the <em>Playground</em> couldn&apos;t have any reverb because it was too heavy on processor power. The below code streamlined every part of <em>Playing In The Waves</em> and was a huge breakthrough in the development process.</p>
+<h5 class="mume-header" id="processing-user-recorded-audio-before-playback-samplerbutton-line-68">Processing User-Recorded Audio Before Playback (<code>SamplerButton</code> line 68):</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> array <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">let</span> max <span class="token operator">=</span> <span class="token number">10000</span><span class="token punctuation">;</span>
+        
+        <span class="token keyword control-flow">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> max<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            array<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> array<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i<span class="token operator">/</span>max<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">length</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">]</span> 
+            <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">length</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i <span class="token operator">/</span> max<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        array <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword control-flow">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> max<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            array<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> array<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i<span class="token operator">/</span>max<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">length</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">]</span> 
+            <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">buffer</span><span class="token punctuation">.</span><span class="token method function property-access">getChannelData</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">length</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i <span class="token operator">/</span> max<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</pre><p>Part of the reason I didn&apos;t try this sooner was because I wasn&apos;t sure if the <code>for</code> loops would go fast enough to be unnoticeable. This is why I use setTimeout to give 300ms of space to process audio before it can be used. It may not need this much time but 0.3 seconds is not a long time for the user to wait after recording to play back and is not generally perceptible.</p>
+<p>The only instance of recording user input and playing it back without the above listed method is in <em>Tour: Audio Slicing</em>. In that case, through lots of trial and error, chanced on a solution. I suspect that the fact this method repeatedly calls a <code>Tone.Loop</code> is why I was not able to turn this into a class and instantiate two versions of this on the same script while still having a functional web audio experience. To be clear, I do not understand why this works. I tested <code>Tone.Player.fadeOut</code> and know it only is triggered when called by <code>player.stop()</code>, but this method does not do that. Without the code set up like this, the &apos;Audio Slicer&apos; would create audible clicks at the end of every loop, which is hard to listen to when the loop is only 100 ms long. Take a look at &apos;TourAudioSlicer.js&apos; line 289 to see how this is implemented.</p>
+<h3 class="mume-header" id="2-amplitude-modulation">2: Amplitude Modulation</h3>
+
+<p>One of the major benefits of using Tone.js instead of p5.sound is the <code>Tone.LFO</code> object. Where p5.sound does not have a dedicated LFO object and is very inflexible when it comes to scaling audio output into a usable range, Tone.js provides a ready-made LFO that has easily adjustable max/min attributes to set the output range. This was one of the main reasons I switched over to Tone.js from p5.sound in the first place, but that was before I tried to implement amplitude modulation with Tone.js.</p>
+<p>I also want to remind the reader here that Tone.js volume objects deal in decibels instead of normal range: 0.0 - 1.0. Tone.js documentation claims there is a constant called <code>-Infinity</code> that functionally works as zero volume when passed into a volume node. I have not been able to get it to work, so i just use 0 as full volume, and -100 as no volume.</p>
+<h4 class="mume-header" id="lfo-constant-output-even-before-start">LFO Constant Output - Even Before .start()</h4>
+
+<p>All objects in Tone.js that return an audio signal must be given the <code>.start()</code> command before they actually generate that audio signal. The exception to this rule seems to be if a <code>Tone.LFO</code> is connected to a <code>Tone.Volume</code>. <code>Volume</code> is just a useful, but not necessary volume node that I use to plug all my objects into in order to keep my amplitude processes separate from any other processes.</p>
+<p>The output from a <code>Volume</code> node that has an inactive <code>LFO</code> connected to it sounds modulated, as though it is receiving an audio signal from an oscillator. Even before the <code>LFO.start()</code> function has fired. This must be some kind of bug in the Tone.js code, but there is a way around it. In <code>setup()</code>, set the phase of the LFO to 90. I am not sure why this works, but I think it&apos;s because 90 degrees of a sine wave is the top of the wave, which is 1. So the LFO is just multiplying it&apos;s connected target by 1.</p>
+<p>In <code>setup()</code> of <em>Tour: Amp Mod</em>:</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript">ampModLFO<span class="token punctuation">.</span><span class="token property-access">phase</span> <span class="token operator">=</span> <span class="token number">90</span><span class="token punctuation">;</span>
+</pre><h4 class="mume-header" id="manage-target-volume-before-applying-lfo">Manage Target Volume BEFORE Applying LFO</h4>
+
+<p>When applying an LFO to a <code>Tone.Volume</code> or a <code>Player.volume</code>, there seems to be an issue if the target (carrier) volume node is not already at -100 or some other functionally silent decibel amount. I set up my amplitude modulating LFOs to have a <code>.min</code> of -100 and a <code>.max</code> of 0, so before I apply the LFO signal, I turn the target volume node down to -100. This is must have something to do with multiplying the signals together and not getting a result that sounds like amplitude modulation. Whatever the reason is, I suggest turning the target volume node down to whatever the LFO&apos;s <code>.min</code> value is just beforehand.</p>
+<h5 class="mume-header" id="inside-triggerampmod-from-playgroundcontrols">Inside <code>triggerAmpMod()</code> from <code>PlaygroundControls</code></h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token keyword control-flow">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">ampModActive</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token property-access">volume</span><span class="token punctuation">.</span><span class="token method function property-access">rampTo</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">ampModLFO</span><span class="token punctuation">.</span><span class="token property-access">amplitude</span><span class="token punctuation">.</span><span class="token method function property-access">rampTo</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">ampModLFO</span><span class="token punctuation">.</span><span class="token method function property-access">start</span><span class="token punctuation">(</span><span class="token string">&quot;+0.1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</pre><p>As the above example shows, I hedge my bets by keeping the LFO&apos;s amplitude at 0 before I need it. The <code>.phase = 90</code> is the most important part, but other safeguards to keep the LFO silent until you need it can&apos;t hurt.</p>
+<h3 class="mume-header" id="3-rampto-whenever-possible">3: rampTo Whenever Possible</h3>
+
+<p>Speaking of the above example, a quick tip I wanted to leave here is to make use of <code>rampTo()</code> whenever possible. It provides a sample rate speed way of smoothly modulating any signal value. The first argument is the target value, and the second argument is the ramp time. The Tone.js documentation says which object attributes are numbers or signals. Anything that is a signal should be changed with <code>rampTo()</code>. The <code>rampTo()</code> function is actually present on the <a href="https://tonejs.github.io/examples/rampTo">Tone.js &apos;Examples&apos; page</a>, linked below, but is <em>not</em> present on the API documentation page.</p>
+<h3 class="mume-header" id="4-animating-lfo-output-in-p5sound-and-tonejs">4: Animating LFO Output in p5.sound and Tone.js</h3>
+
+<p>My library of custom p5.js/Tone.js classes are relatively narrowly suited to the designs of the programs in <em>Playing In The Waves</em>, but there are three that I think have the most reusability for other developers: <code>SamplerButton</code>, <code>OscScope</code>, and <code>LFOVisualizer</code>.</p>
+<p><code>SamplerButton</code> and <code>OscScope</code> are largely derived from other tutorials, all linked in the code comments in the <em>PITW_Classes.js</em> file. The <code>LFOVisualizer</code> class is the only reusable class that was an original trick that might not be obvious on first glance.</p>
+<p>Even though Tone.js does allow direct access to the audio buffer, I have not been able to find a way to get the real-time phase value of an LFO. As shown above, you can set it easily enough, but getting the phase as a return value to scale and track with an animation is not straight forward. In <code>LFOVisualizer</code>, a <code>Tone.Waveform</code> returns an array of amplitude values, of which the very first is scaled from normal range (0.0 - 1.0) to the dimensions of the vertical track and those values are passed to the p5.js <code>circle</code> object&apos;s y-axis position.</p>
+<p>It&apos;s important to note that this process is <em>not</em> happening at sample rate. This is being called from inside the <code>draw()</code> loop, as <code>Tone.Waveform</code> and <code>p5.FFT</code> both only return a snapshot in time. I have not tried to instantiate more than one of these objects at a time in a script, but as far as I can tell, it does not cause any slowdown despite taking detailed snapshots of the audio signal at 60 frames per second.</p>
+<h3 class="mume-header undefined" id="es6-tutorial">5: Classes</h3>
+
+<p>As mentioned in the &apos;Web Audio&apos; chapter, JavaScripts major update, ES6, allowed for the creation of classes in JavaScript. Being able to make several instances of a class was critical to getting the <em>Playground</em> to work, but getting Tone.js to work inside a class took some trial and error. Here&apos;s a few tips I picked up from that process that I wish I had a few months ago.</p>
+<h4 class="mume-header" id="this">this.</h4>
+
+<p>Scope in JavaScript gets a little weird inside class declarations. One of the major things to deal with in the regard is the <code>this.</code> prefix. Any variable that is scoped to more than just a single function, must have the <code>this.</code> prefix. I went to test some newly-written code and had to go back to add a <code>this.</code> to a variable being compared inside an <code>if</code> statement more times than I can count. If any new JavaScript user is running into bugs while using classes, always check this FIRST.</p>
+<h5 class="mume-header" id="this-example"><code>this.</code> Example:</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token keyword control-flow">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">reverbActive</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token method function property-access">connect</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">verb</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token keyword control-flow">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">player</span><span class="token punctuation">.</span><span class="token method function property-access">disconnect</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">verb</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre><h5 class="mume-header" id="potential-error-message-example">Potential Error Message Example:</h5>
+
+<pre class="language-text">Uncaught (in promise) ReferenceError: [object] is not defined
+</pre>
+<h4 class="mume-header" id="the-arrow-function">The <code>=&gt;</code> Arrow Function</h4>
+
+<p>I don&apos;t fully understand why, but using callback functions inside JavaScript classes require the use of the <code>=&gt;</code> arrow function. JavaScript already allows for &apos;anonymous functions&apos; which are unnamed functions stored inside variables or callback functions. These are functions which are generally defined then immediately used. An anonymous function is traditionally declared with the <code>function</code> keyword. ES6 introduced the <code>=&gt;</code> symbol to as a syntactic shortcut to having write out the word &apos;function&apos; for an anonymous function.</p>
+<p>Arrow functions also seem to facilitate using callback functions inside a JavaScript class. I mentioned eariler that scope can get a little weird in a JavaScript class, so I think this is a way to deal with this issue. The <code>=&gt;</code> symbol is used to create an anonymous function that can be definted then and there, or reference another function in the same class.</p>
+<h5 class="mume-header" id="anonymous-function-example-line-90-tourampmodjs"><code>=&gt;</code> Anonymous Function Example (line 90: <em>TourAmpMod.js</em>):</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript">fftButton<span class="token punctuation">.</span><span class="token method function property-access">mousePressed</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span>
+    scope<span class="token punctuation">.</span><span class="token property-access">fftActive</span> <span class="token operator">=</span> scope<span class="token punctuation">.</span><span class="token property-access">fftActive</span> <span class="token operator">?</span> scope<span class="token punctuation">.</span><span class="token property-access">fftActive</span> <span class="token operator">=</span> <span class="token boolean">false</span> <span class="token operator">:</span> scope<span class="token punctuation">.</span><span class="token property-access">fftActive</span> <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</pre><h5 class="mume-header" id="callback-function-example-line-593-pitw_classesjs"><code>=&gt;</code> Callback Function Example (line 593: <em>PITW_Classes.js</em>):</h5>
+
+<pre data-role="codeBlock" data-info="js" class="language-javascript"><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">delayButton</span><span class="token punctuation">.</span><span class="token method function property-access">mousePressed</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token method function property-access">triggerDelay</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</pre><h5 class="mume-header" id="potential-error-message-example-1">Potential Error Message Example:</h5>
+
+<pre class="language-text">Uncaught (in promise) TypeError: Cannot read property &apos;html&apos; of undefined
+</pre>
+<h3 class="mume-header undefined" id="scale">6: p5.sound&apos;s scale()</h3>
+
+<p>My last tip is a warning about the <code>scale()</code> function in p5.sound. <code>scale()</code> is a function that &apos;scales&apos; the audio signal coming from an oscillator into a useful range. It basically fulfills the same role <code>map()</code> is used for, but to work on audio signals instead of numbers. <code>scale()</code> seems to be the only way to have a functioning LFO in a p5.sound script.</p>
+<p>The issue is <code>scale()</code> does something to the audio signal that can not be undone, and attempting to call <code>scale()</code> on an oscillator more than once will result totally stop the program, forcing a restart. This is not obvious because <code>scale()</code> is not a function that is applied <em>to</em> the oscillator, it is a function that seems to act as a filter between the oscillator and target. <code>scale()</code> works fine and does its job, but be aware if you want to change the range a <code>p5.Oscillator</code> is outputting, it is best to just create a new instance of <code>p5.Oscillator</code> and apply the new <code>scale()</code> to it. JavaScript is a &apos;garbage-collected&apos; language, and will free up memory allocated to objects that are no longer referenced.</p>
+<h5 class="mume-header" id="potential-error-message-example-2">Potential Error Message Example:</h5>
+
+<pre class="language-text">Uncaught TypeError: Cannot read property &apos;length&apos; of undefined 
+</pre>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
