@@ -75,7 +75,7 @@ function setup() {
     stockSample2Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample2Button.mousePressed(() => {
         sampler1.clearSampleActivity(1);
-        sampler1.player.load("./sounds/slinky_lazer.wav");
+        sampler1.player.load("./sounds/slinky_lazer_edit.wav");
         sampler1.button.html('PLAY SAMPLE 2');
         sampler1.sampleLoaded = true;
         sampler1.showControls();
@@ -89,7 +89,7 @@ function setup() {
     stockSample3Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample3Button.mousePressed(() => {
         sampler1.clearSampleActivity(2);
-        sampler1.player.load("./sounds/CD_h_gibberish_edit_4.wav");
+        sampler1.player.load("./sounds/rulerSlaps.wav");
         sampler1.button.html('PLAY SAMPLE 3');
         sampler1.sampleLoaded = true;
         sampler1.showControls();
@@ -103,7 +103,7 @@ function setup() {
     stockSample4Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample4Button.mousePressed(() => {
         sampler1.clearSampleActivity(3);
-        sampler1.player.load("./sounds/lazer_chargeUp.wav");
+        sampler1.player.load("./sounds/metal_water_bottle.wav");
         sampler1.button.html('PLAY SAMPLE 4');
         sampler1.sampleLoaded = true;
         sampler1.showControls();
@@ -117,7 +117,7 @@ function setup() {
     stockSample5Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample5Button.mousePressed(() => {
         sampler2.clearSampleActivity(0);
-        sampler2.player.load("./sounds/slinky_lazer_edit.wav");
+        sampler2.player.load("./sounds/waves.wav");
         sampler2.button.html('PLAY SAMPLE 1');
         sampler2.sampleLoaded = true;
         sampler2.showControls();
@@ -145,7 +145,7 @@ function setup() {
     stockSample7Button.size(recButWd * 0.2, recButHt * 0.45);
     stockSample7Button.mousePressed(() => {
         sampler2.clearSampleActivity(2);
-        sampler2.player.load("./sounds/rulerSlaps.wav");
+        sampler2.player.load("./sounds/slap2.wav");
         sampler2.button.html('PLAY SAMPLE 3');
         sampler2.sampleLoaded = true;
         sampler2.showControls();
