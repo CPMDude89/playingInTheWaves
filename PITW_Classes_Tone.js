@@ -1703,7 +1703,7 @@ class PlaygroundControls {
     }
 
     drawActiveCircle() {    //  if the effect is active
-        fill(0, 0, 255);    //  green
+        fill(0, 0, 255);    //  blue
 
         circle(this.x_coordinate, this.y_coordinate, this.diameter);  //  draw circle
     }
