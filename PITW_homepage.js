@@ -5,7 +5,7 @@
  */
 
 let w=window.innerWidth, h=window.innerHeight;
-let tour, playground, phone, youtube, github, blog;
+let tour, playground, phone, youtube, github, blog, dissertation;
 
 function setup() {
     createCanvas(w, h);
@@ -23,15 +23,19 @@ function setup() {
     phone.style('font-size', '4vw');
 
     youtube = createA("https://www.youtube.com/channel/UClRR2mCXVIIttDq9P1NE7iA", 'YouTube');
-    youtube.position(w * 0.1, h * 0.85);
+    youtube.position(w * 0.08, h * 0.85);
     youtube.style('font-size', '3vw');
 
+    dissertation = createA("https://cpmdude89.github.io/playingInTheWaves/dissertation.html", 'Dissertation');
+    dissertation.position(w * 0.32, h * 0.85);
+    dissertation.style('font-size', '3vw');
+
     github = createA("https://github.com/CPMDude89/playingInTheWaves", 'GitHub');
-    github.position(w * 0.45, h * 0.85);
+    github.position(w * 0.6, h * 0.85);
     github.style('font-size', '3vw');
 
     blog = createA("https://chrisduvallmusic.com/2021/05/20/beginning/", 'Blog');
-    blog.position(w * 0.8, h * 0.85);
+    blog.position(w * 0.83, h * 0.85);
     blog.style('font-size', '3vw');
 
     //  set up title link -> explainer
